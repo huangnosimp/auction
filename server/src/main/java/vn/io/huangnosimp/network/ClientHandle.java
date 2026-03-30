@@ -1,14 +1,17 @@
 package vn.io.huangnosimp.network;
 
+import vn.io.huangnosimp.controller.MessageRouter;
 import vn.io.huangnosimp.model.Message;
 import java.io.*;
 import java.net.Socket;
 
 public class ClientHandle implements Runnable {
     private  Socket clientSocket;
+    private MessageRouter router;
 
     public ClientHandle(Socket clientSocket) {
         this.clientSocket = clientSocket;
+        this.router = new MessageRouter();
     }
 
     @Override
@@ -19,12 +22,7 @@ public class ClientHandle implements Runnable {
             while ((inputLine = in.readLine()) != null) {
                 System.out.println("[ClientHandle] Received: " + inputLine);
                 Message request = Message.fromJson(inputLine);
-                Message response;
-                if ("PING".equals(request.getAction())) {
-                    response = new Message("PONG", "Server OK!");
-                } else {
-                    response = new Message("ERROR", "Không hiểu lệnh này");
-                }
+                Message response = router.route(request);
                 out.println(response.toJson());
             }
             } catch (IOException e) {
