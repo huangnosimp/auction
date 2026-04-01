@@ -1,6 +1,5 @@
 package vn.io.huangnosimp.model;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -8,20 +7,16 @@ public abstract class Entity {
 
     private String id;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
+    private long createdAt;
 
     protected Entity() {
         this.id = UUID.randomUUID().toString();
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = System.currentTimeMillis();
     }
 
     protected Entity(String id) {
         this.id = id;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = System.currentTimeMillis();
     }
 
 
@@ -33,20 +28,12 @@ public abstract class Entity {
         this.id = id;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     @Override

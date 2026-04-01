@@ -1,48 +1,49 @@
 package vn.io.huangnosimp.model;
 
-import java.time.LocalDateTime;
-
 public class BidTransaction extends Entity {
 
-    private Auction auction;
+    private String auctionId;
 
-    private Bidder bidder;
+    private String bidderId;
 
     private double amount;
 
-    private LocalDateTime timestamp;
-
     private boolean isAutoBid;
 
-    public BidTransaction() {
+    public BidTransaction(String auctionId, String bidderId, double amount, boolean isAutoBid) {
         super();
+        super.setCreatedAt(System.currentTimeMillis());
+        this.auctionId = auctionId;
+        this.bidderId = bidderId;
+        this.amount = amount;
+        this.isAutoBid = isAutoBid;
     }
 
-    public BidTransaction(Auction auction, Bidder bidder, double amount,
-                          LocalDateTime timestamp, boolean isAutoBid) {
-        super();
-        this.auction = auction;
-        this.bidder = bidder;
+    //constructor cho DAO
+    public BidTransaction(String Id, String auctionId, String bidderId, double amount, long createdAt, boolean isAutoBid) {
+        super(Id);
+        super.setCreatedAt(createdAt);
+        this.auctionId = auctionId;
+        this.bidderId = bidderId;
         this.amount = amount;
-        this.timestamp = timestamp;
         this.isAutoBid = isAutoBid;
     }
 
 
-    public Auction getAuction() {
-        return auction;
+    public String getAuctionId() {
+        return auctionId;
     }
 
-    public void setAuction(Auction auction) {
-        this.auction = auction;
+    public void setAuctionId(String auctionId) {
+        this.auctionId = auctionId;
     }
 
-    public Bidder getBidder() {
-        return bidder;
+    public String getBidderId() {
+        return bidderId;
     }
 
-    public void setBidder(Bidder bidder) {
-        this.bidder = bidder;
+    public void setBidderId(String bidderId) {
+        this.bidderId = bidderId;
     }
 
     public double getAmount() {
@@ -51,14 +52,6 @@ public class BidTransaction extends Entity {
 
     public void setAmount(double amount) {
         this.amount = amount;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
     }
 
     public boolean isAutoBid() {
@@ -71,8 +64,6 @@ public class BidTransaction extends Entity {
 
     @Override
     public String toString() {
-        return "BidTransaction{bidder=" + (bidder != null ? bidder.getUsername() : "null") +
-                ", amount=" + amount +
-                ", autoBid=" + isAutoBid + "}";
+        return "Auction{" + "id='" + getId() + '\'' + ", auctionId='" + auctionId + '\'' + ", bidderId=" + bidderId + '\'' + ", amount=" + amount + '\'' + ", createdAt=" + super.getCreatedAt() + '}';
     }
 }

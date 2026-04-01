@@ -1,10 +1,18 @@
 package vn.io.huangnosimp.service;
+
+import vn.io.huangnosimp.model.Auction;
+
+import java.util.ArrayList;
 //Dùng Singleton pattern
+//Đổi chức năng thành:
+//- cập nhật trạng thái cho Auction
+//- 
 public class AuctionManager {
     private static AuctionManager instance;
+    private ArrayList<Auction> auctions;
 
     private AuctionManager() {
-        // Khởi tạo tài nguyên nếu cần
+        ArrayList<Auction> auctions = new ArrayList<>();
     }
 
     public static synchronized AuctionManager getInstance() {
@@ -14,6 +22,15 @@ public class AuctionManager {
         return instance;
     }
 
-    // Các phương thức xử lý logic liên quan đến đấu giá
-    public void createAuction(String auctionData) {}
+
+    public void addAuction(Auction auction) {
+        if (auction != null) {
+            auctions.add(auction);
+        }
+    }
+    public void removeAuction(Auction auction) {
+        if (auction != null) {
+            auctions.remove(auction);
+        }
+    }
 }

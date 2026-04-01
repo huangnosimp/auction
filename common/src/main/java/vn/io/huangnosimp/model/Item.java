@@ -6,8 +6,6 @@ public abstract class Item extends Entity {
 
     private String description;
 
-    private double startingPrice;
-
     protected Item() {
         super();
     }
@@ -16,7 +14,6 @@ public abstract class Item extends Entity {
         super();
         this.name = name;
         this.description = description;
-        this.startingPrice = startingPrice;
     }
 
     public abstract void printInfo();
@@ -38,16 +35,8 @@ public abstract class Item extends Entity {
         this.description = description;
     }
 
-    public double getStartingPrice() {
-        return startingPrice;
-    }
-
-    public void setStartingPrice(double startingPrice) {
-        this.startingPrice = startingPrice;
-    }
-
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{name='" + name + "', startingPrice=" + startingPrice + "}";
+        return getClass().getSimpleName() + "{name='" + name + "', description" + description + "}";
     }
 }
