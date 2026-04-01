@@ -34,7 +34,6 @@ public class GenericItem extends Item {
         System.out.println("=== Generic Item ===");
         System.out.println("Name           : " + getName());
         System.out.println("Description    : " + getDescription());
-        System.out.println("Starting Price : $" + getStartingPrice());
         System.out.println("Custom Category: " + customCategory);
         if (dynamicAttributes != null && !dynamicAttributes.isEmpty()) {
             System.out.println("Dynamic Attributes:");

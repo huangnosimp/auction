@@ -1,20 +1,20 @@
 package vn.io.huangnosimp.model;
 
-import java.time.LocalDateTime;
-
 public class Auction extends Entity {
 
-    private Item item;
+    private String itemId;
 
-    private Seller seller;
+    private String sellerId;
 
-    private Bidder currentWinner;
+    private String currentWinnerId;
 
     private double currentPrice;
 
-    private LocalDateTime startTime;
+    private double startPrice;
 
-    private LocalDateTime endTime;
+    private long startTime;
+
+    private long endTime;
 
     private AuctionStatus status;
 
@@ -23,40 +23,50 @@ public class Auction extends Entity {
         this.status = AuctionStatus.OPEN;
     }
 
-    public Auction(Item item, Seller seller, double currentPrice,
-                   LocalDateTime startTime, LocalDateTime endTime) {
+    public Auction(String itemId, String sellerId, double startPrice,
+                   long startTime, long endTime) {
         super();
-        this.item = item;
-        this.seller = seller;
-        this.currentPrice = currentPrice;
+        this.itemId = itemId;
+        this.sellerId = sellerId;
+        this.startPrice = startPrice;
+        currentPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
         this.status = AuctionStatus.OPEN;
     }
-
-
-    public Item getItem() {
-        return item;
+    public Auction(String itemId, String sellerId, double startPrice, int durationInMinutes) {
+        super();
+        this.itemId = itemId;
+        this.sellerId = sellerId;
+        this.startPrice = startPrice;
+        currentPrice = startPrice;
+        this.startTime = System.currentTimeMillis();
+        this.endTime = this.startTime + ((long) durationInMinutes * 60 *1000);
+        this.status = AuctionStatus.OPEN;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
+    public String getItemId() {
+        return itemId;
     }
 
-    public Seller getSeller() {
-        return seller;
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
     }
 
-    public void setSeller(Seller seller) {
-        this.seller = seller;
+    public String getSellerId() {
+        return sellerId;
     }
 
-    public Bidder getCurrentWinner() {
-        return currentWinner;
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
     }
 
-    public void setCurrentWinner(Bidder currentWinner) {
-        this.currentWinner = currentWinner;
+    public String getCurrentWinnerId() {
+        return currentWinnerId;
+    }
+
+    public void setCurrentWinnerId(String currentWinnerId) {
+        this.currentWinnerId = currentWinnerId;
     }
 
     public double getCurrentPrice() {
@@ -67,19 +77,27 @@ public class Auction extends Entity {
         this.currentPrice = currentPrice;
     }
 
-    public LocalDateTime getStartTime() {
+    public double getStartPrice() {
+        return startPrice;
+    }
+
+    public void setStartPrice(double startPrice) {
+        this.startPrice = startPrice;
+    }
+
+    public long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public long getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    public void setEndTime(long endTime) {
         this.endTime = endTime;
     }
 
@@ -93,8 +111,6 @@ public class Auction extends Entity {
 
     @Override
     public String toString() {
-        return "Auction{item=" + (item != null ? item.getName() : "null") +
-                ", status=" + status +
-                ", currentPrice=" + currentPrice + "}";
+        return "Auction{" + "id='" + getId() + '\'' + ", itemId='" + itemId + '\'' + ", status=" + status + '\'' +", currentPrice=" + currentPrice + '}';
     }
 }
