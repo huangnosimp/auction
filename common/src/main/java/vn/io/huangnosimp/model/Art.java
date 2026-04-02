@@ -23,7 +23,6 @@ public class Art extends Item {
         System.out.println("=== Art Item ===");
         System.out.println("Name          : " + getName());
         System.out.println("Description   : " + getDescription());
-        System.out.println("Starting Price: $" + getStartingPrice());
         System.out.println("Artist        : " + artist);
         System.out.println("Creation Year : " + creationYear);
     }

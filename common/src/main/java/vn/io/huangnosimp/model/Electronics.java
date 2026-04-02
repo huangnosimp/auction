@@ -23,7 +23,6 @@ public class Electronics extends Item {
         System.out.println("=== Electronics Item ===");
         System.out.println("Name          : " + getName());
         System.out.println("Description   : " + getDescription());
-        System.out.println("Starting Price: $" + getStartingPrice());
         System.out.println("Brand         : " + brand);
         System.out.println("Warranty      : " + warrantyMonths + " months");
     }

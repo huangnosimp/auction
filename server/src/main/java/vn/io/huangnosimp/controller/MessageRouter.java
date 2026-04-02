@@ -6,6 +6,10 @@ public class MessageRouter {
     private UserController userController;
     private AuctionController auctionController;
 
+    public MessageRouter() {
+        this.userController = new UserController();
+        this.auctionController = new AuctionController();
+    }
 
     public Message route(Message request) {
         String action = request.getAction();

@@ -42,7 +42,7 @@ public class Auction extends Entity {
         currentPrice = startPrice;
         this.startTime = System.currentTimeMillis();
         this.endTime = this.startTime + ((long) durationInMinutes * 60 *1000);
-        this.status = AuctionStatus.OPEN;
+        this.status = AuctionStatus.RUNNING;
     }
 
     public String getItemId() {
