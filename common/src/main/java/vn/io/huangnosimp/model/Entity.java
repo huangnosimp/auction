@@ -4,11 +4,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 public abstract class Entity {
-
     private String id;
-
     private long createdAt;
-
+    private long updatedAt;
     protected Entity() {
         this.id = UUID.randomUUID().toString();
         this.createdAt = System.currentTimeMillis();
@@ -34,6 +32,14 @@ public abstract class Entity {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override

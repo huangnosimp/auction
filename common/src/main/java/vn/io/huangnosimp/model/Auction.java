@@ -1,7 +1,9 @@
 package vn.io.huangnosimp.model;
 
-public class Auction extends Entity {
+import java.util.concurrent.ConcurrentHashMap;
 
+public class Auction extends Entity {
+    private ConcurrentHashMap<String, Bidder> bidders;
     private String itemId;
 
     private String sellerId;
@@ -16,12 +18,8 @@ public class Auction extends Entity {
 
     private long endTime;
 
-    private AuctionStatus status;
+    private volatile AuctionStatus status;
 
-    public Auction() {
-        super();
-        this.status = AuctionStatus.OPEN;
-    }
 
     public Auction(String itemId, String sellerId, double startPrice,
                    long startTime, long endTime) {
@@ -32,7 +30,7 @@ public class Auction extends Entity {
         currentPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.status = AuctionStatus.OPEN;
+        bidders = new ConcurrentHashMap<>();
     }
     public Auction(String itemId, String sellerId, double startPrice, int durationInMinutes) {
         super();
@@ -42,7 +40,7 @@ public class Auction extends Entity {
         currentPrice = startPrice;
         this.startTime = System.currentTimeMillis();
         this.endTime = this.startTime + ((long) durationInMinutes * 60 *1000);
-        this.status = AuctionStatus.RUNNING;
+        bidders = new ConcurrentHashMap<>();
     }
 
     public String getItemId() {
@@ -107,6 +105,10 @@ public class Auction extends Entity {
 
     public void setStatus(AuctionStatus status) {
         this.status = status;
+    }
+
+    public ConcurrentHashMap<String, Bidder> getBidders() {
+        return bidders;
     }
 
     @Override
