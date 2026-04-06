@@ -1,41 +1,33 @@
 package vn.io.huangnosimp.model;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Seller extends User {
 
-    private List<Item> postedItems;
+    private Set<String> postedAuctions;
 
-    public Seller() {
-        super();
-        this.postedItems = new ArrayList<>();
-    }
+    private double accountBalance;
 
     public Seller(String username, String password, String email) {
         super(username, password, email);
-        this.postedItems = new ArrayList<>();
+        this.postedAuctions = ConcurrentHashMap.newKeySet();
     }
 
-
-    public List<Item> getPostedItems() {
-        return postedItems;
+    public void addAuction(String auctionId) {
+        this.postedAuctions.add(auctionId);
     }
 
-    public void setPostedItems(List<Item> postedItems) {
-        this.postedItems = postedItems;
+    public void removeAuction(String auctionId) {
+        this.postedAuctions.remove(auctionId);
     }
 
-    public void addItem(Item item) {
-        this.postedItems.add(item);
+    public Set<String> getPostedAuctions() {
+        return postedAuctions;
     }
 
-    public void removeItem(Item item) {
-        this.postedItems.remove(item);
-    }
-
-    @Override
-    public String toString() {
-        return "Seller{username='" + getUsername() + "', postedItems=" + postedItems.size() + "}";
+    public double getAccountBalance() {
+        return accountBalance;
     }
 }

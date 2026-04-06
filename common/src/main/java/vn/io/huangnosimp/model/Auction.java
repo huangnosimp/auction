@@ -3,39 +3,39 @@ package vn.io.huangnosimp.model;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Auction extends Entity {
-    private ConcurrentHashMap<String, Bidder> bidders;
-    private String itemId;
+    private final ConcurrentHashMap<String, Bidder> bidders;
+    private final Item item;
 
-    private String sellerId;
+    private final Seller seller;
 
     private String currentWinnerId;
 
     private double currentPrice;
 
-    private double startPrice;
+    private final double startPrice;
 
-    private long startTime;
+    private final long startTime;
 
     private long endTime;
 
     private volatile AuctionStatus status;
 
 
-    public Auction(String itemId, String sellerId, double startPrice,
+    public Auction(Item item, Seller seller, double startPrice,
                    long startTime, long endTime) {
         super();
-        this.itemId = itemId;
-        this.sellerId = sellerId;
+        this.item = item;
+        this.seller = seller;
         this.startPrice = startPrice;
         currentPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
         bidders = new ConcurrentHashMap<>();
     }
-    public Auction(String itemId, String sellerId, double startPrice, int durationInMinutes) {
+    public Auction(Item item, Seller seller, double startPrice, int durationInMinutes) {
         super();
-        this.itemId = itemId;
-        this.sellerId = sellerId;
+        this.item = item;
+        this.seller = seller;
         this.startPrice = startPrice;
         currentPrice = startPrice;
         this.startTime = System.currentTimeMillis();
@@ -43,76 +43,136 @@ public class Auction extends Entity {
         bidders = new ConcurrentHashMap<>();
     }
 
-    public String getItemId() {
-        return itemId;
+    public Item getItem() {
+        return item;
     }
 
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
-    }
-
-    public String getSellerId() {
-        return sellerId;
-    }
-
-    public void setSellerId(String sellerId) {
-        this.sellerId = sellerId;
+    public Seller getSeller() {
+        return seller;
     }
 
     public String getCurrentWinnerId() {
         return currentWinnerId;
     }
 
-    public void setCurrentWinnerId(String currentWinnerId) {
-        this.currentWinnerId = currentWinnerId;
-    }
 
     public double getCurrentPrice() {
         return currentPrice;
     }
 
-    public void setCurrentPrice(double currentPrice) {
-        this.currentPrice = currentPrice;
-    }
 
     public double getStartPrice() {
         return startPrice;
     }
 
-    public void setStartPrice(double startPrice) {
-        this.startPrice = startPrice;
-    }
 
     public long getStartTime() {
         return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public long getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
-
-    public AuctionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(AuctionStatus status) {
-        this.status = status;
     }
 
     public ConcurrentHashMap<String, Bidder> getBidders() {
         return bidders;
     }
 
-    @Override
-    public String toString() {
-        return "Auction{" + "id='" + getId() + '\'' + ", itemId='" + itemId + '\'' + ", status=" + status + '\'' +", currentPrice=" + currentPrice + '}';
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public boolean extendEndTime(long newEndTime) {
+        if (newEndTime <= this.endTime) {
+            return false;
+        }
+        this.endTime = newEndTime;
+        return true;
+    }
+
+    public AuctionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatusOPEN() {
+        this.status = AuctionStatus.OPEN;
+    }
+
+    public void setStatusRunning() {
+        if (this.status == null || this.status == AuctionStatus.OPEN) {
+            this.status = AuctionStatus.RUNNING;
+        }
+    }
+
+    public void setStatusFinish() {
+        if (this.status == AuctionStatus.RUNNING) {
+            this.status = AuctionStatus.FINISHED;
+        }
+    }
+
+    public void setStatusPaid() {
+        if (this.status == AuctionStatus.FINISHED) {
+            this.status = AuctionStatus.PAID;
+        }
+    }
+
+    public void setStatusCanceled() {
+        this.status = AuctionStatus.CANCELED;
+    }
+
+    public Bidder getBidder(String bidderId) {
+        return this.bidders.get(bidderId);
+    }
+
+    public void addBidder(Bidder bidder) {
+        if (bidder == null || bidder.getId() == null) {
+            return;
+        }
+        this.bidders.put(bidder.getId(), bidder);
+    }
+
+    public void removeBidder(String bidderId) {
+        this.bidders.remove(bidderId);
+    }
+
+    public synchronized boolean placeBid(Bidder bidder, double amount) {
+        if (bidder == null || this.status != AuctionStatus.RUNNING) {
+            return false;
+        }
+        if (amount <= this.currentPrice) {
+            return false;
+        }
+
+        String previousWinnerId = this.currentWinnerId;
+        double previousPrice = this.currentPrice;
+
+        // Same winner only needs to freeze the delta between old and new bid.
+        if (previousWinnerId != null && previousWinnerId.equals(bidder.getId())) {
+            double delta = amount - previousPrice;
+            if (!bidder.freezeMoney(delta)) {
+                return false;
+            }
+            this.addBidder(bidder);
+            this.currentPrice = amount;
+            return true;
+        }
+
+        if (!bidder.freezeMoney(amount)) {
+            return false;
+        }
+
+        this.addBidder(bidder);
+        if (previousWinnerId != null) {
+            Bidder previousWinner = this.bidders.get(previousWinnerId);
+            if (previousWinner != null && !previousWinner.unfreezeMoney(previousPrice)) {
+                bidder.unfreezeMoney(amount);
+                return false;
+            }
+        }
+
+        this.currentWinnerId = bidder.getId();
+        this.currentPrice = amount;
+        return true;
+    }
+
+    public boolean needExtension() {
+        long timeLeft = this.endTime - System.currentTimeMillis();
+        return timeLeft <= 10 * 1000;
     }
 }

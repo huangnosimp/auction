@@ -1,12 +1,16 @@
 package vn.io.huangnosimp.service;
-import vn.io.huangnosimp.model.Auction;
+
+import vn.io.huangnosimp.network.AuctionDTO;
 import vn.io.huangnosimp.model.*;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
+import java.util.Collections;
+import java.util.Map;
 
 public class AuctionService {
     private static volatile AuctionService instance;
@@ -47,19 +51,41 @@ public class AuctionService {
         }
     }
 
-    public ConcurrentHashMap<String, Auction> getAuctions() {
-        return auctions;
+    public Map<String, Auction> getAuctions() {
+        return Collections.unmodifiableMap(auctions);
     }
 
     public Auction openAuction(String sellerId, String itemId, double startPrice, long startTime, long endTime) {
-        Auction auction = new Auction(itemId, sellerId, startPrice, startTime, endTime);
+        if (!isValidOpenAuctionInput(sellerId, itemId, startPrice) || endTime <= startTime) {
+            return null;
+        }
+
+        Seller seller = UserService.getInstance().getSeller(sellerId);
+        Item item = ItemService.getInstance().getItem(itemId);
+        if (seller == null || item == null) {
+            return null;
+        }
+
+        Auction auction = new Auction(item, seller, startPrice, startTime, endTime);
+        seller.addAuction(auction.getId());
         auctions.put(auction.getId(), auction);
         this.scheduleAuction(auction.getId(), startTime, endTime);
         return auction;
     }
 
     public Auction openAuction(String sellerId, String itemId, double startPrice, int durationInMinutes) {
-        Auction auction = new Auction(itemId, sellerId, startPrice, durationInMinutes);
+        if (!isValidOpenAuctionInput(sellerId, itemId, startPrice) || durationInMinutes <= 0) {
+            return null;
+        }
+
+        Seller seller = UserService.getInstance().getSeller(sellerId);
+        Item item = ItemService.getInstance().getItem(itemId);
+        if (seller == null || item == null) {
+            return null;
+        }
+
+        Auction auction = new Auction(item, seller, startPrice, durationInMinutes);
+        seller.addAuction(auction.getId());
         auctions.put(auction.getId(), auction);
         long startTime = System.currentTimeMillis();
         long endTime = startTime + ((long) durationInMinutes * 60 * 1000);
@@ -67,34 +93,30 @@ public class AuctionService {
         return auction;
     }
 
+    private boolean isValidOpenAuctionInput(String sellerId, String itemId, double startPrice) {
+        return sellerId != null && !sellerId.isBlank() && itemId != null && !itemId.isBlank() && startPrice > 0;
+    }
+
     public boolean placeBid(String bidderId, String auctionId, double amount) {
         Auction auction = auctions.get(auctionId);
         if (auction == null) {
             return false;
         }
-        
-        synchronized (auction) {
-            if (auction.getStatus() != AuctionStatus.RUNNING) {
-                return false;
-            }
-            if (amount <= auction.getCurrentPrice()) {
-                return false;
-            }
-            Bidder bidder = auction.getBidders().get(bidderId);
-            if (bidder == null || amount > bidder.getAccountBalance()) {
-                return false;
-            }
-            auction.setCurrentPrice(amount);
-            auction.setCurrentWinnerId(bidderId);
-            auction.setUpdatedAt(System.currentTimeMillis());
-            //save all auction status to database
-
-            long timeLeft = auction.getEndTime() - System.currentTimeMillis();
-            if (timeLeft <= 10 * 1000) {
-                extendAuctionTime(auctionId);
-            }
+        Bidder bidder = UserService.getInstance().getBidder(bidderId);
+        if (bidder == null) {
+            return false;
         }
-        return true;
+        synchronized (auction) {
+            boolean isSuccess = auction.placeBid(bidder, amount);
+            if (isSuccess) {
+                auction.setUpdatedAt(System.currentTimeMillis());
+                //save all status of auction to database
+                if (auction.needExtension()) {
+                    this.extendAuctionTime(auctionId);
+                }
+            }
+            return isSuccess;
+        }
     }
 
     private void scheduleAuction(String auctionId, long startTime, long endTime) {
@@ -114,7 +136,7 @@ public class AuctionService {
         Auction auction = auctions.get(auctionId);
         if (auction != null) {
             synchronized (auction) {
-                auction.setStatus(AuctionStatus.OPEN);
+                auction.setStatusOPEN();
             }
         }
         long delayToStart = startTime - System.currentTimeMillis();
@@ -139,7 +161,7 @@ public class AuctionService {
         Auction auction = auctions.get(auctionId);
         if (auction != null) {
             synchronized (auction) {
-                auction.setStatus(AuctionStatus.RUNNING);
+                auction.setStatusRunning();
             }
         }
     }
@@ -148,7 +170,7 @@ public class AuctionService {
         Auction auction = auctions.get(auctionId);
         if (auction != null) {
             synchronized (auction) {
-                auction.setStatus(AuctionStatus.FINISHED);
+                auction.setStatusFinish();
             }   
         }
     }
@@ -156,32 +178,39 @@ public class AuctionService {
     public void extendAuctionTime(String auctionId) {
         Auction auction = auctions.get(auctionId);
         if (auction != null) {
-            ScheduledFuture<?> oldTask = endTimer.remove(auctionId);
-            if (oldTask != null && !oldTask.isDone()) {
-                oldTask.cancel(false);
+            synchronized (auction) {
+                if (auction.getStatus() != AuctionStatus.RUNNING) {
+                    return;
+                }
+                ScheduledFuture<?> oldTask = endTimer.remove(auctionId);
+                if (oldTask != null && !oldTask.isDone()) {
+                    oldTask.cancel(false);
+                }
+                long newEndTime = System.currentTimeMillis() + 60 * 1000;
+                this.scheduleAuctionEnd(auctionId, newEndTime);
+                auction.extendEndTime(newEndTime);
             }
-            long newEndTime = System.currentTimeMillis() + 60 * 1000;
-            this.scheduleAuctionEnd(auctionId, newEndTime);
-            auction.setEndTime(newEndTime);
         }
     }
 
-    public boolean joinAuction(String auctionId, String bidderId, Bidder bidder) {
+    public boolean joinAuction(String auctionId, String bidderId) {
         Auction auction = auctions.get(auctionId);
-        if (auction != null) {
-            auction.getBidders().put(bidderId, bidder);
-            return true;
+        Bidder bidder = UserService.getInstance().getBidder(bidderId);
+        if (auction == null || bidder == null) {
+            return false;
         }
-        return false;
+        bidder.joinRoom(auctionId);
+        return true;
     }
 
     public boolean leaveAuction(String auctionId, String bidderId) {
         Auction auction = auctions.get(auctionId);
-        if (auction != null) {
-            auction.getBidders().remove(bidderId);
-            return true;
+        Bidder bidder = UserService.getInstance().getBidder(bidderId);
+        if (auction == null || bidder == null) {
+            return false;
         }
-        return false;
+        bidder.leaveRoom(auctionId);
+        return true;
     }
 
     public boolean cancelAuction(String auctionId) {
@@ -191,7 +220,14 @@ public class AuctionService {
         }
         synchronized (auction) {
             if (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
-                auction.setStatus(AuctionStatus.CANCELED);
+                String currentWinnerId = auction.getCurrentWinnerId();
+                if (currentWinnerId != null) {
+                    Bidder currentWinner = auction.getBidder(currentWinnerId);
+                    if (currentWinner != null) {
+                        currentWinner.unfreezeMoney(auction.getCurrentPrice());
+                    }
+                }
+                auction.setStatusCanceled();
                 ScheduledFuture<?> startTask = startTimer.remove(auctionId);
                 if (startTask != null && !startTask.isDone()) {
                     startTask.cancel(false);
@@ -201,9 +237,8 @@ public class AuctionService {
                     endTask.cancel(false);
                 }
                 return true;
-            } else {
-                return false;
             }
+            return false;
         }
     }
 
@@ -215,16 +250,50 @@ public class AuctionService {
         synchronized (auction) {
             if (auction.getStatus() == AuctionStatus.FINISHED) {
                 String bidderId = auction.getCurrentWinnerId();
-                Bidder winner = auction.getBidders().get(bidderId);
-                if (winner != null && winner.getAccountBalance() >= auction.getCurrentPrice()) {
-                    winner.setAccountBalance(winner.getAccountBalance() - auction.getCurrentPrice());
+                if (bidderId == null) {
+                    return false;
+                }
+                Bidder winner = auction.getBidder(bidderId);
+                if (winner != null) {
+                    if (!winner.deductFrozenMoney(auction.getCurrentPrice())) {
+                        return false;
+                    }
                     BidTransaction bidTransaction = new BidTransaction(auctionId, bidderId, auction.getCurrentPrice(), false);
                     //save bidTransaction to database
-                    auction.setStatus(AuctionStatus.PAID);
+                    auction.setStatusPaid();
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    public ArrayList<AuctionDTO> getAuction() {
+        ArrayList<AuctionDTO> runningAuctions = new ArrayList<>();
+        for (Auction auction : auctions.values()) {
+            if (auction.getStatus() == AuctionStatus.RUNNING || auction.getStatus() == AuctionStatus.OPEN) {
+                runningAuctions.add(new AuctionDTO(auction, UserService.getInstance().getBidderUserName(auction.getCurrentWinnerId())));
+            }
+        }
+        return runningAuctions;
+    }
+
+    public ArrayList<AuctionDTO> getAuctionBySeller(String SellerId) {
+        ArrayList<AuctionDTO> sellerAuctions = new ArrayList<>();
+        for (Auction auction : auctions.values()) {
+            if (auction.getSeller().getId().equals(SellerId)) {
+                sellerAuctions.add(new AuctionDTO(auction, UserService.getInstance().getBidderUserName(auction.getCurrentWinnerId())));
+            }
+        }
+        return sellerAuctions;
+    }
+
+    public AuctionDTO getAuctionDetail(String auctionId) {
+        for (Auction auction : auctions.values()) {
+            if (auction.getId().equals(auctionId)) {
+                return new AuctionDTO(auction, UserService.getInstance().getBidderUserName(auction.getCurrentWinnerId()));
+            }
+        }
+        return null;
     }
 }

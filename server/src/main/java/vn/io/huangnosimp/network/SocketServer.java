@@ -1,5 +1,7 @@
 package vn.io.huangnosimp.network;
 
+import vn.io.huangnosimp.controller.MessageRouter;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,16 +10,15 @@ import java.util.concurrent.Executors;
 
 public class SocketServer {
     private int port;
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(100);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(50);
     public SocketServer(int port) {
         this.port = port;
     }
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("[SocketServer] Server started on port " + port);
-            
-            // Khởi tạo router dùng chung cho tất cả các kết nối, tránh tạo hàng loạt Controller mới cho mỗi request
-            vn.io.huangnosimp.controller.MessageRouter sharedRouter = new vn.io.huangnosimp.controller.MessageRouter();
+
+            MessageRouter sharedRouter = new MessageRouter();
             
             while (true) {
                 Socket clientSocket = serverSocket.accept();

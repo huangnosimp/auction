@@ -1,4 +1,4 @@
-package vn.io.huangnosimp.model;
+package vn.io.huangnosimp.network;
 import com.google.gson.Gson;
 public class Message {
     private String action;

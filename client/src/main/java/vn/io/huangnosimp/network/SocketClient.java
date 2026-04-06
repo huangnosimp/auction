@@ -1,6 +1,5 @@
 package vn.io.huangnosimp.network;
 
-import vn.io.huangnosimp.model.Message;
 import java.io.*;
 import java.net.Socket;
 

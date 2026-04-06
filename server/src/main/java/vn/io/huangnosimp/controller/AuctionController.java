@@ -1,7 +1,6 @@
 package vn.io.huangnosimp.controller;
 
-import vn.io.huangnosimp.model.Auction;
-import vn.io.huangnosimp.model.Message;
+import vn.io.huangnosimp.network.Message;
 
 public class AuctionController {
     public Message handleGetActiveAuctions (Message request) {

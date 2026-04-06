@@ -42,13 +42,20 @@ public class AuctionServiceTest {
     public void testPlaceBid() {
         AuctionService auctionService = AuctionService.getInstance();
         Auction auction = AuctionService.getInstance().openAuction("SellerId", "ItemId", 100, 30);
-        boolean result = auctionService.placeBid("BidderId", auction.getId(), 150);
+        Bidder bidder1 = new Bidder("bidder1", "pw", "b1@mail.com", 1_000);
+        Bidder bidder2 = new Bidder("bidder2", "pw", "b2@mail.com", 1_000);
+        assertTrue(auctionService.joinAuction(auction.getId(), bidder1.getId()));
+        assertTrue(auctionService.joinAuction(auction.getId(), bidder2.getId()));
+
+        boolean result = auctionService.placeBid(bidder1.getId(), auction.getId(), 150);
         assertTrue(result);
         assertEquals(150, auction.getCurrentPrice());
-        assertEquals("BidderId", auction.getCurrentWinnerId());
-        boolean wrongResult = auctionService.placeBid("BidderId2", auction.getId(), 120);
+        String winnerAfterFirstBid = auction.getCurrentWinnerId();
+        assertNotNull(winnerAfterFirstBid);
+
+        boolean wrongResult = auctionService.placeBid(bidder2.getId(), auction.getId(), 120);
         assertFalse(wrongResult);
         assertEquals(150, auction.getCurrentPrice());
-        assertEquals("BidderId", auction.getCurrentWinnerId());
+        assertEquals(winnerAfterFirstBid, auction.getCurrentWinnerId());
     }
 }
