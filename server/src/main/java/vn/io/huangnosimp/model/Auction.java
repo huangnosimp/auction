@@ -1,6 +1,6 @@
 package vn.io.huangnosimp.model;
 
-import java.util.concurrent.ConcurrentHashMap;
+import vn.io.huangnosimp.network.AuctionDTO;import java.util.concurrent.ConcurrentHashMap;
 
 public class Auction extends Entity {
     private final ConcurrentHashMap<String, Bidder> bidders;
@@ -174,5 +174,27 @@ public class Auction extends Entity {
     public boolean needExtension() {
         long timeLeft = this.endTime - System.currentTimeMillis();
         return timeLeft <= 10 * 1000;
+    }
+
+    public AuctionDTO toDTO() {
+        String currentWinnerUserName = null;
+        if (this.currentWinnerId != null) {
+            Bidder currentWinner = this.bidders.get(this.currentWinnerId);
+            if (currentWinner != null) {
+                currentWinnerUserName = currentWinner.getUsername();
+            }
+        }
+
+        return new AuctionDTO(
+                this.getId(),
+                this.seller.getUsername(),
+                currentWinnerUserName,
+                this.bidders.size(),
+                this.currentPrice,
+                this.startPrice,
+                this.startTime,
+                this.endTime,
+                this.status
+        );
     }
 }

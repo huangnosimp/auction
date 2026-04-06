@@ -5,8 +5,8 @@ import vn.io.huangnosimp.service.AuctionService;
 
 public class Main {
     public static void main(String[] args) {
-        SocketServer server = new SocketServer(12345);
-        server.start();
         AuctionService.getInstance();
+        SocketServer server = new SocketServer(23343);
+        server.start();
     }
 }
