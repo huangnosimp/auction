@@ -1,7 +1,5 @@
 package vn.io.huangnosimp.network;
 
-import vn.io.huangnosimp.model.Message;
-
 import java.io.PrintWriter;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;

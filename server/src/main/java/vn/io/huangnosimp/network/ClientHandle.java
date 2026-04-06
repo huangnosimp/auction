@@ -1,7 +1,7 @@
 package vn.io.huangnosimp.network;
 
 import vn.io.huangnosimp.controller.MessageRouter;
-import vn.io.huangnosimp.model.Message;
+
 import java.io.*;
 import java.net.Socket;
 import com.google.gson.JsonSyntaxException;
@@ -9,6 +9,8 @@ import com.google.gson.JsonSyntaxException;
 public class ClientHandle implements Runnable {
     private  final Socket clientSocket;
     private final MessageRouter router;
+
+    private String userId;
 
     public ClientHandle(Socket clientSocket, MessageRouter router) {
         this.clientSocket = clientSocket;
@@ -19,8 +21,8 @@ public class ClientHandle implements Runnable {
     public void run() {
         PrintWriter out = null;
         try (Socket socket = this.clientSocket;
-             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-             PrintWriter tryOut = new PrintWriter(socket.getOutputStream(), true)) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            PrintWriter tryOut = new PrintWriter(socket.getOutputStream(), true)) {
              
             out = tryOut;
             ClientSessionManager.getInstance().addClient(out);
