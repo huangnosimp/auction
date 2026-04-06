@@ -1,6 +1,5 @@
 package vn.io.huangnosimp.model;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -61,6 +60,14 @@ public class Bidder extends User {
 
     public Set<String> getJoinedAuctions() {
         return this.joinedAuctions;
+    }
+
+    public boolean deposit(double amount) {
+        if (amount <= 0) {
+            return false;
+        }
+        this.accountBalance += amount;
+        return true;
     }
 
     @Override
