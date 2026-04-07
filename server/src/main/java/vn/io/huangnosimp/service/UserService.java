@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.service;
 
+import vn.io.huangnosimp.database.UserDAO;
 import vn.io.huangnosimp.model.Bidder;
 import vn.io.huangnosimp.model.Seller;
 
@@ -31,5 +32,12 @@ public class UserService {
 
     public String getBidderUserName(String bidderId) {
         return bidderId;
+    }
+
+    public boolean register(String userName, String password, String email) {
+        if (userName == null || password == null || email == null) {
+            return false;
+        }
+        return true;
     }
 }
