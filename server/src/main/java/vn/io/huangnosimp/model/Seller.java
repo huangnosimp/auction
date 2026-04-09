@@ -13,6 +13,9 @@ public class Seller extends User {
         super(username, password, email);
         this.postedAuctions = ConcurrentHashMap.newKeySet();
     }
+    public Seller(String username, String password) {
+        super(username, password, null);
+    }
 
     public void addAuction(String auctionId) {
         this.postedAuctions.add(auctionId);

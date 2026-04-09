@@ -1,0 +1,12 @@
+name: workflow.yml
+on:push:
+  branches:
+    - VDH
+    - PHH
+    - VDG
+    - NHH
+  pull_request:
+    branches: [ "masster" ]
+
+jobs:
+

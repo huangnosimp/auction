@@ -3,8 +3,9 @@ package vn.io.huangnosimp.network;
 import vn.io.huangnosimp.model.AuctionStatus;
 
 
-public class AuctionDTO {
+public class AuctionResponseDTO {
     private int totalBidder;
+    private String itemId;
     private String auctionId;
     private String currentWinnerUserName;
     private String sellerUserName;
@@ -14,7 +15,7 @@ public class AuctionDTO {
     private long endTime;
     private AuctionStatus auctionStatus;
 
-    public AuctionDTO(String auctionId, String sellerUserName, String currentWinnerUserName, int totalBidder, double currentPrice, double startPrice, long startTime, long endTime, AuctionStatus auctionStatus) {
+    public AuctionResponseDTO(String auctionId, String sellerUserName, String currentWinnerUserName, int totalBidder, double currentPrice, double startPrice, long startTime, long endTime, AuctionStatus auctionStatus) {
         this.auctionId = auctionId;
         this.sellerUserName = sellerUserName;
         this.currentWinnerUserName = currentWinnerUserName;

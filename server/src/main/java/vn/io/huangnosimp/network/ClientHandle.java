@@ -5,16 +5,34 @@ import vn.io.huangnosimp.controller.MessageRouter;
 import java.io.*;
 import java.net.Socket;
 import com.google.gson.JsonSyntaxException;
+import vn.io.huangnosimp.model.UserType;
 
 public class ClientHandle implements Runnable {
     private  final Socket clientSocket;
     private final MessageRouter router;
-
     private String userId;
+    private UserType userType;
 
     public ClientHandle(Socket clientSocket, MessageRouter router) {
         this.clientSocket = clientSocket;
         this.router = router;
+        this.userId = null;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     @Override
@@ -32,8 +50,8 @@ public class ClientHandle implements Runnable {
                 System.out.println("[ClientHandle] Received: " + inputLine);
 
                 try {
-                    Message request = Message.fromJson(inputLine);
-                    Message response = router.route(request);
+                    Request request = Request.fromJson(inputLine);
+                    Response response = router.route(request, this);
 
                     if (response != null) {
                         out.println(response.toJson());

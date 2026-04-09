@@ -14,6 +14,10 @@ public class Bidder extends User {
         this.accountBalance = accountBalance;
         this.joinedAuctions = ConcurrentHashMap.newKeySet();
     }
+    public Bidder(String username, String password) {
+        super(username, password, null);
+        this.accountBalance = 0.0;
+    }
 
 
     public double getAccountBalance() {

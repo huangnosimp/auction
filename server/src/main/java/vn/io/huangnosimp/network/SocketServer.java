@@ -19,7 +19,7 @@ public class SocketServer {
             System.out.println("[SocketServer] Server started on port " + port);
 
             MessageRouter sharedRouter = new MessageRouter();
-            
+
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("[SocketServer] Client connected: " + clientSocket.getInetAddress());

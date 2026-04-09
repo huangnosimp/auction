@@ -1,9 +1,8 @@
 package vn.io.huangnosimp.service;
 
-import vn.io.huangnosimp.network.AuctionDTO;
+import vn.io.huangnosimp.network.AuctionResponseDTO;
 import vn.io.huangnosimp.model.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,7 +55,7 @@ public class AuctionService {
         return Collections.unmodifiableMap(auctions);
     }
 
-    public AuctionDTO openAuction(String sellerId, String itemId, double startPrice, long startTime, long endTime) {
+    public AuctionResponseDTO openAuction(String sellerId, String itemId, double startPrice, long startTime, long endTime) {
         if (!isValidOpenAuctionInput(sellerId, itemId, startPrice) || endTime <= startTime) {
             return null;
         }
@@ -74,7 +73,7 @@ public class AuctionService {
         return auction.toDTO();
     }
 
-    public AuctionDTO openAuction(String sellerId, String itemId, double startPrice, int durationInMinutes) {
+    public AuctionResponseDTO openAuction(String sellerId, String itemId, double startPrice, int durationInMinutes) {
         if (!isValidOpenAuctionInput(sellerId, itemId, startPrice) || durationInMinutes <= 0) {
             return null;
         }
@@ -194,26 +193,6 @@ public class AuctionService {
         }
     }
 
-    public boolean joinAuction(String auctionId, String bidderId) {
-        Auction auction = auctions.get(auctionId);
-        Bidder bidder = UserService.getInstance().getBidder(bidderId);
-        if (auction == null || bidder == null) {
-            return false;
-        }
-        bidder.joinRoom(auctionId);
-        return true;
-    }
-
-    public boolean leaveAuction(String auctionId, String bidderId) {
-        Auction auction = auctions.get(auctionId);
-        Bidder bidder = UserService.getInstance().getBidder(bidderId);
-        if (auction == null || bidder == null) {
-            return false;
-        }
-        bidder.leaveRoom(auctionId);
-        return true;
-    }
-
     public boolean cancelAuction(String auctionId) {
         Auction auction = auctions.get(auctionId);
         if (auction == null) {
@@ -270,8 +249,8 @@ public class AuctionService {
         return false;
     }
 
-    public ArrayList<AuctionDTO> getAuction() {
-        ArrayList<AuctionDTO> runningAuctions = new ArrayList<>();
+    public ArrayList<AuctionResponseDTO> getActiveAuction() {
+        ArrayList<AuctionResponseDTO> runningAuctions = new ArrayList<>();
         for (Auction auction : auctions.values()) {
             if (auction.getStatus() == AuctionStatus.RUNNING || auction.getStatus() == AuctionStatus.OPEN) {
                 runningAuctions.add(auction.toDTO());
@@ -280,8 +259,8 @@ public class AuctionService {
         return runningAuctions;
     }
 
-    public ArrayList<AuctionDTO> getAuctionBySeller(String SellerId) {
-        ArrayList<AuctionDTO> sellerAuctions = new ArrayList<>();
+    public ArrayList<AuctionResponseDTO> getAuctionBySeller(String SellerId) {
+        ArrayList<AuctionResponseDTO> sellerAuctions = new ArrayList<>();
         for (Auction auction : auctions.values()) {
             if (auction.getSeller().getId().equals(SellerId)) {
                 sellerAuctions.add(auction.toDTO());
@@ -290,8 +269,8 @@ public class AuctionService {
         return sellerAuctions;
     }
 
-    public ArrayList<AuctionDTO> getAuctionByBidder(String bidderId) {
-        ArrayList<AuctionDTO> bidderAuctions = new ArrayList<>();
+    public ArrayList<AuctionResponseDTO> getAuctionByBidder(String bidderId) {
+        ArrayList<AuctionResponseDTO> bidderAuctions = new ArrayList<>();
         for (Auction auction : auctions.values()) {
             if (auction.getBidder(bidderId) != null) {
                 bidderAuctions.add(auction.toDTO());
@@ -300,7 +279,7 @@ public class AuctionService {
         return bidderAuctions;
     }
 
-    public AuctionDTO getAuctionDetail(String auctionId) {
+    public AuctionResponseDTO getAuctionDetail(String auctionId) {
         for (Auction auction : auctions.values()) {
             if (auction.getId().equals(auctionId)) {
                 return auction.toDTO();
