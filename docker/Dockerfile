@@ -1,6 +1,6 @@
 FROM eclipse-temurin:25-jre-alpine
 LABEL authors="vuhoa"
 WORKDIR /app
-COPY server.jar .
+COPY server.jar /app/server.jar
 
-ENTRYPOINT ["top", "-b"]
+ENTRYPOINT ["java", "-Xmx300m", "-jar", "server.jar"]

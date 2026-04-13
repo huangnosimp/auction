@@ -1,12 +1,8 @@
 name: workflow.yml
-on:push:
-  branches:
-    - VDH
-    - PHH
-    - VDG
-    - NHH
-  pull_request:
-    branches: [ "masster" ]
-
+on:
+  push:
+    branches: [master]
 jobs:
-
+  build-docker-image:
+    uses: ./.github/workflows/build-and-push.yml
+    secrets: inherit
