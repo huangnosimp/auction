@@ -1,29 +1,15 @@
 package vn.io.huangnosimp.model;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class GenericItem extends Item {
 
-    private String customCategory;
+    private final String customCategory;
 
-    private Map<String, String> dynamicAttributes;
+    private final HashMap<String, String> dynamicAttributes;
 
-    public GenericItem() {
-        super();
-        this.dynamicAttributes = new HashMap<>();
-    }
-
-    public GenericItem(String name, String description, double startingPrice,
-                       String customCategory) {
-        super(name, description, startingPrice);
-        this.customCategory = customCategory;
-        this.dynamicAttributes = new HashMap<>();
-    }
-
-    public GenericItem(String name, String description, double startingPrice,
-                       String customCategory, Map<String, String> dynamicAttributes) {
-        super(name, description, startingPrice);
+    public GenericItem(String ownerId, String name, String description, String customCategory, HashMap<String, String> dynamicAttributes) {
+        super(ownerId, name, description);
         this.customCategory = customCategory;
         this.dynamicAttributes = dynamicAttributes != null ? dynamicAttributes : new HashMap<>();
     }
@@ -42,29 +28,12 @@ public class GenericItem extends Item {
         }
     }
 
-
     public String getCustomCategory() {
         return customCategory;
     }
 
-    public void setCustomCategory(String customCategory) {
-        this.customCategory = customCategory;
-    }
-
-    public Map<String, String> getDynamicAttributes() {
+    public HashMap<String, String> getDynamicAttributes() {
         return dynamicAttributes;
-    }
-
-    public void setDynamicAttributes(Map<String, String> dynamicAttributes) {
-        this.dynamicAttributes = dynamicAttributes;
-    }
-
-    public void putAttribute(String key, String value) {
-        this.dynamicAttributes.put(key, value);
-    }
-
-    public String getAttribute(String key) {
-        return this.dynamicAttributes.get(key);
     }
 
     @Override

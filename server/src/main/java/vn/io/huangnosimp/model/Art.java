@@ -2,17 +2,12 @@ package vn.io.huangnosimp.model;
 
 public class Art extends Item {
 
-    private String artist;
+    private final String artist;
 
-    private int creationYear;
+    private final int creationYear;
 
-    public Art() {
-        super();
-    }
-
-    public Art(String name, String description, double startingPrice,
-               String artist, int creationYear) {
-        super(name, description, startingPrice);
+    public Art(String ownerId, String name, String description, String artist, int creationYear) {
+        super(ownerId, name, description);
         this.artist = artist;
         this.creationYear = creationYear;
     }
@@ -32,16 +27,8 @@ public class Art extends Item {
         return artist;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
     public int getCreationYear() {
         return creationYear;
-    }
-
-    public void setCreationYear(int creationYear) {
-        this.creationYear = creationYear;
     }
 
     @Override

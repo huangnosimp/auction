@@ -1,0 +1,8 @@
+name: workflow.yml
+on:
+  push:
+    branches: [master]
+jobs:
+  build-docker-image:
+    uses: ./.github/workflows/build-and-push.yml
+    secrets: inherit

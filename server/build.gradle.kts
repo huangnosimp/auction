@@ -16,8 +16,9 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.awaitility:awaitility:4.3.0")
     implementation("com.google.code.gson:gson:2.13.2")
-    implementation("io.lettuce:lettuce-core:7.5.1.RELEASE")
     implementation("com.mysql:mysql-connector-j:9.6.0")
+    implementation("org.mindrot:jbcrypt:0.4")
+    implementation("com.zaxxer:HikariCP:7.0.2")
     implementation(project(":common"))
 }
 
