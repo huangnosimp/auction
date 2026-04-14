@@ -18,9 +18,9 @@ public class AuctionController {
         return response;
     }
     public Response handleGetAuctionDetail(Request request) {
-        String auctionData = Request.GSON.toJson(request.getData());
-        AuctionRequestDTO auctionRequestDTO = Request.GSON.fromJson(auctionData, AuctionRequestDTO.class);
-        String auctionId = auctionRequestDTO.getAuctionId();
+        CreateAuctionWithDurationRequestDTO createAuctionWithDurationRequestDTO = Request.GSON.fromJson(
+                Request.GSON.toJsonTree(request.getData()), CreateAuctionWithDurationRequestDTO.class);
+        String auctionId = createAuctionWithDurationRequestDTO.getAuctionId();
         Response response = new Response(ResponseStatus.SUCCESS, AuctionService.getInstance().getAuctionDetail(auctionId));
         return response;
 
@@ -30,18 +30,18 @@ public class AuctionController {
         return null;
     }
     public Response handleCancelAuction(Request request) {
-        String auctionData = Request.GSON.toJson(request.getData());
-        AuctionRequestDTO auctionRequestDTO = Request.GSON.fromJson(auctionData, AuctionRequestDTO.class);
-        String auctionId = auctionRequestDTO.getAuctionId();
+        CreateAuctionWithDurationRequestDTO createAuctionWithDurationRequestDTO = Request.GSON.fromJson(
+                Request.GSON.toJsonTree(request.getData()), CreateAuctionWithDurationRequestDTO.class);
+        String auctionId = createAuctionWithDurationRequestDTO.getAuctionId();
         AuctionService.getInstance().cancelAuction(auctionId);
         Response response = new Response(ResponseStatus.SUCCESS, "huỷ thành công!");
         return response;
     }
     public Response handlePlaceBid (Request request, ClientHandle client) {
-        String auctionData = Request.GSON.toJson(request.getData());
-        AuctionRequestDTO auctionRequestDTO = Request.GSON.fromJson(auctionData, AuctionRequestDTO.class);
-        String auctionId = auctionRequestDTO.getAuctionId();
-        double bidAmount = auctionRequestDTO.getAmount();
+        CreateAuctionWithDurationRequestDTO createAuctionWithDurationRequestDTO = Request.GSON.fromJson(
+                Request.GSON.toJsonTree(request.getData()), CreateAuctionWithDurationRequestDTO.class);
+        String auctionId = createAuctionWithDurationRequestDTO.getAuctionId();
+        double bidAmount = createAuctionWithDurationRequestDTO.getAmount();
         if (AuctionService.getInstance().placeBid(auctionId, client.getUserId(), bidAmount)) {
             Response response = new Response(ResponseStatus.SUCCESS, "Đặt giá thành công!");
             return response;

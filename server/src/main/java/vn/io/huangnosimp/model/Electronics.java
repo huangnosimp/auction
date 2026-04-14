@@ -2,17 +2,12 @@ package vn.io.huangnosimp.model;
 
 public class Electronics extends Item {
 
-    private String brand;
+    private final String brand;
 
-    private int warrantyMonths;
+    private final int warrantyMonths;
 
-    public Electronics() {
-        super();
-    }
-
-    public Electronics(String name, String description, double startingPrice,
-                       String brand, int warrantyMonths) {
-        super(name, description, startingPrice);
+    public Electronics(String ownerId, String name, String description, String brand, int warrantyMonths) {
+        super(ownerId, name, description);
         this.brand = brand;
         this.warrantyMonths = warrantyMonths;
     }
@@ -32,16 +27,8 @@ public class Electronics extends Item {
         return brand;
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
     public int getWarrantyMonths() {
         return warrantyMonths;
-    }
-
-    public void setWarrantyMonths(int warrantyMonths) {
-        this.warrantyMonths = warrantyMonths;
     }
 
     @Override

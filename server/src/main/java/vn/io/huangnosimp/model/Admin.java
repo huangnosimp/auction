@@ -1,13 +1,11 @@
 package vn.io.huangnosimp.model;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class Admin extends User {
-
-    public Admin() {
-        super();
-    }
-
-    public Admin(String username, String password) {
-        super(username, password, null);
+    public Admin(String username, String password, String email) {
+        super(username, password, email);
     }
 
     @Override

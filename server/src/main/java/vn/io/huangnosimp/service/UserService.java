@@ -1,6 +1,7 @@
 package vn.io.huangnosimp.service;
 
-import vn.io.huangnosimp.database.UserDAO;
+import vn.io.huangnosimp.database.User;
+import vn.io.huangnosimp.factory.UserFactory;
 import vn.io.huangnosimp.model.*;
 import vn.io.huangnosimp.network.ClientHandle;
 
@@ -12,10 +13,12 @@ public class UserService {
     private ConcurrentHashMap<String, Bidder> onlineBidders;
     private ConcurrentHashMap<String, Seller> onlineSellers;
     private ConcurrentHashMap<String, Admin> onlineAdmin;
+    private UserFactory userFactory;
     private UserService() {
         this.onlineBidders = new ConcurrentHashMap<>();
         this.onlineSellers = new ConcurrentHashMap<>();
         this.onlineAdmin = new ConcurrentHashMap<>();
+        this.userFactory = new UserFactory();
     }
     public static UserService getInstance() {
         if (instance == null) {
@@ -40,38 +43,16 @@ public class UserService {
         return bidderId;
     }
 
-    public boolean register(String userName, String password, String email) {
-        if (userName == null || password == null || email == null) {
+    public boolean register(UserType type, String username, String password, String email) {
+        if (username == null || password == null || email == null) {
             return false;
         }
+        userFactory.createUser(username, password, email, type);
 
         return true;
     }
-    public boolean Login(UserType type, String username, String password, ClientHandle client) {
-        if (username == null || password == null) {
-            return false;
-        }
-        if (type == UserType.Bidder) {
-            Bidder bidder = new Bidder(username, password);
-            onlineBidders.put(bidder.getId(), bidder);
-            client.setUserId(bidder.getId());
-            client.setUserType(type);
-            return true;
-        } else if (type == UserType.Seller) {
-            Seller seller = new Seller(username, password);
-            onlineSellers.put(seller.getId(), seller);
-            client.setUserId(seller.getId());
-            client.setUserType(type);
-            return true;
-        } else if (type == UserType.Admin) {
-            Admin admin = new Admin(username, password);
-            onlineAdmin.put(admin.getId(), admin);
-            client.setUserId(admin.getId());
-            client.setUserType(type);
-            return true;
-        } else {
-            return false;
-        }
+    public boolean Login(UserType type, String username, String password, String email, ClientHandle client) {
+
     }
 
     public boolean joinAuction(String auctionId, String bidderId) {

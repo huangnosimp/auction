@@ -7,16 +7,12 @@ public class Bidder extends User {
 
     private double accountBalance;
     private double frozenBalance = 0.0;
-    private Set<String> joinedAuctions;
+    private final Set<String> joinedAuctions;
+    private boolean isBanned = false;
 
-    public Bidder(String username, String password, String email, double accountBalance) {
+    public Bidder(String username, String password, String email) {
         super(username, password, email);
-        this.accountBalance = accountBalance;
         this.joinedAuctions = ConcurrentHashMap.newKeySet();
-    }
-    public Bidder(String username, String password) {
-        super(username, password, null);
-        this.accountBalance = 0.0;
     }
 
 
@@ -26,6 +22,14 @@ public class Bidder extends User {
 
     public double getFrozenBalance() {
         return frozenBalance;
+    }
+
+    public boolean isBanned() {
+        return isBanned;
+    }
+
+    public void setBanned() {
+        isBanned = true;
     }
 
     public synchronized boolean freezeMoney(double amount) {

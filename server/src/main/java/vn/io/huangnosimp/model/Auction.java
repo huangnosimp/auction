@@ -141,8 +141,7 @@ public class Auction extends Entity {
 
         String previousWinnerId = this.currentWinnerId;
         double previousPrice = this.currentPrice;
-
-        // Same winner only needs to freeze the delta between old and new bid.
+        
         if (previousWinnerId != null && previousWinnerId.equals(bidder.getId())) {
             double delta = amount - previousPrice;
             if (!bidder.freezeMoney(delta)) {

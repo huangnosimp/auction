@@ -7,8 +7,8 @@ import vn.io.huangnosimp.service.UserService;
 
 public class UserController {
     public Response handleLogin(Request request, ClientHandle client) {
-        String userData = Request.GSON.toJson(request.getData());
-        LoginRequestDTO loginRequestDTO = Request.GSON.fromJson(userData, LoginRequestDTO.class);
+        LoginRequestDTO loginRequestDTO = Request.GSON.fromJson(
+                Request.GSON.toJsonTree(request.getData()), LoginRequestDTO.class);
         String username = loginRequestDTO.getUsername();
         String password = loginRequestDTO.getPassword();
         UserType userType = loginRequestDTO.getUserType();

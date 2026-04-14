@@ -2,17 +2,12 @@ package vn.io.huangnosimp.model;
 
 public class Vehicle extends Item {
 
-    private String engineType;
+    private final String engineType;
 
-    private double mileage;
+    private final int mileage;
 
-    public Vehicle() {
-        super();
-    }
-
-    public Vehicle(String name, String description, double startingPrice,
-                   String engineType, double mileage) {
-        super(name, description, startingPrice);
+    public Vehicle(String ownerId, String name, String description, String engineType, int mileage) {
+        super(ownerId, name, description);
         this.engineType = engineType;
         this.mileage = mileage;
     }
@@ -32,16 +27,8 @@ public class Vehicle extends Item {
         return engineType;
     }
 
-    public void setEngineType(String engineType) {
-        this.engineType = engineType;
-    }
-
     public double getMileage() {
         return mileage;
-    }
-
-    public void setMileage(double mileage) {
-        this.mileage = mileage;
     }
 
     @Override

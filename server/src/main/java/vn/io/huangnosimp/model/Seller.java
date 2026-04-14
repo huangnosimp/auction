@@ -6,15 +6,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Seller extends User {
 
     private Set<String> postedAuctions;
-
     private double accountBalance;
+    private boolean isBanned = false;
 
     public Seller(String username, String password, String email) {
         super(username, password, email);
         this.postedAuctions = ConcurrentHashMap.newKeySet();
-    }
-    public Seller(String username, String password) {
-        super(username, password, null);
     }
 
     public void addAuction(String auctionId) {
@@ -31,6 +28,14 @@ public class Seller extends User {
 
     public double getAccountBalance() {
         return accountBalance;
+    }
+
+    public boolean isBanned() {
+        return isBanned;
+    }
+
+    public void setBanned() {
+        isBanned = true;
     }
 
     public void receivePayment(double amount) {

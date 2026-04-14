@@ -1,11 +1,12 @@
 package vn.io.huangnosimp;
 
+import vn.io.huangnosimp.database.DatabaseConnection;
 import vn.io.huangnosimp.network.SocketServer;
-import vn.io.huangnosimp.service.AuctionService;
+//import vn.io.huangnosimp.service.AuctionService;
 
 public class Main {
     public static void main(String[] args) {
-        AuctionService.getInstance();
+        DatabaseConnection.getInstance();
         SocketServer server = new SocketServer(26676);
         server.start();
     }
