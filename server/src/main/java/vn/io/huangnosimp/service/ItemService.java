@@ -1,49 +1,44 @@
 package vn.io.huangnosimp.service;
 
+import vn.io.huangnosimp.enums.ItemType;
 import vn.io.huangnosimp.factory.ItemFactory;
 import vn.io.huangnosimp.model.*;
+import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
+import vn.io.huangnosimp.repository.IItemRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
-public class ItemService {
-    private static volatile ItemService instance;
-    private final ConcurrentHashMap<String, Item> itemStore;
+public class ItemService implements IItemService {
+    private final IItemRepository itemRepository;
 
-    private ItemService() {
-        itemStore = new ConcurrentHashMap<>();
+    public ItemService(IItemRepository iItemRepository) {
+        this.itemRepository = iItemRepository;
     }
-    public static ItemService getInstance() {
-        if (instance == null) {
-            synchronized (ItemService.class) {
-                if (instance == null) {
-                    instance = new ItemService();
-                }
-            }
-        }
-        return instance;
-    }
-    public Item getItem(String ownerId, String name, String description, ItemType type, HashMap<String, String> attributes) {
+
+    @Override
+    public Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes) {
         Item item = ItemFactory.createItem(ownerId, name, description, type, attributes);
-        itemStore.put(item.getId(), item);
+        itemRepository.save(item);
         return item;
     }
 
+    @Override
+    public Item getItemById(String id) {
+        return itemRepository.findById(id);
+    }
+
+    @Override
     public boolean transferOwnership(Item item, String newOwnerId) {
         if (item == null || newOwnerId == null) {
             return false;
         }
         item.setOwnerId(newOwnerId);
+        itemRepository.updateOwner(item.getId(), newOwnerId);
         return true;
     }
-    public ArrayList<Item> getItemsByOwner(String ownerId) {
-        ArrayList<Item> items = new ArrayList<>();
-        for (Item item : itemStore.values()) {
-            if (item.getOwnerId().equals(ownerId)) {
-                items.add(item);
-            }
-        }
-        return items;
+
+    @Override
+    public List<Item> getItemsByOwner(String ownerId) {
+        return itemRepository.findByOwnerId(ownerId);
     }
 }

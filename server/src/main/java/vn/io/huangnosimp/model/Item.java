@@ -17,9 +17,6 @@ public abstract class Item extends Entity {
         this.description = description;
     }
 
-    public abstract void printInfo();
-
-
     public String getName() {
         return name;
     }
@@ -44,8 +41,4 @@ public abstract class Item extends Entity {
         this.ownerId = ownerId;
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{name='" + name + "', description" + description + "}";
-    }
 }

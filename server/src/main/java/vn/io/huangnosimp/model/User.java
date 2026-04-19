@@ -8,13 +8,12 @@ public abstract class User extends Entity {
 
     private String email;
 
-    protected User(String username, String password, String email) {
-        super();
+    protected User(String id, String username, String password, String email) {
+        super(id);
         this.username = username;
         this.password = password;
         this.email = email;
     }
-
 
     public String getUsername() {
         return username;

@@ -1,28 +1,26 @@
 package vn.io.huangnosimp.factory;
 
+import vn.io.huangnosimp.enums.ItemType;
 import vn.io.huangnosimp.model.*;
-
-import java.util.HashMap;
+import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 
 public class ItemFactory {
-    public static Item createItem(String ownerID, String name, String description, ItemType type, HashMap<String, String> attributes) {
+    public static Item createItem(String ownerID, String name, String description, ItemType type, ItemAttributesDTO attributes) {
         switch (type) {
             case ART:
-                String artist = attributes.get("artist");
-                int creationYear = Integer.parseInt(attributes.get("creationYear"));
+                String artist = attributes.getArtist();
+                int creationYear = attributes.getCreationYear();
                 return new Art(ownerID, name, description, artist, creationYear);
             case ELECTRONICS:
-                String brand = attributes.get("brand");
-                int warrantyMonths = Integer.parseInt(attributes.get("warrantyMonths"));
+                String brand = attributes.getBrand();
+                int warrantyMonths = attributes.getWarrantyMonths();
                 return new Electronics(ownerID, name, description, brand, warrantyMonths);
             case VEHICLE:
-                String engineType = attributes.get("engineType");
-                int mileage = Integer.parseInt(attributes.get("mileage"));
+                String engineType = attributes.getEngineType();
+                int mileage = attributes.getMileage();
                 return new Vehicle(ownerID, name, description, engineType, mileage);
-            case GENERIC:
             default:
-                String customCategory = attributes.get("customCategory");
-                return new GenericItem(ownerID, name, description, customCategory, attributes);
+                throw new IllegalArgumentException("Unknown item type: " + type);
         }
     }
 }
