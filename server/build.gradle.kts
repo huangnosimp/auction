@@ -15,6 +15,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.awaitility:awaitility:4.3.0")
+    testImplementation("com.h2database:h2:2.4.240")
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("com.mysql:mysql-connector-j:9.6.0")
     implementation("org.mindrot:jbcrypt:0.4")
