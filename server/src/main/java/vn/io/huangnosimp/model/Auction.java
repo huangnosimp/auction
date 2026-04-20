@@ -105,6 +105,8 @@ public class Auction extends Entity {
         this.currentPrice = currentPrice;
     }
 
+
+
     public boolean extendEndTime(long newEndTime) {
         if (newEndTime <= this.endTime) {
             return false;
