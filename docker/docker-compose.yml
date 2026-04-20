@@ -1,0 +1,14 @@
+services:
+  auction-server:
+    image: ghcr.io/huangnosimp/auction/auction-server:latest
+    restart: unless-stopped
+    ports:
+      - "26676:26676"
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 400M
