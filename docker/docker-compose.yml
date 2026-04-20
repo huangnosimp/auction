@@ -3,7 +3,7 @@ services:
     image: ghcr.io/huangnosimp/auction-server:latest
     restart: unless-stopped
     ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+      - "26676:26676"
     environment:
       - DB_URL=${DB_URL}
       - DB_USERNAME=${DB_USERNAME}
