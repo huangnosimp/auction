@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="vbox1" prefHeight="215.0" prefWidth="161.0" spacing="6" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
+    <children>
+        <Label styleClass="ac-product" text="Name" />
+        <Label styleClass="status-badge s-outbid" text="Outbid" />
+        <HBox styleClass="ac-row">
+            <children>
+                <Label styleClass="ac-key" text="Slot: " HBox.hgrow="ALWAYS" />
+                <Label styleClass="ac-val" />
+            </children>
+        </HBox>
+        <HBox styleClass="ac-row">
+            <children>
+                <Label styleClass="ac-key" text="Remaining: " HBox.hgrow="ALWAYS" />
+                <Label styleClass="ac-val" />
+            </children>
+        </HBox>
+        <HBox styleClass="ac-row">
+            <children>
+                <Label styleClass="ac-key" text="Current bid: " HBox.hgrow="ALWAYS" />
+                <Label styleClass="ac-val" />
+            </children>
+        </HBox>
+        <HBox prefHeight="34.0" prefWidth="161.0">
+            <children>
+                <Label styleClass="ac-bid" text="Your bid: " />
+                <Label />
+            </children>
+        </HBox>
+        <Button onAction="#handleBidClick" styleClass="bid-btn" text="Bid now" />
+    </children>
+</VBox>

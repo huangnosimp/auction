@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.service;
 //Dùng Singleton pattern
+import vn.io.huangnosimp.model.*;
 public class AuctionManager {
     private static AuctionManager instance;
 
@@ -15,5 +16,7 @@ public class AuctionManager {
     }
 
     // Các phương thức xử lý logic liên quan đến đấu giá
-    public void createAuction(String auctionData) {}
+    public void createAuction(String auctionData) {
+
+    }
 }

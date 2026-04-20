@@ -12,6 +12,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":common"))
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -28,4 +29,9 @@ application {
 
 tasks.test {
     useJUnitPlatform()
+}
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "vn.io.huangnosimp.Main"
+    }
 }

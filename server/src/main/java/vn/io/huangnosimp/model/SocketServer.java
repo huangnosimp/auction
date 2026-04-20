@@ -1,4 +1,4 @@
-package vn.io.huangnosimp.network;
+package vn.io.huangnosimp.model;
 
 import java.io.IOException;
 import java.net.ServerSocket;

@@ -1,0 +1,236 @@
+/* ════════════════════════════════════════════════
+   open_slots.css  –  Open Slots panel styles
+   Matches the dark #1a1c22 / #00e676 dashboard theme
+   ════════════════════════════════════════════════ */
+
+/* ── Root ─────────────────────────────────────── */
+.os-root {
+    -fx-background-color: #1a1c22;
+    -fx-padding: 20 20 0 20;
+}
+
+/* ── Header ───────────────────────────────────── */
+.os-header {
+    -fx-background-color: #1a1c22;
+    -fx-padding: 0 0 16 0;
+    -fx-border-color: transparent transparent #2e3245 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.os-title {
+    -fx-text-fill: #f0f2f8;
+    -fx-font-family: "Segoe UI", "SF Pro Display", sans-serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.os-live-badge {
+    -fx-background-color: #00e67622;
+    -fx-text-fill: #00e676;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 999;
+    -fx-border-color: #00e67644;
+    -fx-border-width: 1;
+    -fx-border-radius: 999;
+}
+
+.os-result-count {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+/* ── Search box ───────────────────────────────── */
+.os-search-box {
+    -fx-background-color: #23262f;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 6 12 6 12;
+    -fx-max-width: 300px;
+    -fx-min-width: 200px;
+}
+
+.os-search-box:focused-within {
+    -fx-border-color: #00e676;
+}
+
+.os-search-icon {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 13px;
+}
+
+.os-search-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #f0f2f8;
+    -fx-prompt-text-fill: #8b8fa8;
+    -fx-font-size: 13px;
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.os-search-field:focused {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* ── Filter chips ─────────────────────────────── */
+.os-filter-group {
+    -fx-padding: 2 0 2 0;
+}
+
+.os-filter-chip {
+    -fx-background-color: #23262f;
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-padding: 6 14 6 14;
+    -fx-background-radius: 20px;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 20px;
+    -fx-cursor: hand;
+}
+
+.os-filter-chip:hover {
+    -fx-background-color: #2a2d38;
+    -fx-text-fill: #f0f2f8;
+    -fx-border-color: #4a4f6a;
+}
+
+.os-filter-chip:selected,
+.os-filter-active {
+    -fx-background-color: #00e67622;
+    -fx-text-fill: #00e676;
+    -fx-border-color: #00e67655;
+    -fx-font-weight: bold;
+}
+
+.os-filter-chip:selected:hover {
+    -fx-background-color: #00e67633;
+}
+
+/* ── Sort combo ───────────────────────────────── */
+.os-sort-combo {
+    -fx-background-color: #23262f;
+    -fx-text-fill: #c5c8d8;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 4 10 4 10;
+    -fx-cursor: hand;
+}
+
+.os-sort-combo .list-cell {
+    -fx-background-color: #23262f;
+    -fx-text-fill: #c5c8d8;
+    -fx-font-size: 12px;
+    -fx-padding: 5 10 5 10;
+}
+
+.os-sort-combo .list-view {
+    -fx-background-color: #23262f;
+    -fx-border-color: #2e3245;
+}
+
+.os-sort-combo:hover {
+    -fx-border-color: #4a4f6a;
+}
+
+/* ── Scroll pane ──────────────────────────────── */
+.os-scroll {
+    -fx-background-color: transparent;
+    -fx-padding: 16 0 0 0;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+}
+
+.os-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.os-scroll .scroll-bar:vertical,
+.os-scroll .scroll-bar:horizontal {
+    -fx-background-color: #1a1c22;
+}
+
+.os-scroll .scroll-bar:vertical .thumb,
+.os-scroll .scroll-bar:horizontal .thumb {
+    -fx-background-color: #2e3245;
+    -fx-background-radius: 4px;
+}
+
+.os-scroll .scroll-bar:vertical .thumb:hover,
+.os-scroll .scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #4a4f6a;
+}
+
+/* ── Card flow pane ───────────────────────────── */
+.os-flow-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 4 4 16 4;
+}
+
+/* ── Footer ───────────────────────────────────── */
+.os-footer {
+    -fx-padding: 14 0 20 0;
+    -fx-background-color: #1a1c22;
+    -fx-border-color: #2e3245 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.os-show-more-btn {
+    -fx-background-color: #23262f;
+    -fx-text-fill: #00e676;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-padding: 10 40 10 40;
+    -fx-background-radius: 8px;
+    -fx-border-color: #00e67644;
+    -fx-border-width: 1;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.os-show-more-btn:hover {
+    -fx-background-color: #00e67618;
+    -fx-border-color: #00e676;
+}
+
+.os-show-more-btn:disabled {
+    -fx-opacity: 0.4;
+    -fx-cursor: default;
+}
+
+/* ── Empty state (shown when no results) ─────── */
+.os-empty-state {
+    -fx-alignment: CENTER;
+    -fx-padding: 60 0 60 0;
+}
+
+.os-empty-icon {
+    -fx-text-fill: #2e3245;
+    -fx-font-size: 48px;
+}
+
+.os-empty-title {
+    -fx-text-fill: #4a4f6a;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.os-empty-sub {
+    -fx-text-fill: #3a3f56;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}

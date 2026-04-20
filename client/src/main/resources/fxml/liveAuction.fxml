@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<HBox fx:id="mainHbox" prefHeight="500.0" prefWidth="800.0" stylesheets="@../css/liveAuction.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.liveAuctionController">
+    <children>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!--         VBOX TRÁI: Biểu đồ + Thông tin     -->
+        <!-- ═══════════════════════════════════════════ -->
+        <VBox fx:id="vbox1" style="-fx-background-color: #211429;" HBox.hgrow="ALWAYS">
+            <children>
+
+                <!-- Biểu đồ giá -->
+                <AnchorPane prefHeight="351.0" prefWidth="548.0" VBox.vgrow="NEVER">
+                    <children>
+                        <LineChart fx:id="lineChart" prefHeight="260.0" prefWidth="562.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <xAxis>
+                                <NumberAxis side="BOTTOM" fx:id="xAxis" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="yAxis" side="LEFT" />
+                            </yAxis>
+                        </LineChart>
+                    </children>
+                </AnchorPane>
+
+                <!-- ─────────────────────────────────────── -->
+                <!-- ScrollPane: Thông tin sản phẩm đấu giá -->
+                <!-- ─────────────────────────────────────── -->
+                <ScrollPane fx:id="productInfoScroll" fitToWidth="true" prefHeight="117.0" prefWidth="561.0" styleClass="product-scroll" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox spacing="10" styleClass="product-info-container">
+                            <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
+
+                            <!-- Tiêu đề section -->
+                            <Label styleClass="section-title" text="Thông tin sản phẩm đấu giá" />
+
+                            <!-- ── Tên sản phẩm ── -->
+                            <VBox spacing="4" styleClass="info-card">
+                                <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                <Label styleClass="info-card-label" text="Tên sản phẩm" />
+                                <Label fx:id="productTitleLabel" styleClass="info-card-value-white" text="iPhone 15 Pro Max 256GB – Space Black" wrapText="true" />
+                            </VBox>
+
+                            <!-- ── Danh mục + Tình trạng ── -->
+                            <HBox spacing="8">
+                                <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                    <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                    <Label styleClass="info-card-label" text="Danh mục" />
+                                    <Label fx:id="categoryLabel" styleClass="info-card-value-white" text="Điện tử" wrapText="true" />
+                                </VBox>
+                                <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                    <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                    <Label styleClass="info-card-label" text="Tình trạng" />
+                                    <Label fx:id="conditionLabel" styleClass="info-card-badge-new" text="Mới" />
+                                </VBox>
+                            </HBox>
+
+                            <!-- ── Mô tả sản phẩm ── -->
+                            <VBox spacing="4" styleClass="info-card">
+                                <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                <Label styleClass="info-card-label" text="Mô tả" />
+                                <Label fx:id="descriptionLabel" styleClass="info-card-value-muted" text="Máy nguyên seal, đầy đủ phụ kiện hộp. Màu Space Black, bộ nhớ 256GB. Không có vết xước hay lỗi kỹ thuật." wrapText="true" />
+                            </VBox>
+
+                            <!-- ── Hình ảnh sản phẩm (placeholder) ── -->
+                            <VBox spacing="6" styleClass="info-card">
+                                <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                <Label styleClass="info-card-label" text="Hình ảnh (tối đa 3 ảnh)" />
+                                <HBox spacing="8">
+                                    <!-- Ô ảnh 1 -->
+                                    <VBox alignment="CENTER" prefHeight="70" prefWidth="100" styleClass="image-placeholder">
+                                        <Label styleClass="image-placeholder-text" text="Ảnh 1" />
+                                    </VBox>
+                                    <!-- Ô ảnh 2 -->
+                                    <VBox alignment="CENTER" prefHeight="70" prefWidth="100" styleClass="image-placeholder">
+                                        <Label styleClass="image-placeholder-text" text="Ảnh 2" />
+                                    </VBox>
+                                    <!-- Ô ảnh 3 -->
+                                    <VBox alignment="CENTER" prefHeight="70" prefWidth="100" styleClass="image-placeholder">
+                                        <Label styleClass="image-placeholder-text" text="Ảnh 3" />
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+
+                            <!-- ── Định giá & Đấu giá ── -->
+                            <Label styleClass="section-title" text="Định giá &amp; Đấu giá" />
+
+                            <HBox spacing="8">
+                                <!-- Giá khởi điểm -->
+                                <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                    <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                    <Label styleClass="info-card-label" text="Giá khởi điểm" />
+                                    <Label fx:id="startingPriceInfoLabel" styleClass="info-card-value-green" text="2.500.000.000 ₫" />
+                                </VBox>
+                                <!-- Bước giá -->
+                                <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                    <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                    <Label styleClass="info-card-label" text="Bước giá" />
+                                    <Label fx:id="bidIncrementInfoLabel" styleClass="info-card-value-orange" text="50.000.000 ₫" />
+                                </VBox>
+                            </HBox>
+
+                            <HBox spacing="8">
+                                <!-- Mua ngay -->
+                                <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                    <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                    <HBox alignment="CENTER_LEFT" spacing="6">
+                                        <Label styleClass="info-card-label" text="Mua ngay" />
+                                        <Label styleClass="badge-optional" text="tùy chọn" />
+                                    </HBox>
+                                    <Label fx:id="buyNowPriceLabel" styleClass="info-card-value-purple" text="3.500.000.000 ₫" />
+                                </VBox>
+                                <!-- Giá sàn bí mật -->
+                                <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                    <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                    <HBox alignment="CENTER_LEFT" spacing="6">
+                                        <Label styleClass="info-card-label" text="Giá sàn" />
+                                        <Label styleClass="badge-secret" text="bí mật" />
+                                    </HBox>
+                                    <Label fx:id="reservePriceLabel" styleClass="info-card-value-muted" text="••••••••••" />
+                                </VBox>
+                            </HBox>
+
+                            <!-- ── Lịch trình ── -->
+                            <Label styleClass="section-title" text="Lịch trình &amp; Thời hạn" />
+
+                            <HBox spacing="8">
+                                <!-- Ngày bắt đầu -->
+                                <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                    <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                    <Label styleClass="info-card-label" text="Bắt đầu" />
+                                    <Label fx:id="startDateLabel" styleClass="info-card-value-white" text="20/07/2025 · 14:00" />
+                                </VBox>
+                                <!-- Thời lượng -->
+                                <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                    <padding><Insets bottom="10" left="12" right="12" top="10" /></padding>
+                                    <Label styleClass="info-card-label" text="Thời lượng" />
+                                    <Label fx:id="durationLabel" styleClass="info-card-value-white" text="1 ngày" />
+                                </VBox>
+                            </HBox>
+
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+                <!-- ─────────────────────────────────────── -->
+                <!-- HBox dưới: Điều chỉnh & Đặt giá        -->
+                <!-- ─────────────────────────────────────── -->
+                <HBox fx:id="hbox1" alignment="CENTER_LEFT" prefHeight="91.0" prefWidth="562.0" spacing="12" style="-fx-background-color: #211429; -fx-border-color: #3a1a4a; -fx-border-width: 1 0 0 0;" VBox.vgrow="NEVER">
+                    <padding><Insets bottom="10" left="14" right="14" top="10" /></padding>
+                    <children>
+
+                        <!-- Giá kế tiếp tối thiểu -->
+                        <VBox alignment="CENTER_LEFT" spacing="2">
+                            <children>
+                                <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Giá kế tiếp tối thiểu" />
+                                <Label fx:id="minNextBidLabel" style="-fx-text-fill: #f0a500; -fx-font-size: 13px; -fx-font-weight: bold;" text="2.900.000.000 ₫" />
+                            </children>
+                        </VBox>
+
+                        <Separator orientation="VERTICAL" style="-fx-background-color: #3a3d4a;" />
+
+                        <!-- Điều chỉnh giá đặt -->
+                        <HBox alignment="CENTER" spacing="6" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Button fx:id="btnDecrease" onAction="#handleDecreaseButton" onMousePressed="#onMousePressed" onMouseReleased="#onMouseReleased" prefHeight="32" prefWidth="32" styleClass="allbtn" text="−" />
+                                <VBox alignment="CENTER" spacing="2">
+                                    <children>
+                                        <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Giá đặt của bạn" />
+                                        <HBox>
+                                            <children>
+                                                <Label fx:id="myBidLabel" style="-fx-text-fill: #ffffff; -fx-font-size: 15px; -fx-font-weight: bold;" text="2.900.000.000 " />
+                                                <Label style="-fx-text-fill: white;" text="đ" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                                <Button fx:id="btnIncrease" onAction="#handleIncreaseButton" onMousePressed="#onMousePressed" onMouseReleased="#onMouseReleased" prefHeight="32" prefWidth="32" styleClass="allbtn" text="+" />
+                            </children>
+                        </HBox>
+
+                        <!-- Nút đặt giá -->
+                        <Button fx:id="btnPlaceBid" prefHeight="38" prefWidth="100" styleClass="bidbtn" text="Đặt giá" />
+
+                        <Separator orientation="VERTICAL" style="-fx-background-color: #3a3d4a;" />
+
+                        <!-- Nút rút khỏi phiên -->
+                        <Button fx:id="btnWithdraw" onAction="#handlebtnWithdraw" prefHeight="32" styleClass="quitbtn" text="Rút khỏi phiên" />
+
+                    </children>
+                </HBox>
+
+            </children>
+        </VBox>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!--         VBOX PHẢI: Sidebar thông tin        -->
+        <!-- ═══════════════════════════════════════════ -->
+        <VBox prefHeight="470.0" prefWidth="237.0" spacing="8" style="-fx-background-color: #1e2029;" HBox.hgrow="NEVER">
+            <padding><Insets bottom="12" left="10" right="10" top="12" /></padding>
+            <children>
+
+                <!-- Đồng hồ thời gian -->
+                <VBox alignment="CENTER" spacing="2" style="-fx-border-color: #3a3d4a; -fx-border-width: 0 0 1 0;">
+                    <padding><Insets bottom="10" /></padding>
+                    <children>
+                        <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Thời gian" />
+                        <Label fx:id="timeLabel" style="-fx-text-fill: #f0a500; -fx-font-size: 22px; -fx-font-weight: bold;" text="00:00:00" />
+                    </children>
+                </VBox>
+
+                <!-- Thông tin lô hàng -->
+                <VBox spacing="2" style="-fx-background-color: #16181f; -fx-background-radius: 8;">
+                    <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
+                    <children>
+                        <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Phiên đấu giá" />
+                        <Label fx:id="lotCodeLabel" style="-fx-text-fill: #ffffff; -fx-font-size: 12px; -fx-font-weight: bold;" text="Lô #A-2024-081" />
+                        <Label fx:id="lotDescLabel" style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Đất nền Q9 · 120m²" />
+                    </children>
+                </VBox>
+
+                <!-- Giá hiện tại -->
+                <VBox spacing="2" style="-fx-background-color: #16181f; -fx-background-radius: 8;">
+                    <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
+                    <children>
+                        <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Giá hiện tại" />
+                        <Label fx:id="currentPriceLabel" style="-fx-text-fill: #4fc97e; -fx-font-size: 13px; -fx-font-weight: bold;" text="2.850.000.000 ₫" />
+                        <Label fx:id="startPriceLabel" style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Khởi điểm: 2.500.000.000 ₫" />
+                    </children>
+                </VBox>
+
+                <!-- Người dẫn đầu -->
+                <VBox spacing="2" style="-fx-background-color: #16181f; -fx-background-radius: 8;">
+                    <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
+                    <children>
+                        <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Người trả cao nhất" />
+                        <Label fx:id="leadBidderLabel" style="-fx-text-fill: #ffffff; -fx-font-size: 12px; -fx-font-weight: bold;" text="Khách #007" />
+                        <Label fx:id="lastBidTimeLabel" style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Lần đặt: 14:31:07" />
+                    </children>
+                </VBox>
+
+                <!-- Thống kê nhanh -->
+                <HBox spacing="6">
+                    <children>
+                        <VBox alignment="CENTER" spacing="2" style="-fx-background-color: #16181f; -fx-background-radius: 8;" HBox.hgrow="ALWAYS">
+                            <padding><Insets bottom="6" left="4" right="4" top="6" /></padding>
+                            <children>
+                                <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 9px;" text="Tham gia" />
+                                <Label fx:id="participantCountLabel" style="-fx-text-fill: #ffffff; -fx-font-size: 14px; -fx-font-weight: bold;" text="12" />
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="2" style="-fx-background-color: #16181f; -fx-background-radius: 8;" HBox.hgrow="ALWAYS">
+                            <padding><Insets bottom="6" left="4" right="4" top="6" /></padding>
+                            <children>
+                                <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 9px;" text="Lượt đặt" />
+                                <Label fx:id="bidCountLabel" style="-fx-text-fill: #ffffff; -fx-font-size: 14px; -fx-font-weight: bold;" text="47" />
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="2" style="-fx-background-color: #16181f; -fx-background-radius: 8;" HBox.hgrow="ALWAYS">
+                            <padding><Insets bottom="6" left="4" right="4" top="6" /></padding>
+                            <children>
+                                <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 9px;" text="Bước giá" />
+                                <Label fx:id="bidStepLabel" style="-fx-text-fill: #f0a500; -fx-font-size: 14px; -fx-font-weight: bold;" text="50tr" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Lịch sử đặt giá -->
+                <VBox spacing="4" style="-fx-background-color: #16181f; -fx-background-radius: 8;" VBox.vgrow="ALWAYS">
+                    <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
+                    <children>
+                        <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Lịch sử đặt giá" />
+                        <ListView fx:id="bidHistoryList" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS" />
+                    </children>
+                </VBox>
+
+                <!-- Trạng thái phiên -->
+                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #2d1a1a; -fx-background-radius: 8;">
+                    <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
+                    <children>
+                        <Circle fx:id="statusDot" fill="#e24b4a" radius="4" />
+                        <Label fx:id="statusLabel" style="-fx-text-fill: #f09595; -fx-font-size: 10px;" text="Đang diễn ra · Còn 15:28" />
+                    </children>
+                </HBox>
+
+            </children>
+        </VBox>
+
+    </children>
+</HBox>

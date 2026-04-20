@@ -1,0 +1,273 @@
+/* dashboard.css - rút gọn (chỉ giữ selector đang dùng trong FXML) */
+
+/* Root */
+.root-pane {
+    -fx-background-color: #1a1c22;
+    -fx-font-family: "Segoe UI", "SF Pro Display", sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    -fx-background-color: #1e2029;
+    -fx-padding: 0 24 0 0;
+    -fx-min-height: 56px;
+    -fx-max-height: 56px;
+    -fx-border-color: transparent transparent #2e3245 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.logo-container { -fx-padding: 0 32 0 20; -fx-min-width: 160px; }
+.logo-ofc { -fx-text-fill: #ffffff; -fx-font-size: 20px; -fx-font-weight: bold; }
+.logo-digital { -fx-text-fill: #00e676; -fx-font-size: 20px; -fx-font-weight: bold; }
+
+.nav-buttons { -fx-padding: 0 0 0 8; }
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 13px;
+    -fx-padding: 6 16 6 16;
+    -fx-cursor: hand;
+    -fx-background-radius: 20px;
+    -fx-border-color: transparent;
+}
+.nav-btn:hover { -fx-background-color: #2a2d38; -fx-text-fill: #f0f2f8; }
+
+.nav-btn-active {
+    -fx-background-color: #00e676;
+    -fx-text-fill: #0d1117;
+    -fx-font-weight: bold;
+}
+.nav-btn-active:hover { -fx-background-color: #00c853; }
+
+.nav-right { -fx-padding: 0 0 0 16; }
+
+.support-btn {
+    -fx-background-color: #23262f;
+    -fx-text-fill: #c5c8d8;
+    -fx-font-size: 12px;
+    -fx-padding: 7 16 7 16;
+    -fx-background-radius: 20px;
+    -fx-border-color: #3a3f56;
+    -fx-border-width: 1;
+    -fx-border-radius: 20px;
+    -fx-cursor: hand;
+}
+.support-btn:hover { -fx-background-color: #2e3245; }
+
+.icon-btn {
+    -fx-background-color: #23262f;
+    -fx-text-fill: #c5c8d8;
+    -fx-font-size: 14px;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
+    -fx-background-radius: 50%;
+    -fx-border-color: #3a3f56;
+    -fx-border-width: 1;
+    -fx-border-radius: 50%;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+.icon-btn:hover { -fx-background-color: #2e3245; }
+
+.avatar-btn {
+    -fx-background-color: #00e676;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-background-radius: 50%;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+.avatar-label { -fx-font-size: 14px; }
+
+/* Main content */
+.main-content { -fx-padding: 20; -fx-background-color: #1a1c22; }
+.left-panel { /* reserved to grow */ }
+
+/* Stat cards */
+.stats-row { /* row container for stat cards */ }
+.stat-card {
+    -fx-background-color: #23262f;
+    -fx-background-radius: 12px;
+    -fx-padding: 16 20 16 20;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 12px;
+    -fx-min-height: 90px;
+}
+.stat-label {
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+.stat-value { -fx-text-fill: #4fc97e; -fx-font-size: 22px; -fx-font-weight: bold; }
+.green-value { -fx-text-fill: #00e676; }
+.stat-sub { -fx-text-fill: #8b8fa8; -fx-font-size: 11px; }
+.green-sub { -fx-text-fill: #00e676; }
+.stat-link { -fx-text-fill: #00e676; -fx-font-size: 12px; -fx-cursor: hand; }
+
+.badge-warning {
+    -fx-background-color: #ffc10733;
+    -fx-text-fill: #ffc107;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 20px;
+}
+
+/* Progress bar styling used in stats */
+.expense-progress {
+    -fx-accent: #ffc107;
+    -fx-background-color: #2e3245;
+    -fx-pref-height: 6px;
+    -fx-background-radius: 4px;
+    -fx-min-width: 100px;
+}
+.expense-progress .bar { -fx-background-color: #ffc107; -fx-background-radius: 4px; -fx-padding: 0; }
+.expense-progress .track { -fx-background-color: #2e3245; -fx-background-radius: 4px; }
+
+/* Table / sections */
+.table-section {
+    -fx-background-color: #23262f;
+    -fx-background-radius: 12px;
+    -fx-padding: 16 20 16 20;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 12px;
+}
+.section-title { -fx-text-fill: #f0f2f8; -fx-font-size: 16px; -fx-font-weight: bold; }
+.section-subtitle { -fx-text-fill: #8b8fa8; -fx-font-size: 13px; }
+
+/* Scroll + FlowPane for auction cards */
+.auction-scroll { -fx-background-color: transparent; -fx-padding: 0; }
+.auction-scroll > .viewport { -fx-background-color: transparent; }
+.auction-flow-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 4;
+}
+
+/* Auction card base (kept because cards can be created/used inside flow pane) */
+.auction-card {
+    -fx-background-color: #1e1530;
+    -fx-border-color: #4a3a5a;
+    -fx-border-width: 0.5;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 14;
+    -fx-pref-width: 165;
+    -fx-pref-height: 200;
+}
+.auction-card:hover { -fx-border-color: #9b59d1; }
+
+/* Winning variant (may be toggled at runtime) */
+.auction-card-winning { -fx-border-color: #1a5c36; }
+.auction-card-winning:hover { -fx-border-color: #2ecc71; }
+
+/* Card text classes (some used by included ItemCard fragments) */
+.ac-product { -fx-text-fill: #dddddd; -fx-font-size: 13px; -fx-font-weight: bold; }
+.ac-row { -fx-alignment: CENTER_LEFT; }
+.ac-key { -fx-text-fill: #888888; -fx-font-size: 11px; }
+.ac-val { -fx-text-fill: #cccccc; -fx-font-size: 11px; -fx-font-weight: bold; }
+.ac-bid { -fx-text-fill: #e74c3c; -fx-font-size: 13px; -fx-font-weight: bold; }
+.ac-bid-winning { -fx-text-fill: #2ecc71; }
+
+/* Status badges */
+.status-badge { -fx-font-size: 10px; -fx-padding: 2 8 2 8; -fx-background-radius: 999; }
+.s-live { -fx-background-color: #1a3a28; -fx-text-fill: #2ecc71; }
+.s-winning { -fx-background-color: #1a2e40; -fx-text-fill: #3daef5; }
+.s-outbid { -fx-background-color: #3a1a1a; -fx-text-fill: #e74c3c; }
+
+/* Bid button (used on cards and elsewhere) */
+.bid-btn {
+    -fx-background-color: #9b59d1;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 5 0 5 0;
+    -fx-max-width: Infinity;
+    -fx-cursor: hand;
+}
+.bid-btn:hover { -fx-background-color: #8e44ad; }
+.bid-btn-winning { -fx-background-color: #1a6b3a; }
+.bid-btn-winning:hover { -fx-background-color: #27ae60; }
+
+/* Floating action button */
+.fab-btn {
+    -fx-background-color: #00e676;
+    -fx-text-fill: #0d1117;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-min-width: 44px;
+    -fx-min-height: 44px;
+    -fx-max-width: 44px;
+    -fx-max-height: 44px;
+    -fx-background-radius: 50%;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, #00e67666, 12, 0.4, 0, 2);
+}
+.fab-btn:hover { -fx-background-color: #00c853; -fx-effect: dropshadow(gaussian, #00e676aa, 16, 0.5, 0, 4); }
+
+/* Small helper classes used in liveAuction.fxml */
+.allbtn { -fx-cursor: hand; } /* base marker class; specifics usually inline-styled in FXML */
+.bidbtn { /* marker for main place-bid button */ }
+
+/* IDs used by FXML */
+#side { -fx-border-color: #1e2029; -fx-border-width: 5; }
+#createButton {
+    -fx-background-color: #00c853;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+#createButton:hover { -fx-background-color: #00e676; }
+/* Side panel additions */
+.side-card {
+    -fx-background-color: #23262f;
+    -fx-background-radius: 12px;
+    -fx-padding: 12 14 12 14;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 12px;
+}
+
+.side-section-title {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.mini-stat {
+    -fx-background-color: #1a1c22;
+    -fx-background-radius: 8px;
+    -fx-padding: 8 6 8 6;
+    -fx-alignment: CENTER;
+}
+.mini-val { -fx-font-size: 16px; -fx-font-weight: bold; }
+.mini-key { -fx-text-fill: #8b8fa8; -fx-font-size: 10px; }
+
+/* Thêm màu còn thiếu */
+.blue-value  { -fx-text-fill: #3daef5; }
+.red-value   { -fx-text-fill: #e74c3c; }
+.amber-value { -fx-text-fill: #ffc107; }
+
+/* Activity dot */
+.dot-green  { -fx-fill: #2ecc71; }
+.dot-red    { -fx-fill: #e74c3c; }
+.dot-blue   { -fx-fill: #3daef5; }
+.dot-amber  { -fx-fill: #ffc107; }
+
+/* Expiring item cards */
+.expiring-card {
+    -fx-background-color: #1e1530;
+    -fx-border-color: #4a3a5a;
+    -fx-border-width: 0.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 10 8 10;
+}
+.expiring-name { -fx-text-fill: #dddddd; -fx-font-size: 11px; -fx-font-weight: bold; }
+.expiring-bid  { -fx-text-fill: #8b8fa8; -fx-font-size: 10px; }

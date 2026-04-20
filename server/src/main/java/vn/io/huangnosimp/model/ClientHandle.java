@@ -1,7 +1,7 @@
-package vn.io.huangnosimp.network;
+package vn.io.huangnosimp.model;
 
 import vn.io.huangnosimp.controller.MessageRouter;
-import vn.io.huangnosimp.model.Message;
+
 import java.io.*;
 import java.net.Socket;
 
