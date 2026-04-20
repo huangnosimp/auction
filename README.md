@@ -9,6 +9,7 @@
 ## Sơ đồ thiết kế lớp
 ```
 mermaid
+graphTD
 classDiagram
 direction BT
 class Admin
