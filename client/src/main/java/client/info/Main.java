@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("--- ĐĂNG KÝ TÀI KHOẢN ĐẤU GIÁ ---");
+        System.out.println("ĐĂNG KÝ TÀI KHOẢN ĐẤU GIÁ");
 
         System.out.print("Nhập tên đăng nhập (Username): ");
         String user = sc.nextLine();
@@ -26,11 +26,8 @@ public class Main {
         }
 
         Client newUser = new Client(user, name, email, money);
-
         newUser.showInfo();
-
-        System.out.println("\n>>> Chúc mừng " + user + " đã đăng ký thành công!");
-
+        System.out.println("Chúc mừng " + user + " đã đăng ký thành công!");
         sc.close();
     }
 }
