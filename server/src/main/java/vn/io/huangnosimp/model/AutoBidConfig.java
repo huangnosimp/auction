@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class AutoBidConfig extends Entity {
 
-    private Bidder bidder;
+    private Member bidder;
 
     private Auction auction;
 
@@ -18,7 +18,7 @@ public class AutoBidConfig extends Entity {
         super();
     }
 
-    public AutoBidConfig(Bidder bidder, Auction auction, double maxBid,
+    public AutoBidConfig(Member bidder, Auction auction, double maxBid,
                          double increment, LocalDateTime registeredAt) {
         super();
         this.bidder = bidder;
@@ -29,11 +29,11 @@ public class AutoBidConfig extends Entity {
     }
 
 
-    public Bidder getBidder() {
+    public Member getBidder() {
         return bidder;
     }
 
-    public void setBidder(Bidder bidder) {
+    public void setBidder(Member bidder) {
         this.bidder = bidder;
     }
 
@@ -67,12 +67,5 @@ public class AutoBidConfig extends Entity {
 
     public void setRegisteredAt(LocalDateTime registeredAt) {
         this.registeredAt = registeredAt;
-    }
-
-    @Override
-    public String toString() {
-        return "AutoBidConfig{bidder=" + (bidder != null ? bidder.getUsername() : "null") +
-                ", maxBid=" + maxBid +
-                ", increment=" + increment + "}";
     }
 }

@@ -12,17 +12,6 @@ public class Art extends Item {
         this.creationYear = creationYear;
     }
 
-
-    @Override
-    public void printInfo() {
-        System.out.println("=== Art Item ===");
-        System.out.println("Name          : " + getName());
-        System.out.println("Description   : " + getDescription());
-        System.out.println("Artist        : " + artist);
-        System.out.println("Creation Year : " + creationYear);
-    }
-
-
     public String getArtist() {
         return artist;
     }
@@ -31,8 +20,4 @@ public class Art extends Item {
         return creationYear;
     }
 
-    @Override
-    public String toString() {
-        return "Art{name='" + getName() + "', artist='" + artist + "', year=" + creationYear + "}";
-    }
 }

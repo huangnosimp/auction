@@ -1,77 +1,91 @@
 package vn.io.huangnosimp.service;
 
-import vn.io.huangnosimp.database.User;
-import vn.io.huangnosimp.factory.UserFactory;
+import org.mindrot.jbcrypt.BCrypt;
+
+import vn.io.huangnosimp.dto.response.LoginResult;
+import vn.io.huangnosimp.dto.response.RegisterResult;
+import vn.io.huangnosimp.enums.UserType;
 import vn.io.huangnosimp.model.*;
 import vn.io.huangnosimp.network.ClientHandle;
+import vn.io.huangnosimp.repository.IUserRepository;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
 
-//prototype
-public class UserService {
-    private static volatile UserService instance;
-    private ConcurrentHashMap<String, Bidder> onlineBidders;
-    private ConcurrentHashMap<String, Seller> onlineSellers;
-    private ConcurrentHashMap<String, Admin> onlineAdmin;
-    private UserFactory userFactory;
-    private UserService() {
-        this.onlineBidders = new ConcurrentHashMap<>();
-        this.onlineSellers = new ConcurrentHashMap<>();
-        this.onlineAdmin = new ConcurrentHashMap<>();
-        this.userFactory = new UserFactory();
+public class UserService implements IUserService {
+    private final IUserRepository userRepository;
+    public UserService(IUserRepository userRepository) {
+        this.userRepository = userRepository;
     }
-    public static UserService getInstance() {
-        if (instance == null) {
-            synchronized (UserService.class) {
-                if (instance == null) {
-                    instance = new UserService();
-                }
+
+    @Override
+    public Member getMember(String memberId) {
+        User user = userRepository.findById(memberId);
+        if (user instanceof Member) {
+            return (Member) user;
+        }
+        return null;
+    }
+
+    @Override
+    public RegisterResult register(UserType type, String username, String password, String email) {
+        if (userRepository.checkUsername(username)) {
+            return RegisterResult.USERNAME_TAKEN;
+        }
+        if (userRepository.checkEmail(email)) {
+            return RegisterResult.EMAIL_TAKEN;
+        }
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        String id = UUID.randomUUID().toString();
+        if (userRepository.saveUser(id, username, hashedPassword, email, type.name())) {
+            return RegisterResult.SUCCESS;
+        }
+        return RegisterResult.ERROR;
+    }
+
+    @Override
+    public LoginResult login(UserType type, String username, String password, ClientHandle client) {
+        User user = userRepository.findByUsername(username);
+        if (user == null || !user.getClass().getSimpleName().equalsIgnoreCase(type.name())) {
+            return LoginResult.USER_NOT_FOUND;
+        }
+        if (BCrypt.checkpw(password, user.getPassword())) {
+            client.setUserId(user.getId());
+            client.setUserType(type);
+            return LoginResult.SUCCESS;
+        }
+        return LoginResult.INVALID_PASSWORD;
+    }
+
+    @Override
+    public synchronized boolean deposit(String userId, double amount) {
+        User user = userRepository.findById(userId);
+        if (user instanceof Member member && amount > 0) {
+            double newBalance = member.getAccountBalance() + amount;
+            return userRepository.updateBalance(userId, newBalance);
+        }
+        return false;
+    }
+
+    @Override
+    public synchronized boolean withdraw(String userId, double amount) {
+        User user = userRepository.findById(userId);
+        if (user instanceof Member member && amount > 0) {
+            if (member.getAccountBalance() < amount) {
+                return false;
             }
+            double newBalance = member.getAccountBalance() - amount;
+            return userRepository.updateBalance(userId, newBalance);
         }
-        return instance;
+        return false;
     }
 
-    public Bidder getBidder(String bidderId) {
-        return new Bidder(bidderId, "password", bidderId + "@example.com", 1000.0);
+    @Override
+    public boolean banUser(String userId) {
+        return false;
     }
 
-    public Seller getSeller(String sellerId) {
-        return new Seller(sellerId, "password", sellerId + "@example.com");
-    }
-
-    public String getBidderUserName(String bidderId) {
-        return bidderId;
-    }
-
-    public boolean register(UserType type, String username, String password, String email) {
-        if (username == null || password == null || email == null) {
-            return false;
-        }
-        userFactory.createUser(username, password, email, type);
-
-        return true;
-    }
-    public boolean Login(UserType type, String username, String password, String email, ClientHandle client) {
-
-    }
-
-    public boolean joinAuction(String auctionId, String bidderId) {
-        Auction auction = AuctionService.getInstance().getAuctions().get(auctionId);
-        Bidder bidder = this.getBidder(bidderId);
-        if (auction == null || bidder == null || auction.getStatus() != AuctionStatus.OPEN || auction.getStatus() != AuctionStatus.RUNNING) {
-            return false;
-        }
-        bidder.joinRoom(auctionId);
-        return true;
-    }
-
-    public boolean leaveAuction(String auctionId, String bidderId) {
-        Auction auction = AuctionService.getInstance().getAuctions().get(auctionId);
-        Bidder bidder = this.getBidder(bidderId);
-        if (auction == null || bidder == null ) {
-            return false;
-        }
-        bidder.leaveRoom(auctionId);
-        return true;
+    @Override
+    public boolean unbanUser(String userId) {
+        return false;
     }
 }

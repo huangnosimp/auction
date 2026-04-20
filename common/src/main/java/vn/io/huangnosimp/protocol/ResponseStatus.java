@@ -1,0 +1,10 @@
+package vn.io.huangnosimp.protocol;
+
+public enum ResponseStatus {
+    SUCCESS,
+    ERROR,
+    UNAUTHORIZED,
+    CONFLICT,
+    BANNED,
+    FAILED
+}

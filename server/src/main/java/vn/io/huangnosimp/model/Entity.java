@@ -22,6 +22,9 @@ public abstract class Entity {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public long getCreatedAt() {
         return createdAt;
@@ -50,10 +53,5 @@ public abstract class Entity {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{id='" + id + "'}";
     }
 }
