@@ -9,7 +9,7 @@ public class Client extends User {
     }
 
     public void showInfo() {
-        System.out.println("\n=== THÔNG TIN TÀI KHOẢN BIDDER ===");
+        System.out.println("THÔNG TIN TÀI KHOẢN USER");
         System.out.println("Username: " + username);
         System.out.println("Email: " + email);
         System.out.println("Số dư ví: $" + balance);
