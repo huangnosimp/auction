@@ -7,9 +7,7 @@
 | Vũ Đình Giang | phát triển UI/UX cho client |
 
 ## Sơ đồ thiết kế lớp
-```
-mermaid
-graphTD
+```mermaid
 classDiagram
 direction BT
 class Admin
