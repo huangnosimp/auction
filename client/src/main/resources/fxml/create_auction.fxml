@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="0" styleClass="auction-form-root" stylesheets="@../css/create_auction.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.CreateAuctionController">
+    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="form-header">
+        <Label styleClass="form-header-icon" text="+" />
+        <Label styleClass="form-header-title" text="Create new auction" />
+        <Label styleClass="form-header-badge" text="Live bidding" />
+    </HBox>
+
+
+    <ScrollPane fitToWidth="true" styleClass="form-scroll" VBox.vgrow="ALWAYS">
+        <VBox spacing="28" styleClass="form-body">
+            <padding><Insets bottom="28" left="28" right="28" top="28" /></padding>
+
+            <VBox spacing="14">
+                <Label styleClass="section-label" text="ITEM INFORMATION" />
+
+                <VBox spacing="6">
+                    <Label styleClass="field-label" text="Item title" />
+                    <TextField promptText="e.g. iPhone 15 Pro Max 256GB – Space Black" styleClass="form-input" />
+                </VBox>
+
+                <HBox spacing="14">
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Category" />
+                        <ComboBox maxWidth="Infinity" promptText="Select category..." styleClass="form-combo">
+                            <items>
+
+                            </items>
+                        </ComboBox>
+                    </VBox>
+
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Condition" />
+                        <ChoiceBox maxWidth="Infinity" styleClass="form-choice">
+                            <items>
+
+                            </items>
+                        </ChoiceBox>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="6">
+                    <Label styleClass="field-label" text="Description" />
+                    <TextArea prefRowCount="3" promptText="Describe item condition, features, defects (if any)..." styleClass="form-textarea" />
+                </VBox>
+
+                <VBox spacing="8">
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <Label styleClass="field-label" text="Images" />
+                        <Label styleClass="tag-optional" text="up to 3" />
+                    </HBox>
+                    <VBox alignment="CENTER" prefHeight="90" spacing="4" styleClass="upload-box">
+                        <Label styleClass="upload-icon-label" text="+" />
+                        <Label styleClass="upload-main-text" text="Click to upload or drag &amp; drop" />
+                        <Label styleClass="upload-hint" text="PNG, JPG – max 5MB each" />
+                    </VBox>
+                    <HBox fx:id="imagePreviewRow" spacing="8" />
+                </VBox>
+            </VBox>
+
+            <VBox spacing="14">
+                <Label styleClass="section-label" text="PRICING &amp; BIDDING" />
+
+                <HBox spacing="14">
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Starting price ($)" />
+                        <TextField promptText="0.00" styleClass="form-input" />
+                    </VBox>
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Bid increment ($)" />
+                        <Spinner editable="true" initialValue="10" max="100000" min="1" styleClass="form-spinner" />
+                    </VBox>
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="6">
+                            <Label styleClass="field-label" text="Buy It Now" />
+                            <Label styleClass="tag-optional" text="optional" />
+                        </HBox>
+                        <TextField promptText="—" styleClass="form-input" />
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="6">
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <Label styleClass="field-label" text="Reserve price" />
+                        <Label styleClass="tag-optional" text="secret floor – optional" />
+                    </HBox>
+                    <TextField promptText="Hidden minimum price – leave blank if none" styleClass="form-input" />
+                </VBox>
+            </VBox>
+
+            <VBox spacing="14">
+                <Label styleClass="section-label" text="SCHEDULE &amp; DURATION" />
+
+                <HBox spacing="14">
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Start date &amp; time" />
+                        <DatePicker maxWidth="Infinity" promptText="Pick a date..." styleClass="form-datepicker" />
+                    </VBox>
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Duration" />
+                        <ComboBox maxWidth="Infinity" styleClass="form-combo" value="1 day">
+                            <items>
+
+                            </items>
+                        </ComboBox>
+                    </VBox>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="0" styleClass="toggle-row">
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label styleClass="toggle-title" text="Auto-extend" />
+                        <Label styleClass="toggle-hint" text="Adds 3 min if someone bids in the final moments (prevents sniping)" />
+                    </VBox>
+                    <CheckBox fx:id="autoExtendCheck" selected="true" styleClass="form-toggle" />
+                </HBox>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+
+    <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="form-footer">
+        <Button onAction="#handleCancelButton" styleClass="btn-cancel" text="Cancel" />
+        <Button fx:id="launchButton" styleClass="btn-submit" text="Launch auction" />
+    </HBox>
+
+</VBox>

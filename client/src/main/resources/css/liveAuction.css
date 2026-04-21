@@ -1,0 +1,224 @@
+Pane {
+    -fx-background-color: #1e2029;
+    -fx-background-radius: 15;
+    -fx-border-color: #270830;
+    -fx-border-width: 7;
+    -fx-border-radius: 15;
+}
+
+#mainHbox {
+    -fx-border-color: #1e2029;
+    -fx-border-width: 15;
+}
+
+.chart {
+    -fx-padding: 10px;
+}
+
+.chart-plot-background {
+    -fx-background-color: #2B2222;
+}
+
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: #323544;
+}
+
+.axis {
+    -fx-tick-label-fill: #ffffff;
+    -fx-axis-label-fill: #ffffff;
+    -fx-text-fill: white;
+}
+
+.axis-axis-label {
+    -fx-text-fill: white;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #f0a500;
+    -fx-stroke-width: 2px;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: #f0a500, #270830;
+}
+
+.product-scroll {
+    -fx-background-color: transparent;
+    -fx-background: #1d0f27;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.product-scroll > .viewport {
+    -fx-background-color: #1d0f27;
+}
+
+.product-scroll .scroll-bar:vertical .track {
+    -fx-background-color: #2a1a3a;
+    -fx-background-radius: 4;
+}
+
+.product-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #5a2a7a;
+    -fx-background-radius: 4;
+}
+
+.product-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #7a3a9a;
+}
+
+.product-scroll .scroll-bar:vertical .increment-button,
+.product-scroll .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.product-info-container {
+    -fx-background-color: #1d0f27;
+}
+
+.section-title {
+    -fx-text-fill: #c084f5;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 0 2 0;
+}
+
+.info-card {
+    -fx-background-color: #16181f;
+    -fx-background-radius: 8;
+}
+
+.info-card-label {
+    -fx-text-fill: #888888;
+    -fx-font-size: 9px;
+}
+
+.info-card-value-white {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.info-card-value-muted {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 11px;
+}
+
+.info-card-value-green {
+    -fx-text-fill: #4fc97e;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.info-card-value-orange {
+    -fx-text-fill: #f0a500;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.info-card-value-purple {
+    -fx-text-fill: #c084f5;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.info-card-badge-new {
+    -fx-text-fill: #4fc97e;
+    -fx-background-color: #0d2e1c;
+    -fx-background-radius: 4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 6 2 6;
+}
+
+.badge-optional {
+    -fx-text-fill: #888888;
+    -fx-background-color: #2a2d38;
+    -fx-background-radius: 4;
+    -fx-font-size: 9px;
+    -fx-padding: 1 5 1 5;
+}
+
+.badge-secret {
+    -fx-text-fill: #f0a500;
+    -fx-background-color: #2e2200;
+    -fx-background-radius: 4;
+    -fx-font-size: 9px;
+    -fx-padding: 1 5 1 5;
+}
+
+.image-placeholder {
+    -fx-background-color: #261535;
+    -fx-background-radius: 6;
+    -fx-border-color: #3a1a4a;
+    -fx-border-radius: 6;
+    -fx-border-style: dashed;
+}
+
+.image-placeholder-text {
+    -fx-text-fill: #5a3a6a;
+    -fx-font-size: 10px;
+}
+
+.auto-extend-chip {
+    -fx-background-color: #0d2212;
+    -fx-background-radius: 8;
+    -fx-border-color: #1a4a2a;
+    -fx-border-radius: 8;
+}
+
+.auto-extend-title {
+    -fx-text-fill: #4fc97e;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.auto-extend-desc {
+    -fx-text-fill: #888888;
+    -fx-font-size: 9px;
+}
+
+.allbtn {
+    -fx-background-color: #3a1a4a;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #5a2a6a;
+    -fx-border-radius:6;
+    -fx-background-radius:6;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+}
+
+.allbtn:hover {
+    -fx-background-color: #662C82;
+    -fx-text-fill: #f0f2f8;
+    -fx-border-color: #7E4491;
+    -fx-text-fill: #F2F2F2;
+}
+.bidbtn{
+    -fx-background-color: #1CC953;
+    -fx-text-fill: #0a2a18;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+.bidbtn:hover {
+    -fx-background-color: #4fc97e;
+    -fx-cursor:hand;
+
+}
+.quitbtn{
+    -fx-background-color: transparent;
+    -fx-text-fill: #d09af0;
+    -fx-border-color: #5a2a6a;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 11px;
+    -fx-cursor:hand;
+}
+.quitbtn:hover{
+    -fx-border-color: #7B4A8F;
+    -fx-text-fill: #e8e6f0;
+}
