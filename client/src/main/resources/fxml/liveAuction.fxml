@@ -4,7 +4,6 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
 
 <HBox fx:id="mainHbox" prefHeight="500.0" prefWidth="800.0" stylesheets="@../css/liveAuction.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.liveAuctionController">
     <children>
@@ -284,10 +283,9 @@
                 <!-- Trạng thái phiên -->
                 <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #2d1a1a; -fx-background-radius: 8;">
                     <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
-                    <children>
-                        <Circle fx:id="statusDot" fill="#e24b4a" radius="4" />
-                        <Label fx:id="statusLabel" style="-fx-text-fill: #f09595; -fx-font-size: 10px;" text="Đang diễn ra · Còn 15:28" />
-                    </children>
+               <children>
+                  <Button alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="236.0" styleClass="bidbtn" text="Auto Bid" />
+               </children>
                 </HBox>
 
             </children>

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.collections.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -29,7 +31,11 @@
                         <Label styleClass="field-label" text="Category" />
                         <ComboBox maxWidth="Infinity" promptText="Select category..." styleClass="form-combo">
                             <items>
-
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Art" />
+                                    <String fx:value="Electronics" />
+                                    <String fx:value="Vehicle" />
+                                </FXCollections>
                             </items>
                         </ComboBox>
                     </VBox>
@@ -38,7 +44,11 @@
                         <Label styleClass="field-label" text="Condition" />
                         <ChoiceBox maxWidth="Infinity" styleClass="form-choice">
                             <items>
-
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="New" />
+                                    <String fx:value="Like New" />
+                                    <String fx:value="Used" />
+                                </FXCollections>
                             </items>
                         </ChoiceBox>
                     </VBox>

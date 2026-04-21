@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
 import javafx.event.ActionEvent;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -22,6 +23,7 @@ public class DashboardController implements Initializable {
     @FXML private Button createButton;
     @FXML private Button btnOpenSlots;
     @FXML private HBox menuHbox;
+    @FXML private VBox sideVbox;
 
     @FXML
     public void handleMenuAction(ActionEvent event){
@@ -34,6 +36,10 @@ public class DashboardController implements Initializable {
             }
         }
         clickedButton.getStyleClass().add("nav-btn-active");
+    }
+    @FXML
+    public void handlebtnAvatar(ActionEvent event){
+        changeView("AccountView.fxml", 1);
     }
     @FXML
     public void handlebtnDashboard(ActionEvent event){

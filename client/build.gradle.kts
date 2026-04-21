@@ -17,6 +17,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation(project(":common"))
+    implementation("com.google.code.gson:gson:2.13.2")
 }
 
 javafx {
