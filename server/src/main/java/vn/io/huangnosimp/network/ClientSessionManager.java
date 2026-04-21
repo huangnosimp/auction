@@ -28,9 +28,10 @@ public class ClientSessionManager {
     public void removeClient(ClientHandle client) {
         if (client != null) {
             activeClients.remove(client);
-            for (Set<ClientHandle> room : auctionRooms.values()) {
+            auctionRooms.values().removeIf(room -> {
                 room.remove(client);
-            }
+                return room.isEmpty();
+            });
         }
     }
 
@@ -42,10 +43,10 @@ public class ClientSessionManager {
 
     public void leaveRoom(String auctionId, ClientHandle client) {
         if (auctionId != null && client != null) {
-            Set<ClientHandle> room = auctionRooms.get(auctionId);
-            if (room != null) {
+            auctionRooms.computeIfPresent(auctionId, (key, room) -> {
                 room.remove(client);
-            }
+                return room.isEmpty() ? null : room;
+            });
         }
     }
 

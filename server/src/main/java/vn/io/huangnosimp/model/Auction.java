@@ -167,6 +167,9 @@ public class Auction extends Entity {
         if (bidders.get(bidder.getId()) == null) {
             return false;
         }
+        if (bidder.equals(seller)) {
+            return false;
+        }
         if (amount <= this.currentPrice) {
             return false;
         }

@@ -20,18 +20,7 @@ public class AuctionScheduler {
     }
 
     public void scheduleAuction(Auction auction) {
-        long currentTime = System.currentTimeMillis();
-        long startTime = auction.getStartTime();
-        long endTime = auction.getEndTime();
-
-        if (currentTime < startTime) {
-            this.scheduleStart(auction);
-        } else if (currentTime >= startTime && currentTime < endTime) {
-            this.startAuctionTask(auction);
-            this.scheduleEnd(auction);
-        } else {
-            this.finishAuctionTask(auction);
-        }
+        this.scheduleStart(auction);
     }
 
     private void scheduleStart(Auction auction) {

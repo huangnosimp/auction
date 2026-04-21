@@ -59,7 +59,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public boolean saveUser(String userId, String username, String password, String email, String role) {
-        String sql = "INSERT INTO Users (id, username, email, role) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (id, username, password, email, role) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = databaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, userId);
