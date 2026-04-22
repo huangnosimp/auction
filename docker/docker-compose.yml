@@ -1,6 +1,6 @@
 services:
   auction-server:
-    image: ghcr.io/huangnosimp/auction-server:latest
+    image: ghcr.io/huangnosimp/auction/auction-server:latest
     restart: unless-stopped
     ports:
       - "26676:26676"

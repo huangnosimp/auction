@@ -1,35 +1,180 @@
 package vn.io.huangnosimp.network;
 
-import com.google.gson.Gson;
-import javafx.application.Platform; // giữ nếu bạn dùng Platform.runLater
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
+import vn.io.huangnosimp.util.GsonParser;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SocketClient {
-    private static SocketClient instance;
+    private final String host;
+    private final int port;
+
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-    private final Gson gson = new Gson();
-    private boolean isRunning = true;
+    private Thread listenerThread;
 
-    private SocketClient(String host, int port){
-        try {
-            this.socket = new Socket(host, port);
-            this.out = new PrintWriter(socket.getOutputStream(), true);
-            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        }
-        catch (IOException e){
-            System.out.println("[SocketClient] Error: " + e.getMessage());
+    private final List<IServerMessageListener> listeners = new CopyOnWriteArrayList<>();
+    private final Map<String, CompletableFuture<Response>> pendingRequests = new ConcurrentHashMap<>();
+
+    public SocketClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public void addListener(IServerMessageListener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
         }
     }
-    public void sendRequest(Request request){
-        if(out != null){
-            String json = gson.toJson(request);
-            out.println(json);
+
+    public void removeListener(IServerMessageListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void connect() throws IOException {
+        socket = new Socket(host, port);
+        out = new PrintWriter(socket.getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        System.out.println("[SocketClient] Connected to server at " + host + ":" + port);
+
+        listenerThread = new Thread(this::listenForMessages);
+        listenerThread.setDaemon(true);
+        listenerThread.start();
+    }
+
+    public CompletableFuture<Response> sendRequestAsync(Request request) {
+        CompletableFuture<Response> future = new CompletableFuture<>();
+        if (out != null && socket != null && !socket.isClosed()) {
+            pendingRequests.put(request.getRequestId(), future);
+            String jsonStr = GsonParser.GSON.toJson(request);
+            synchronized (out) {
+                out.println(jsonStr);
+            }
+            System.out.println("[SocketClient] Sent: " + jsonStr);
+        } else {
+            future.completeExceptionally(new IOException("Not connected to server."));
         }
+        return future;
+    }
+
+    public Response sendRequestBlocking(Request request) throws Exception {
+        return sendRequestAsync(request).get();
+    }
+
+    public void sendRequest(Request request) {
+        if (out != null && socket != null && !socket.isClosed()) {
+            String jsonStr = GsonParser.GSON.toJson(request);
+            synchronized (out) {
+                out.println(jsonStr);
+            }
+            System.out.println("[SocketClient] Sent (Fire & Forget): " + jsonStr);
+        } else {
+            System.err.println("[SocketClient] Cannot send message, not connected to server.");
+        }
+    }
+
+    private void listenForMessages() {
+        try {
+            String inputLine;
+            while (!Thread.currentThread().isInterrupted() && (inputLine = in.readLine()) != null) {
+                System.out.println("[SocketClient] Raw Received: " + inputLine);
+                try {
+                    JsonObject jsonObject = JsonParser.parseString(inputLine).getAsJsonObject();
+
+                    if (jsonObject.has("status") || jsonObject.has("message")) {
+                        Response response = GsonParser.GSON.fromJson(jsonObject, Response.class);
+                        handleResponse(response);
+                    } else if (jsonObject.has("action")) {
+                        Request request = GsonParser.GSON.fromJson(jsonObject, Request.class);
+                        handleServerNotification(request);
+                    } else {
+                        System.out.println("[SocketClient] Unknown message format: " + inputLine);
+                    }
+
+                } catch (Exception e) {
+                    System.err.println("[SocketClient] Failed to parse JSON from server: " + e.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("[SocketClient] Connection closed or lost: " + e.getMessage());
+            notifyDisconnect(e.getMessage());
+        } finally {
+            disconnect();
+        }
+    }
+
+    private void handleResponse(Response response) {
+        if (response.getRequestId() != null) {
+            CompletableFuture<Response> future = pendingRequests.remove(response.getRequestId());
+            if (future != null) {
+                future.complete(response);
+            }
+        }
+
+        for (IServerMessageListener listener : listeners) {
+            try {
+                listener.onResponseReceived(response);
+            } catch (Exception e) {
+                System.err.println("[SocketClient] Error in Response listener: " + e.getMessage());
+            }
+        }
+    }
+
+    private void handleServerNotification(Request request) {
+        for (IServerMessageListener listener : listeners) {
+            try {
+                listener.onRequestReceived(request);
+            } catch (Exception e) {
+                System.err.println("[SocketClient] Error in Notification listener: " + e.getMessage());
+            }
+        }
+    }
+
+    private void notifyDisconnect(String reason) {
+        for (CompletableFuture<Response> future : pendingRequests.values()) {
+            future.completeExceptionally(new IOException("Connection lost: " + reason));
+        }
+        pendingRequests.clear();
+
+        for (IServerMessageListener listener : listeners) {
+            try {
+                listener.onDisconnected(reason);
+            } catch (Exception e) {
+                System.err.println("[SocketClient] Error notifying disconnect: " + e.getMessage());
+            }
+        }
+    }
+
+    public void disconnect() {
+        if (listenerThread != null && listenerThread.isAlive()) {
+            listenerThread.interrupt();
+        }
+        try {
+            if (in != null) in.close();
+        } catch (IOException e) {
+            System.err.println("[SocketClient] Error closing input stream: " + e.getMessage());
+        }
+        
+        if (out != null) out.close();
+        
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            System.err.println("[SocketClient] Error closing socket: " + e.getMessage());
+        }
+        System.out.println("[SocketClient] Disconnected cleanly.");
     }
 }

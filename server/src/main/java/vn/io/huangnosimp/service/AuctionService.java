@@ -56,7 +56,7 @@ public class AuctionService implements IAuctionService {
     public AuctionResponseDTO createAuction(String sellerId, String itemName, String description, ItemType itemType,
             ItemAttributesDTO attributes, double startPrice, long startTime, long endTime) {
         if (!isValidOpenAuctionInput(sellerId, itemName, description, itemType, attributes, startPrice)
-                || endTime <= startTime || startTime < System.currentTimeMillis()) {
+                || endTime <= startTime || startTime > System.currentTimeMillis()) {
             return null;
         }
         Member seller = userService.getMember(sellerId);
@@ -106,6 +106,7 @@ public class AuctionService implements IAuctionService {
     }
 
     public boolean cancelAuction(String auctionId) {
+        boolean success = false;
         Object lock = getAuctionLock(auctionId);
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
@@ -130,13 +131,17 @@ public class AuctionService implements IAuctionService {
                 if (scheduler != null) {
                     scheduler.cancelTimers(auctionId);
                 }
-                return true;
+                success = true;
             }
-            return false;
         }
+        if (success) {
+            auctionLocks.remove(auctionId);
+        }
+        return success;
     }
 
     public boolean processPayment(String auctionId) {
+        boolean success = false;
         Object lock = getAuctionLock(auctionId);
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
@@ -166,11 +171,14 @@ public class AuctionService implements IAuctionService {
                         notificationService.notifyAuctionEnded(auctionId, bidderId, auction.getCurrentPrice());
                     }
 
-                    return itemService.transferOwnership(auction.getItem(), winner.getId());
+                    success = itemService.transferOwnership(auction.getItem(), winner.getId());
                 }
             }
         }
-        return false;
+        if (success) {
+            auctionLocks.remove(auctionId);
+        }
+        return success;
     }
 
     @Override

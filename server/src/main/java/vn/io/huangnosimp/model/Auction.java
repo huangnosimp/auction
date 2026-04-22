@@ -2,12 +2,11 @@ package vn.io.huangnosimp.model;
 
 import vn.io.huangnosimp.dto.response.AuctionResponseDTO;
 import java.util.concurrent.ConcurrentHashMap;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import vn.io.huangnosimp.enums.AuctionStatus;
+import vn.io.huangnosimp.util.GsonParser;
 
 public class Auction extends Entity {
-    private static final Gson GSON = new Gson();
     private final ConcurrentHashMap<String, Member> bidders;
     private final Item item;
 
@@ -106,6 +105,8 @@ public class Auction extends Entity {
         this.currentPrice = currentPrice;
     }
 
+
+
     public boolean extendEndTime(long newEndTime) {
         if (newEndTime <= this.endTime) {
             return false;
@@ -166,6 +167,9 @@ public class Auction extends Entity {
         if (bidders.get(bidder.getId()) == null) {
             return false;
         }
+        if (bidder.equals(seller)) {
+            return false;
+        }
         if (amount <= this.currentPrice) {
             return false;
         }
@@ -202,11 +206,11 @@ public class Auction extends Entity {
     }
 
     public String biddersToJson() {
-        return GSON.toJson(this.bidders);
+        return GsonParser.GSON.toJson(this.bidders);
     }
 
     public static ConcurrentHashMap<String, Member> biddersFromJson(String json) {
-        return GSON.fromJson(json, new TypeToken<ConcurrentHashMap<String, Member>>(){}.getType());
+        return GsonParser.GSON.fromJson(json, new TypeToken<ConcurrentHashMap<String, Member>>(){}.getType());
     }
 
     public AuctionResponseDTO toDTO() {
