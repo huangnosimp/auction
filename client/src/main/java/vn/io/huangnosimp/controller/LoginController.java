@@ -2,8 +2,12 @@ package vn.io.huangnosimp.controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
+import vn.io.huangnosimp.dto.request.LoginRequestDTO;
+import vn.io.huangnosimp.enums.UserType;
+import vn.io.huangnosimp.network.SocketClient;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -20,6 +24,16 @@ public class LoginController implements Initializable {
 
     private boolean isPasswordVisible = false;
 
+    @FXML
+    private Parent rootNode;
+
+    private UserType getCurrentScreenType() {
+        String id = rootNode.getId();
+        if ("ADMIN_LOGIN_VIEW".equals(id)) {
+            return UserType.ADMIN;
+        }
+        return UserType.MEMBER;
+    }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Sync text giữa PasswordField và TextField khi toggle
@@ -43,11 +57,9 @@ public class LoginController implements Initializable {
             showError("Vui lòng nhập đầy đủ thông tin đăng nhập.");
             return;
         }
-
-        // TODO: Gọi service xác thực
-        // authService.login(username, password);
-
-        System.out.println("Đăng nhập với: " + username);
+        if(getCurrentScreenType().equals(UserType.ADMIN));
+            LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserType.ADMIN, username, password);
+            SocketClient.sendRequest(loginRequestDTO);
     }
 
     @FXML
