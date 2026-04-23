@@ -24,9 +24,9 @@ public class AuctionRepository implements IAuctionRepository {
     public void save(Auction auction) {
         if (auction == null || auction.getId() == null) return;
         //add save bidders
-        String sql = "INSERT INTO Auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status, bidders) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE winner_id = VALUES(winner_id), end_time = VALUES(end_time), final_price = VALUES(final_price), status = VALUES(status), bidders = VALUES(bidders)";
+        String sql = "INSERT INTO Auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE winner_id = VALUES(winner_id), end_time = VALUES(end_time), final_price = VALUES(final_price), status = VALUES(status)";
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -40,7 +40,6 @@ public class AuctionRepository implements IAuctionRepository {
             stmt.setDouble(7, auction.getStartPrice());
             stmt.setDouble(8, auction.getCurrentPrice());
             stmt.setString(9, auction.getStatus() != null ? auction.getStatus().name() : "OPEN");
-            stmt.setString(10, auction.biddersToJson());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -87,15 +86,13 @@ public class AuctionRepository implements IAuctionRepository {
         double startingPrice = rs.getDouble("starting_price");
         double finalPrice = rs.getDouble("final_price");
         String statusStr = rs.getString("status");
-        String biddersJson = rs.getString("bidders");
 
         Item item = itemRepository.findById(itemId);
         Member seller = (Member) userRepository.findById(sellerId);
-        ConcurrentHashMap<String, Member> bidders = Auction.biddersFromJson(biddersJson);
 
         if (item == null || seller == null) return null;
 
-        Auction auction = new Auction(id, item, seller, startingPrice, startTime, endTime, bidders);
+        Auction auction = new Auction(id, item, seller, startingPrice, startTime, endTime);
         auction.setCurrentWinnerId(winnerId);
         auction.setCurrentPrice(finalPrice > 0 ? finalPrice : startingPrice);
         if (statusStr != null) {
@@ -103,5 +100,64 @@ public class AuctionRepository implements IAuctionRepository {
         }
 
         return auction;
+    }
+
+    @Override
+    public void addParticipant(String auctionId, String userId) {
+        String sql = "INSERT IGNORE INTO AuctionParticipants (auction_id, user_id) VALUES (?, ?)";
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, auctionId);
+            stmt.setString(2, userId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("DB error adding participant: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void removeParticipant(String auctionId, String userId) {
+        String sql = "DELETE FROM AuctionParticipants WHERE auction_id = ? AND user_id = ?";
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, auctionId);
+            stmt.setString(2, userId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("DB error removing participant: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean isParticipant(String auctionId, String userId) {
+        String sql = "SELECT 1 FROM AuctionParticipants WHERE auction_id = ? AND user_id = ? LIMIT 1";
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, auctionId);
+            stmt.setString(2, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error checking participant: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public int getParticipantCount(String auctionId) {
+        String sql = "SELECT COUNT(*) FROM AuctionParticipants WHERE auction_id = ?";
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, auctionId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error getting participant count: " + e.getMessage());
+        }
+        return 0;
     }
 }

@@ -14,6 +14,8 @@ public class ClientHandle implements Runnable {
     private  final Socket clientSocket;
     private final MessageRouter router;
     private String userId;
+
+    private UserType userType;
     private PrintWriter out;
 
     public ClientHandle(Socket clientSocket, MessageRouter router) {
@@ -28,6 +30,14 @@ public class ClientHandle implements Runnable {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     public void sendResponse(Response response) {

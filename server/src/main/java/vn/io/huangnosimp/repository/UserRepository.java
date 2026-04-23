@@ -122,6 +122,20 @@ public class UserRepository implements IUserRepository {
             return false;
         }
     }
+
+    @Override
+    public boolean updateFrozenBalance(String userId, double newFrozenBalance) {
+        String sql = "UPDATE Users SET frozen_balance = ? WHERE id = ?";
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setDouble(1, newFrozenBalance);
+            stmt.setString(2, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("DB error when updating frozen balance: " + e.getMessage());
+            return false;
+        }
+    }
     private User mapRowToUser(ResultSet rs) throws SQLException {
         String id = rs.getString("id");
         String username = rs.getString("username");
