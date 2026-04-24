@@ -8,11 +8,14 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.dto.request.LoginRequestDTO;
+import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.enums.UserType;
 import vn.io.huangnosimp.network.SocketClient;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.ResponseStatus;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -64,14 +67,30 @@ public class LoginController implements Initializable {
             showError("Vui lòng nhập đầy đủ thông tin đăng nhập.");
             return;
         }
-        if(getCurrentScreenType().equals(UserType.ADMIN)) {
-            LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserType.ADMIN, username, password);
+        if(getCurrentScreenType().equals(UserType.MEMBER)) {
+            LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserType.MEMBER, username, password);
             Request request = new Request(ActionType.LOGIN, loginRequestDTO);
             socketClient.sendRequestAsync(request)
-                    .thenAccept(response -> Platform.runLater(() -> {
+                    .thenAccept(response -> {
+                        // 1. Xử lý logic dữ liệu ở luồng nền (không cần Platform.runLater)
+                        if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
 
-                            }
-                    ));
+                            // Dùng hàm convert để tránh lỗi ép kiểu
+                            DashboardResponseDTO dashboardResponse = response.getDataAs(DashboardResponseDTO.class);
+                            UserSession.setDashboardInfo(dashboardResponse);
+
+                            // 2. Chỉ dùng Platform.runLater khi chuyển màn hình (Tác động UI)
+                            Platform.runLater(() -> {
+                                NavigationManager.switchScene("/views/dashboard.fxml");
+                            });
+
+                        } else {
+                            // Hiển thị lỗi nếu đăng nhập thất bại
+                            Platform.runLater(() -> {
+                                showErrorAlert(response.getMessage());
+                            });
+                        }
+                    });
         }
     }
 
