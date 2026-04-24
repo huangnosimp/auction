@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox fx:id="openSlotsPane"
+      spacing="0"
+      styleClass="os-root"
+      stylesheets="@../css/open_slots.css"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1">
+
+    <VBox styleClass="os-header" spacing="12">
+
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label styleClass="os-title" text="🔥 Open Slots" />
+            <Label styleClass="os-live-badge" text="LIVE" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblResultCount" styleClass="os-result-count" text="Showing 6 of 24 auctions" />
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="10">
+
+            <HBox styleClass="os-search-box" alignment="CENTER_LEFT" spacing="6" HBox.hgrow="ALWAYS">
+                <Label styleClass="os-search-icon" text="🔍" />
+                <TextField fx:id="txtSearch"
+                           styleClass="os-search-field"
+                           promptText="Search auctions, items…"
+                           HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <HBox styleClass="os-filter-group" alignment="CENTER_LEFT" spacing="6">
+                <ToggleButton fx:id="filterAll"    styleClass="os-filter-chip, os-filter-active" text="All"      selected="true" />
+                <ToggleButton fx:id="filterLive"   styleClass="os-filter-chip" text="🟢 Live"    />
+                <ToggleButton fx:id="filterWinning" styleClass="os-filter-chip" text="🏆 Winning" />
+                <ToggleButton fx:id="filterOutbid" styleClass="os-filter-chip" text="🔴 Outbid"  />
+                <ToggleButton fx:id="filterEnding" styleClass="os-filter-chip" text="⏰ Ending Soon" />
+            </HBox>
+
+            <ComboBox fx:id="cbSort"
+                      styleClass="os-sort-combo"
+                      promptText="Sort by…"
+                      prefWidth="140" />
+        </HBox>
+
+    </VBox>
+
+    <ScrollPane fx:id="scrollPane"
+                styleClass="os-scroll"
+                fitToWidth="true"
+                VBox.vgrow="ALWAYS">
+
+        <FlowPane fx:id="cardContainer"
+                  styleClass="os-flow-pane"
+                  hgap="14" vgap="14" />
+
+    </ScrollPane>
+
+    <HBox styleClass="os-footer" alignment="CENTER">
+        <Button fx:id="btnShowMore"
+                styleClass="os-show-more-btn"
+                text="Show More  ↓"/>
+    </HBox>
+
+</VBox>

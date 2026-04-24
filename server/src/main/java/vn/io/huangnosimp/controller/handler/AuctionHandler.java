@@ -7,7 +7,7 @@ import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.controller.RequestHandler;
 import vn.io.huangnosimp.protocol.ResponseStatus;
-import vn.io.huangnosimp.network.*;
+import vn.io.huangnosimp.model.*;
 import vn.io.huangnosimp.service.IAuctionService;
 
 public class AuctionHandler {

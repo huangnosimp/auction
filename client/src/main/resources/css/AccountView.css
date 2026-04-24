@@ -1,0 +1,322 @@
+/* account.css — center panel styles, matches dashboard.css palette */
+
+/* ── ScrollPane wrapper ── */
+.account-scroll {
+    -fx-background-color: #1a1c22;
+    -fx-background: #1a1c22;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.account-scroll > .viewport {
+    -fx-background-color: #1a1c22;
+}
+
+/* ── Center root ── */
+.center-content {
+    -fx-background-color: #1a1c22;
+    -fx-font-family: "Segoe UI", "SF Pro Display", sans-serif;
+}
+
+/* ── Page header ── */
+.page-title {
+    -fx-text-fill: #f0f2f8;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.page-sub {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 12px;
+}
+.online-badge {
+    -fx-background-color: #1a3a28;
+    -fx-text-fill: #2ecc71;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 12 4 12;
+    -fx-background-radius: 20px;
+}
+
+/* ── Stat cards ── */
+.stat-card {
+    -fx-background-color: #23262f;
+    -fx-background-radius: 12px;
+    -fx-padding: 16 18 16 18;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 12px;
+}
+.sc-label {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+.sc-val  { -fx-font-size: 22px; -fx-font-weight: bold; }
+.sc-sub  { -fx-text-fill: #8b8fa8; -fx-font-size: 11px; }
+.c-green { -fx-text-fill: #00e676; }
+.c-blue  { -fx-text-fill: #3daef5; }
+.c-amber { -fx-text-fill: #ffc107; }
+
+/* ── Section card (shared) ── */
+.sec-card {
+    -fx-background-color: #23262f;
+    -fx-background-radius: 12px;
+    -fx-padding: 16 18 16 18;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 12px;
+}
+.sec-title {
+    -fx-text-fill: #00e676;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 10 0;
+}
+
+/* ── Profile section ── */
+.avatar-section { -fx-padding: 4 0 10 0; }
+.avatar-circle {
+    -fx-background-color: #00e676;
+    -fx-background-radius: 50%;
+    -fx-min-width: 56px;
+    -fx-min-height: 56px;
+    -fx-max-width: 56px;
+    -fx-max-height: 56px;
+    -fx-font-size: 20px;
+    -fx-alignment: CENTER;
+    -fx-padding: 0;
+}
+.uname {
+    -fx-text-fill: #f0f2f8;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+.uid { -fx-text-fill: #8b8fa8; -fx-font-size: 11px; }
+.verified-badge {
+    -fx-background-color: #1a3a28;
+    -fx-text-fill: #2ecc71;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 10 2 10;
+    -fx-background-radius: 20px;
+}
+
+.sec-divider {
+    -fx-background-color: #2e3245;
+    -fx-padding: 0;
+    -fx-pref-height: 1px;
+    -fx-border-color: transparent;
+}
+
+.info-table { -fx-padding: 6 0 6 0; }
+.info-row   { -fx-padding: 5 0 5 0; -fx-border-color: transparent; }
+.ir-key  { -fx-text-fill: #8b8fa8; -fx-font-size: 12px; }
+.ir-val  { -fx-text-fill: #c5c8d8; -fx-font-size: 12px; -fx-font-weight: bold; }
+.ir-green { -fx-text-fill: #00e676; -fx-font-size: 12px; -fx-font-weight: bold; }
+
+.action-row { -fx-padding: 10 0 0 0; }
+.btn-dep {
+    -fx-background-color: #00c853;
+    -fx-text-fill: #0d1117;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-padding: 9 0 9 0;
+    -fx-cursor: hand;
+}
+.btn-dep:hover { -fx-background-color: #00e676; }
+.btn-wit {
+    -fx-background-color: #1e2029;
+    -fx-text-fill: #c5c8d8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-border-color: #3a3f56;
+    -fx-border-width: 1;
+    -fx-border-radius: 8px;
+    -fx-padding: 9 0 9 0;
+    -fx-cursor: hand;
+}
+.btn-wit:hover { -fx-background-color: #2a2d38; }
+
+/* ── Wallet tabs ── */
+.wallet-tabs {
+    -fx-background-color: #1e2029;
+    -fx-background-radius: 8px;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 8px;
+    -fx-padding: 0;
+    -fx-spacing: 0;
+}
+.wtab {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 12px;
+    -fx-padding: 7 0 7 0;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+}
+.wtab:hover { -fx-text-fill: #f0f2f8; }
+.wtab-active {
+    -fx-background-color: #2a2d38;
+    -fx-text-fill: #f0f2f8;
+    -fx-font-weight: bold;
+    -fx-background-radius: 7px;
+}
+
+/* ── Transaction list ── */
+.tx-pane { -fx-padding: 8 0 0 0; }
+.tx-item {
+    -fx-padding: 9 0 9 0;
+    -fx-border-color: transparent transparent #2e3245 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.tx-name { -fx-text-fill: #dddddd; -fx-font-size: 12px; -fx-font-weight: bold; }
+.tx-date { -fx-text-fill: #8b8fa8; -fx-font-size: 10px; }
+.tx-amt  { -fx-font-size: 13px; -fx-font-weight: bold; }
+.pos { -fx-text-fill: #00e676; }
+.neg { -fx-text-fill: #e74c3c; }
+
+/* Transaction dots (Circle) */
+.dot-green { -fx-fill: #00e676; }
+.dot-red   { -fx-fill: #e74c3c; }
+.dot-blue  { -fx-fill: #3daef5; }
+.dot-amber { -fx-fill: #ffc107; }
+
+/* ── Fund panes (Deposit / Withdraw) ── */
+.fund-pane { -fx-padding: 8 0 0 0; }
+.fl {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+.fund-input {
+    -fx-background-color: #1e2029;
+    -fx-border-color: #3a3f56;
+    -fx-border-width: 1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #f0f2f8;
+    -fx-font-size: 14px;
+    -fx-padding: 8 12 8 12;
+    -fx-prompt-text-fill: #4a4e66;
+}
+.fund-input:focused {
+    -fx-border-color: #00e676;
+    -fx-background-color: #1e2029;
+}
+
+/* Payment method buttons */
+.meth {
+    -fx-background-color: #1e2029;
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 11px;
+    -fx-padding: 6 4 6 4;
+    -fx-background-radius: 6px;
+    -fx-border-color: #3a3f56;
+    -fx-border-width: 1;
+    -fx-border-radius: 6px;
+    -fx-cursor: hand;
+}
+.meth:hover { -fx-background-color: #2a2d38; }
+.meth-sel {
+    -fx-background-color: #1a2e20;
+    -fx-text-fill: #00e676;
+    -fx-border-color: #00e676;
+}
+
+/* Quick amount buttons */
+.qa-btn {
+    -fx-background-color: #23262f;
+    -fx-text-fill: #c5c8d8;
+    -fx-font-size: 11px;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 6px;
+    -fx-border-color: #3a3f56;
+    -fx-border-width: 1;
+    -fx-border-radius: 6px;
+    -fx-cursor: hand;
+}
+.qa-btn:hover {
+    -fx-background-color: #1a2e20;
+    -fx-border-color: #00e676;
+    -fx-text-fill: #00e676;
+}
+
+/* Submit buttons */
+.submit-dep {
+    -fx-background-color: #00c853;
+    -fx-text-fill: #0d1117;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-padding: 10 0 10 0;
+    -fx-cursor: hand;
+}
+.submit-dep:hover { -fx-background-color: #00e676; }
+.submit-wit {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-padding: 10 0 10 0;
+    -fx-cursor: hand;
+}
+.submit-wit:hover { -fx-background-color: #c0392b; }
+
+.avail-note {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 10px;
+}
+
+/* ── Security settings ── */
+.sec-row {
+    -fx-padding: 9 0 9 0;
+    -fx-border-color: transparent transparent #2e3245 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.sec-row-last {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+.sec-label { -fx-text-fill: #c5c8d8; -fx-font-size: 12px; }
+.sec-desc  { -fx-text-fill: #8b8fa8; -fx-font-size: 10px; }
+
+/* Toggle buttons */
+.toggle-on {
+    -fx-background-color: #00c853;
+    -fx-min-width: 36px;
+    -fx-max-width: 36px;
+    -fx-min-height: 20px;
+    -fx-max-height: 20px;
+    -fx-background-radius: 10px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+.toggle-off {
+    -fx-background-color: #2e3245;
+    -fx-min-width: 36px;
+    -fx-max-width: 36px;
+    -fx-min-height: 20px;
+    -fx-max-height: 20px;
+    -fx-background-radius: 10px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+/* Security badges */
+.sbadge {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 10px;
+}
+.sb-ok   { -fx-background-color: #1a3a28; -fx-text-fill: #2ecc71; }
+.sb-warn { -fx-background-color: #3a2a10; -fx-text-fill: #ffc107; }
