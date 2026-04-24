@@ -1,29 +1,40 @@
 package vn.io.huangnosimp;
 
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import vn.io.huangnosimp.Manager.SceneManager;
+import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.network.SocketClient;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
+import java.lang.reflect.Method;
+import java.net.URL;
 
-public class Main {
-    public static void main(String[] args) {
-        final int port = 26676;
-        String host = "127.0.0.1";
+public class Main extends Application {
 
-        Properties props = new Properties();
-        try (FileInputStream fis = new FileInputStream("./client/config.properties")) {
-            props.load(fis);
-            host = props.getProperty("SERVER_IP", host);
-            System.out.println("Loaded config: " + host + ":" + port);
-        } catch (IOException e) {
-            System.out.println("Could not load config.properties, using default host");
-        }
-        SocketClient client = new SocketClient(host, port);
+    @Override
+    public void start(Stage primaryStage) {
         try {
-            client.connect();
-        } catch (IOException e) {
+            SceneManager.setStage(primaryStage);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard.fxml"));
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            primaryStage.setTitle("Dashboard");
+            primaryStage.setScene(scene);
+            primaryStage.setMinWidth(800);
+            primaryStage.setMinHeight(500);
+            primaryStage.show();
+        } catch (Exception e) {
             e.printStackTrace();
+            Platform.exit();
         }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

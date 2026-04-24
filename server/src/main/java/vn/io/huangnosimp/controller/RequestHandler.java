@@ -1,6 +1,6 @@
 package vn.io.huangnosimp.controller;
 
-import vn.io.huangnosimp.network.ClientHandle;
+import vn.io.huangnosimp.model.ClientHandle;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
 

@@ -5,7 +5,7 @@ import vn.io.huangnosimp.controller.handler.AuctionHandler;
 import vn.io.huangnosimp.controller.handler.UserHandler;
 import vn.io.huangnosimp.database.DatabaseConnection;
 import vn.io.huangnosimp.protocol.ActionType;
-import vn.io.huangnosimp.network.SocketServer;
+import vn.io.huangnosimp.model.SocketServer;
 import vn.io.huangnosimp.repository.*;
 import vn.io.huangnosimp.service.*;
 

@@ -71,9 +71,9 @@
         <VBox spacing="6">
             <HBox alignment="CENTER_LEFT">
                 <Label style="-fx-text-fill: #BA0000;                            -fx-font-size: 12px;                            -fx-font-weight: bold;                            -fx-font-family: 'Trebuchet MS';" text="Mật khẩu" HBox.hgrow="ALWAYS" />
-                <Hyperlink fx:id="forgotPasswordLink"  style="-fx-text-fill: #BA0000;                            -fx-font-size: 11px;                            -fx-border-color: transparent;                            -fx-font-family: 'Trebuchet MS';" text="Quên mật khẩu?" />
+                <Hyperlink fx:id="forgotPasswordLink" onAction="#handleForgotPassword" style="-fx-text-fill: #BA0000;                            -fx-font-size: 11px;                            -fx-border-color: transparent;                            -fx-font-family: 'Trebuchet MS';" text="Quên mật khẩu?" />
             </HBox>
-            <PasswordField fx:id="passwordField"  prefHeight="44" promptText="Nhập mật khẩu..." style="-fx-background-color: white;                        -fx-border-color: #dde3ef;                        -fx-border-radius: 8px;                        -fx-background-radius: 8px;                        -fx-border-width: 1.5px;                        -fx-padding: 12 16 12 16;                        -fx-font-size: 13px;                        -fx-font-family: 'Trebuchet MS';                        -fx-text-fill: #2d3748;                        -fx-prompt-text-fill: #a0aec0;" />
+            <PasswordField fx:id="passwordField" prefHeight="44" promptText="Nhập mật khẩu..." style="-fx-background-color: white;                        -fx-border-color: #dde3ef;                        -fx-border-radius: 8px;                        -fx-background-radius: 8px;                        -fx-border-width: 1.5px;                        -fx-padding: 12 16 12 16;                        -fx-font-size: 13px;                        -fx-font-family: 'Trebuchet MS';                        -fx-text-fill: #2d3748;                        -fx-prompt-text-fill: #a0aec0;" />
         </VBox>
 
         <!-- Spacer -->
@@ -89,7 +89,7 @@
         <VBox prefHeight="24" />
 
         <!-- Login Button -->
-        <Button fx:id="loginButton" maxWidth="Infinity"  prefHeight="46" style="-fx-background-color: #BA0000;                    -fx-text-fill: white;                    -fx-font-size: 13px;                    -fx-font-weight: bold;                    -fx-font-family: 'Trebuchet MS';                    -fx-background-radius: 8px;                    -fx-cursor: hand;                    -fx-effect: dropshadow(gaussian, rgba(26,58,107,0.35), 8, 0, 0, 3);" text="ĐĂNG NHẬP" />
+        <Button fx:id="loginButton" maxWidth="Infinity" onAction="#handleLogin" prefHeight="46" style="-fx-background-color: #BA0000;                    -fx-text-fill: white;                    -fx-font-size: 13px;                    -fx-font-weight: bold;                    -fx-font-family: 'Trebuchet MS';                    -fx-background-radius: 8px;                    -fx-cursor: hand;                    -fx-effect: dropshadow(gaussian, rgba(26,58,107,0.35), 8, 0, 0, 3);" text="ĐĂNG NHẬP" />
 
         <!-- Spacer -->
         <VBox prefHeight="16" />
@@ -105,7 +105,7 @@
         <VBox prefHeight="16" />
 
         <!-- SSO Button -->
-        <Button fx:id="ssoButton" maxWidth="Infinity" prefHeight="44" style="-fx-background-color: white;                    -fx-text-fill: #BA0000;                    -fx-font-size: 13px;                    -fx-font-weight: bold;                    -fx-font-family: 'Trebuchet MS';                    -fx-background-radius: 8px;                    -fx-border-color: #BA0000;                    -fx-border-width: 1.5px;                    -fx-border-radius: 8px;                    -fx-cursor: hand;" text="Đăng ký nếu chưa có tài khoản" />
+        <Button fx:id="ssoButton" maxWidth="Infinity" onAction="#handleRegister" prefHeight="44" style="-fx-background-color: white;                    -fx-text-fill: #BA0000;                    -fx-font-size: 13px;                    -fx-font-weight: bold;                    -fx-font-family: 'Trebuchet MS';                    -fx-background-radius: 8px;                    -fx-border-color: #BA0000;                    -fx-border-width: 1.5px;                    -fx-border-radius: 8px;                    -fx-cursor: hand;" text="Đăng ký nếu chưa có tài khoản" />
 
         <!-- Spacer -->
         <VBox prefHeight="32" />
