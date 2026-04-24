@@ -58,40 +58,6 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public int getJoinedAuctionCount(String userId) {
-        String sql = "SELECT COUNT(*) FROM AuctionParticipants WHERE user_id = ?";
-        try (Connection connection = databaseConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("DB error when getting joined auction count: " + e.getMessage());
-        }
-        return 0;
-    }
-
-    @Override
-    public double getAccountBalance(String userId) {
-        String sql = "SELECT account_balance FROM users WHERE id = ?";
-        try (Connection connection = databaseConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getDouble("account_balance");
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("DB error when getting account balance: " + e.getMessage());
-        }
-        return 0.0;
-    }
-
-    @Override
     public boolean saveUser(String userId, String username, String password, String email, String role) {
         String sql = "INSERT INTO Users (id, username, password, email, role) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = databaseConnection.getConnection();
@@ -179,28 +145,12 @@ public class UserRepository implements IUserRepository {
         double accountBalance = rs.getDouble("account_balance");
         double frozenBalance = rs.getDouble("frozen_balance");
         boolean isBanned = rs.getBoolean("is_banned");
+        long createdAt = rs.getTimestamp("created_at").getTime();
 
         return switch (role) {
-            case "MEMBER" -> new Member(id, username, password, email, accountBalance, frozenBalance, isBanned);
-            case "ADMIN" -> new Admin(id, username, password, email);
+            case "MEMBER" -> new Member(id, username, password, email, accountBalance, frozenBalance, isBanned, createdAt);
+            case "ADMIN" -> new Admin(id, username, password, email, createdAt);
             default -> null;
         };
-    }
-
-    @Override
-    public int getWinningAuction(String userId) {
-        String sql = "SELECT COUNT(*) FROM Auctions WHERE winner_id = ?";
-        try (Connection connection = databaseConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("DB error when getting winning auction count: " + e.getMessage());
-        }
-        return 0;
     }
 }

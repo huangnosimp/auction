@@ -6,8 +6,11 @@ public abstract class Item extends Entity {
     private String ownerId;
     private String description;
 
-    protected Item() {
-        super();
+    public Item(String id, long createdAt, String name, String ownerId, String description) {
+        super(id, createdAt);
+        this.name = name;
+        this.ownerId = ownerId;
+        this.description = description;
     }
 
     protected Item(String ownerId, String name, String description) {

@@ -18,9 +18,8 @@ public class Transaction extends Entity {
         this.amount = amount;
     }
 
-    //constructor cho DAO
-    public Transaction(String Id, String userId, TransactionType transactionType, double amount, long createdAt) {
-        super(Id);
+    public Transaction(String id, String userId, TransactionType transactionType, double amount, long createdAt) {
+        super(id, createdAt);
         super.setCreatedAt(createdAt);
         this.userId = userId;
         this.transactionType = transactionType;

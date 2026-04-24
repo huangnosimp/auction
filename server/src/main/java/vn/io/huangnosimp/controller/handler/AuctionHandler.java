@@ -1,30 +1,16 @@
 package vn.io.huangnosimp.controller.handler;
 
 import vn.io.huangnosimp.dto.response.AuctionResponseDTO;
+import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.util.GsonParser;
 import vn.io.huangnosimp.dto.request.*;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.controller.RequestHandler;
 import vn.io.huangnosimp.protocol.ResponseStatus;
-import vn.io.huangnosimp.model.*;
 import vn.io.huangnosimp.service.IAuctionService;
 
 public class AuctionHandler {
-    public static class GetAuctionDetailHandler implements RequestHandler {
-        private final IAuctionService auctionService;
-
-        public GetAuctionDetailHandler(IAuctionService auctionService) {
-            this.auctionService = auctionService;
-        }
-
-        @Override
-        public Response handle(Request request, ClientHandle client) {
-            GetAuctionDetailRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetAuctionDetailRequestDTO.class);
-            return new Response(ResponseStatus.SUCCESS, auctionService.getAuctionDetail(dto.getAuctionId()));
-        }
-    }
-
     public static class CreateAuctionHandler implements RequestHandler {
         private final IAuctionService auctionService;
 

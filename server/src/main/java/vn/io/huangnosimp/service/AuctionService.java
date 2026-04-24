@@ -8,7 +8,9 @@ import vn.io.huangnosimp.model.*;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.network.ClientSessionManager;
 import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
+import vn.io.huangnosimp.repository.IAuctionParticipantsRepository;
 import vn.io.huangnosimp.repository.IAuctionRepository;
+import vn.io.huangnosimp.repository.IBidTransactionRepository;
 import vn.io.huangnosimp.repository.ITransactionRepository;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,6 +22,8 @@ public class AuctionService implements IAuctionService {
     private NotificationService notificationService;
     private IAutoBidService autoBidService;
     private final ITransactionRepository transactionRepository;
+    private final IAuctionParticipantsRepository auctionParticipantsRepository;
+    private final IBidTransactionRepository bidTransactionRepository;
 
     private final ConcurrentHashMap<String, Object> auctionLocks = new ConcurrentHashMap<>();
 
@@ -28,11 +32,14 @@ public class AuctionService implements IAuctionService {
     }
 
     public AuctionService(IAuctionRepository auctionRepository, IUserService userService, IItemService itemService,
-            ITransactionRepository transactionRepository) {
+            ITransactionRepository transactionRepository, IAuctionParticipantsRepository auctionParticipantsRepository,
+            IBidTransactionRepository bidTransactionRepository) {
         this.auctionRepository = auctionRepository;
         this.userService = userService;
         this.itemService = itemService;
         this.transactionRepository = transactionRepository;
+        this.auctionParticipantsRepository = auctionParticipantsRepository;
+        this.bidTransactionRepository = bidTransactionRepository;
     }
 
     public void setScheduler(AuctionScheduler scheduler) {
@@ -84,7 +91,7 @@ public class AuctionService implements IAuctionService {
             if (auction == null || auction.getStatus() != AuctionStatus.RUNNING) {
                 return false;
             }
-            if (!auctionRepository.isParticipant(auctionId, bidderId)) {
+            if (!auctionParticipantsRepository.isParticipant(auctionId, bidderId)) {
                 return false;
             }
             Member bidder = userService.getMember(bidderId);
@@ -110,11 +117,18 @@ public class AuctionService implements IAuctionService {
                 }
                 if (previousWinnerId != null) {
                     Member previousWinner = userService.getMember(previousWinnerId);
-                    if (previousWinner != null && !previousWinner.unfreezeMoney(previousPrice)) {
+                    if (previousWinner == null) {
                         bidder.unfreezeMoney(amount);
+                        userService.updateBalance(bidder.getId(), bidder.getAccountBalance());
+                        userService.updateFrozenBalance(bidder.getId(), bidder.getFrozenBalance());
                         return false;
                     }
-                    // Persist previous winner's updated balance
+                    if (!previousWinner.unfreezeMoney(previousPrice)) {
+                        bidder.unfreezeMoney(amount);
+                        userService.updateBalance(bidder.getId(), bidder.getAccountBalance());
+                        userService.updateFrozenBalance(bidder.getId(), bidder.getFrozenBalance());
+                        return false;
+                    }
                     userService.updateBalance(previousWinner.getId(), previousWinner.getAccountBalance());
                     userService.updateFrozenBalance(previousWinner.getId(), previousWinner.getFrozenBalance());
                 }
@@ -127,6 +141,7 @@ public class AuctionService implements IAuctionService {
 
             auction.setUpdatedAt(System.currentTimeMillis());
             auctionRepository.save(auction);
+            bidTransactionRepository.saveBidTransaction(new BidTransaction(bidderId, auctionId, amount));
 
             if (notificationService != null) {
                 notificationService.notifyBidPlaced(auctionId, auction.getCurrentPrice(), bidderId);
@@ -177,7 +192,7 @@ public class AuctionService implements IAuctionService {
         return success;
     }
 
-    public boolean processPayment(String auctionId) {
+    public void processPayment(String auctionId) {
         boolean success = false;
         Object lock = getAuctionLock(auctionId);
 
@@ -226,7 +241,6 @@ public class AuctionService implements IAuctionService {
         if (success) {
             auctionLocks.remove(auctionId);
         }
-        return success;
     }
 
     @Override
@@ -242,7 +256,7 @@ public class AuctionService implements IAuctionService {
             if (bidder == null) {
                 return false;
             }
-            auctionRepository.addParticipant(auctionId, userId);
+            auctionParticipantsRepository.addParticipant(auctionId, userId);
             ClientSessionManager.getInstance().joinRoom(auctionId, client);
             return true;
         }
@@ -260,25 +274,9 @@ public class AuctionService implements IAuctionService {
             if (bidder == null) {
                 return false;
             }
-            auctionRepository.removeParticipant(auctionId, userId);
+            auctionParticipantsRepository.removeParticipant(auctionId, userId);
             ClientSessionManager.getInstance().leaveRoom(auctionId, client);
             return true;
         }
-    }
-
-    public AuctionResponseDTO getAuctionDetail(String auctionId) {
-        Auction auction = auctionRepository.findById(auctionId);
-        if (auction == null) {
-            return null;
-        }
-        int participantCount = auctionRepository.getParticipantCount(auctionId);
-        String currentWinnerUserName = null;
-        if (auction.getCurrentWinnerId() != null) {
-            Member winner = userService.getMember(auction.getCurrentWinnerId());
-            if (winner != null) {
-                currentWinnerUserName = winner.getUsername();
-            }
-        }
-        return auction.toDTO(participantCount, currentWinnerUserName);
     }
 }

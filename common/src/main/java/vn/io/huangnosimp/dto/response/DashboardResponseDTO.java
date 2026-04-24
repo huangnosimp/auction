@@ -1,23 +1,24 @@
 package vn.io.huangnosimp.dto.response;
 
+import java.util.List;
+
 public class DashboardResponseDTO {
     private double balance;
-    private int activeBids;
+    private int joinedRooms;
     private int winningBids;
     private int outBids;
     private int wonTotal;
-    private AuctionCardDTO auctionCardInfo;
+    private List<AuctionCardDTO> auctionCardInfo;
 
     public DashboardResponseDTO(
             double balance,
             int activeBids,
             int winningBids,
-
             int outBids,
             int wonTotal,
-            AuctionCardDTO auctionCardInfo) {
+            List<AuctionCardDTO> auctionCardInfo) {
         this.balance = balance;
-        this.activeBids = activeBids;
+        this.joinedRooms = activeBids;
         this.winningBids = winningBids;
         this.outBids = outBids;
         this.wonTotal = wonTotal;
@@ -29,8 +30,8 @@ public class DashboardResponseDTO {
         return balance;
     }
 
-    public int getActiveBids() {
-        return activeBids;
+    public int getJoinedRooms() {
+        return joinedRooms;
     }
 
     public int getWinningBids() {
@@ -45,7 +46,7 @@ public class DashboardResponseDTO {
         return wonTotal;
     }
 
-    public AuctionCardDTO getAuctionCardInfo() {
+    public List<AuctionCardDTO> getAuctionCardInfo() {
         return auctionCardInfo;
     }
 

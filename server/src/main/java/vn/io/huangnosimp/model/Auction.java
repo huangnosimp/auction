@@ -37,8 +37,8 @@ public class Auction extends Entity {
             Member seller,
             double startPrice,
             long startTime,
-            long endTime) {
-        super(id);
+            long endTime, long createdAt) {
+        super(id, createdAt);
         this.item = item;
         this.seller = seller;
         this.startPrice = startPrice;

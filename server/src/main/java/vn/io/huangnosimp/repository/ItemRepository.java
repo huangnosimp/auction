@@ -85,24 +85,6 @@ public class ItemRepository implements IItemRepository {
     }
 
     @Override
-    public List<Item> findByOwnerId(String ownerId) {
-        List<Item> ownerItems = new ArrayList<>();
-        String sql = "SELECT * FROM Items WHERE owner_id = ?";
-        try (Connection conn = databaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, ownerId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    ownerItems.add(mapRowToItem(rs));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("DB error in findByOwnerId: " + e.getMessage());
-        }
-        return ownerItems;
-    }
-
-    @Override
     public void updateOwner(String itemId, String ownerId) {
         String sql = "UPDATE Items SET owner_id = ? WHERE id = ?";
         try (Connection connection = databaseConnection.getConnection();

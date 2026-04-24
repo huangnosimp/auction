@@ -7,7 +7,6 @@ import vn.io.huangnosimp.model.Item;
 import vn.io.huangnosimp.model.Member;
 
 import java.sql.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class AuctionRepository implements IAuctionRepository {
     private final DatabaseConnection databaseConnection;
@@ -86,13 +85,14 @@ public class AuctionRepository implements IAuctionRepository {
         double startingPrice = rs.getDouble("starting_price");
         double finalPrice = rs.getDouble("final_price");
         String statusStr = rs.getString("status");
+        long createdAt = rs.getTimestamp("created_at").getTime();
 
         Item item = itemRepository.findById(itemId);
         Member seller = (Member) userRepository.findById(sellerId);
 
         if (item == null || seller == null) return null;
 
-        Auction auction = new Auction(id, item, seller, startingPrice, startTime, endTime);
+        Auction auction = new Auction(id, item, seller, startingPrice, startTime, endTime, createdAt);
         auction.setCurrentWinnerId(winnerId);
         auction.setCurrentPrice(finalPrice > 0 ? finalPrice : startingPrice);
         if (statusStr != null) {
@@ -100,64 +100,5 @@ public class AuctionRepository implements IAuctionRepository {
         }
 
         return auction;
-    }
-
-    @Override
-    public void addParticipant(String auctionId, String userId) {
-        String sql = "INSERT IGNORE INTO AuctionParticipants (auction_id, user_id) VALUES (?, ?)";
-        try (Connection conn = databaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, auctionId);
-            stmt.setString(2, userId);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("DB error adding participant: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void removeParticipant(String auctionId, String userId) {
-        String sql = "DELETE FROM AuctionParticipants WHERE auction_id = ? AND user_id = ?";
-        try (Connection conn = databaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, auctionId);
-            stmt.setString(2, userId);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("DB error removing participant: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public boolean isParticipant(String auctionId, String userId) {
-        String sql = "SELECT 1 FROM AuctionParticipants WHERE auction_id = ? AND user_id = ? LIMIT 1";
-        try (Connection conn = databaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, auctionId);
-            stmt.setString(2, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException e) {
-            System.err.println("DB error checking participant: " + e.getMessage());
-            return false;
-        }
-    }
-
-    @Override
-    public int getParticipantCount(String auctionId) {
-        String sql = "SELECT COUNT(*) FROM AuctionParticipants WHERE auction_id = ?";
-        try (Connection conn = databaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, auctionId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("DB error getting participant count: " + e.getMessage());
-        }
-        return 0;
     }
 }
