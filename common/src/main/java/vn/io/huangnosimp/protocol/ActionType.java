@@ -7,6 +7,7 @@ public enum ActionType {
     DEPOSIT,
     WITHDRAW,
 
+    GET_DASHBOARD_INFO,
     GET_ACTIVE_AUCTIONS,
     GET_AUCTION_DETAIL,
     CREATE_AUCTION,

@@ -44,7 +44,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public boolean checkEmail(String email) {
-        String sql = "SELECT 1 FROM Users WHERE email = ? LIMIT 1";
+        String sql = "SELECT 1 FROM users WHERE email = ? LIMIT 1";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, email);
@@ -55,6 +55,40 @@ public class UserRepository implements IUserRepository {
             System.err.println("DB error when checking email: " + e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public int getJoinedAuctionCount(String userId) {
+        String sql = "SELECT COUNT(*) FROM AuctionParticipants WHERE user_id = ?";
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error when getting joined auction count: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    @Override
+    public double getAccountBalance(String userId) {
+        String sql = "SELECT account_balance FROM users WHERE id = ?";
+        try (Connection connection = databaseConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("account_balance");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error when getting account balance: " + e.getMessage());
+        }
+        return 0.0;
     }
 
     @Override
@@ -151,5 +185,22 @@ public class UserRepository implements IUserRepository {
             case "ADMIN" -> new Admin(id, username, password, email);
             default -> null;
         };
+    }
+
+    @Override
+    public int getWinningAuction(String userId) {
+        String sql = "SELECT COUNT(*) FROM Auctions WHERE winner_id = ?";
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error when getting winning auction count: " + e.getMessage());
+        }
+        return 0;
     }
 }

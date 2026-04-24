@@ -12,4 +12,7 @@ public interface IUserRepository {
     boolean updateFrozenBalance(String userId, double newFrozenBalance);
     boolean banUser(String userId);
     boolean unbanUser(String userId);
+    double getAccountBalance(String userId);
+    int getJoinedAuctionCount(String userId);
+    int getWinningAuction(String userId);
 }
