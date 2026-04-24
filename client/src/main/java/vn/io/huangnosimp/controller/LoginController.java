@@ -1,16 +1,23 @@
 package vn.io.huangnosimp.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
+import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.dto.request.LoginRequestDTO;
 import vn.io.huangnosimp.enums.UserType;
 import vn.io.huangnosimp.network.SocketClient;
+import vn.io.huangnosimp.protocol.ActionType;
+import vn.io.huangnosimp.protocol.Request;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static vn.io.huangnosimp.Manager.ViewManager.changeMainStage;
 
 public class LoginController implements Initializable {
 
@@ -23,6 +30,7 @@ public class LoginController implements Initializable {
     @FXML private Button togglePasswordBtn;
 
     private boolean isPasswordVisible = false;
+    private SocketClient socketClient = SocketManager.getClient();
 
     @FXML
     private Parent rootNode;
@@ -36,7 +44,6 @@ public class LoginController implements Initializable {
     }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Sync text giữa PasswordField và TextField khi toggle
         passwordVisible.textProperty().bindBidirectional(passwordField.textProperty());
 
         // Hover effect cho nút đăng nhập
@@ -57,9 +64,15 @@ public class LoginController implements Initializable {
             showError("Vui lòng nhập đầy đủ thông tin đăng nhập.");
             return;
         }
-        if(getCurrentScreenType().equals(UserType.ADMIN));
+        if(getCurrentScreenType().equals(UserType.ADMIN)) {
             LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserType.ADMIN, username, password);
-            SocketClient.sendRequest(loginRequestDTO);
+            Request request = new Request(ActionType.LOGIN, loginRequestDTO);
+            socketClient.sendRequestAsync(request)
+                    .thenAccept(response -> Platform.runLater(() -> {
+
+                            }
+                    ));
+        }
     }
 
     @FXML
@@ -83,14 +96,12 @@ public class LoginController implements Initializable {
 
     @FXML
     private void handleForgotPassword() {
-        // TODO: Mở màn hình quên mật khẩu
-        System.out.println("Quên mật khẩu được nhấn");
+         changeMainStage("ForgotPassword.fxml");
     }
 
     @FXML
     private void handleRegister() {
-        // TODO: Mở màn hình đăng ký
-        System.out.println("Đăng ký ngay được nhấn");
+        changeMainStage("Register.fxml");
     }
 
     @FXML
@@ -101,8 +112,7 @@ public class LoginController implements Initializable {
 
     @FXML
     private void handleClose() {
-        // TODO: Đóng dialog hoặc quay về màn hình trước
-        usernameField.getScene().getWindow().hide();
+        changeMainStage("LoginView.fxml");
     }
 
     private void showError(String message) {

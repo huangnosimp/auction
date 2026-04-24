@@ -6,6 +6,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import vn.io.huangnosimp.Manager.SceneManager;
+import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.network.SocketClient;
 
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -15,7 +18,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-
+            SceneManager.setStage(primaryStage);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard.fxml"));
             Parent root = loader.load();
 

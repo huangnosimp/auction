@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.Manager;
 
+import javafx.scene.Scene;
 import vn.io.huangnosimp.controller.DashboardController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -42,6 +43,17 @@ public class ViewManager {
                 }
             }
             mainBorderPane.setCenter(root);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    public static void changeMainStage(String fxmlFile){
+        try{
+            FXMLLoader loader = new FXMLLoader(ViewManager.class.getResource("/fxml/" + fxmlFile));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            SceneManager.getStage().setScene(scene);
         }
         catch (IOException e){
             e.printStackTrace();
