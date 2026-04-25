@@ -23,11 +23,8 @@ public class Member extends User {
         return isBanned;
     }
 
-    public synchronized void setBanned() {
-        this.isBanned = true;
-    }
-    public synchronized void unban() {
-        this.isBanned = false;
+    public synchronized void setBanned(boolean banned) {
+        this.isBanned = banned;
     }
 
     public synchronized boolean deposit(double amount) {

@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import vn.io.huangnosimp.dto.response.AuctionResponseDTO;
+import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
+import vn.io.huangnosimp.enums.ItemType;
 import vn.io.huangnosimp.model.Auction;
 import vn.io.huangnosimp.model.Item;
 import vn.io.huangnosimp.model.Member;
@@ -47,7 +50,6 @@ class AuctionServiceTest {
         bidder = new Member("B1", "bidder", "pass", "bidder@test.com", 5000.0, 0.0, false);
         item = new Item("S1", "Test Item", "A test item for auction") {};
 
-
         bidders.put(bidder.getId(), bidder);
         mockAuction = new Auction("A1", item, seller, 100.0, 0, System.currentTimeMillis() + 100000, bidders);
         mockAuction.setStatusRunning();
@@ -57,10 +59,6 @@ class AuctionServiceTest {
 
     @Test
     void testBiddingWithoutDatabase() throws InterruptedException {
-        NotificationService notificationService = mock(NotificationService.class);
-        auctionService.setNotificationService(notificationService);
-        auctionService.setScheduler(mock(AuctionScheduler.class));
-
         int numThreads = 10;
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         CountDownLatch startLatch = new CountDownLatch(1);
@@ -96,7 +94,7 @@ class AuctionServiceTest {
         mockAuction.setCurrentPrice(200.0);
         when(userService.getMember("B1")).thenReturn(bidder);
 
-        boolean result = auctionService.placeBid("B1", "A1", 190.0, false);
+        boolean result = auctionService.placeBid("B1", "A1",190.0, false);
         assertFalse(result);
         assertEquals(200.0, mockAuction.getCurrentPrice());
     }
@@ -108,14 +106,19 @@ class AuctionServiceTest {
     }
 
     @Test
-    void placeBid_ShouldReturnFalse_WhenAuctionHasExpired() {
-        item = new Item("S1", "Test Item", "A test item for auction") {};
-        bidders = new ConcurrentHashMap<>();
-
-        mockAuction = new Auction("A1", item, seller, 100.0, 0, System.currentTimeMillis() - 3600000, bidders);
-        when(auctionRepo.findById("A1")).thenReturn(mockAuction);
-        boolean result = auctionService.placeBid("B1", "A1", 500.0, false);
-        assertFalse(result, "Không được đặt giá khi phiên đấu giá đã kết thúc");
+    void createAuction_WhenAuctionHasExpired() {
+        ItemType itemType = ItemType.ELECTRONICS;
+        ItemAttributesDTO attributes = new ItemAttributesDTO();
+        AuctionResponseDTO auctionResponseDTO = auctionService.createAuction(
+                "S1",
+                "Test Item",
+                "A test item for auction",
+                itemType,
+                attributes,
+                100.0,
+                System.currentTimeMillis() - 200000,
+                System.currentTimeMillis() - 100000);
+        assertNull(auctionResponseDTO, "Không được phép tạo phiên đấu giá đã kết thúc!");
     }
 
      @Test
@@ -131,17 +134,21 @@ class AuctionServiceTest {
 
     @Test
     void placeBid_ShouldUnfreezePreviousWinnerMoney_WhenOutbid() {
-        Member bidderA = new Member("A", "userA", "pass", "a@test.com", 1000.0, 150.0, false);
+        Member bidder2 = new Member("B2", "userA", "pass", "a@test.com", 1000.0, 150.0, false);
+        bidders.put(bidder2.getId(), bidder2);
+        mockAuction = new Auction("A1", item, seller, 100.0, 0, System.currentTimeMillis() + 100000, bidders);
         mockAuction.setCurrentWinnerId("A");
         mockAuction.setCurrentPrice(150.0);
+        mockAuction.getBidders().put("B1", bidder);
+        mockAuction.setStatusRunning();
 
         when(auctionRepo.findById("A1")).thenReturn(mockAuction);
         when(userService.getMember("B1")).thenReturn(bidder);
-        when(userService.getMember("A")).thenReturn(bidderA);
+        when(userService.getMember("B2")).thenReturn(bidder2);
 
-        auctionService.placeBid("B1", "A1", 200.0, false);
 
-        assertEquals(1150.0, bidderA.getAccountBalance(), "Người A phải được hoàn lại 150 vào tài khoản");
-        assertEquals(0.0, bidderA.getFrozenBalance(), "Frozen Balance của người A phải về 0");
+        System.out.println(auctionService.placeBid("B1", "A1", 200.0, false));
+        assertEquals(1150.0, bidder2.getAccountBalance(), "Người A phải được hoàn lại 150 vào tài khoản");
+        assertEquals(0.0, bidder2.getFrozenBalance(), "Frozen Balance của người A phải về 0");
     }
 }
