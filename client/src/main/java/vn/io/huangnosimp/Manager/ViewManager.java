@@ -14,14 +14,8 @@ public class ViewManager {
 
     private static BorderPane mainBorderPane;
 
-    private static DashboardController mainController;
-
     public static void setMainBorderPane(BorderPane area){
         mainBorderPane = area;
-    }
-
-    public static void setMainController(DashboardController controller) {
-        mainController = controller;
     }
 
     public static void changeView(String fxmlFile, int mode){
@@ -34,10 +28,7 @@ public class ViewManager {
             else {
                 FXMLLoader loader = new FXMLLoader(ViewManager.class.getResource("/fxml/" + fxmlFile));
                 root = loader.load();
-                Object controller = loader.getController();
-                if(controller instanceof Controllable){
-                    ((Controllable) controller).setDashboardController(mainController);
-                }
+
                 if(mode == 1){
                     cache.put(fxmlFile, root);
                 }

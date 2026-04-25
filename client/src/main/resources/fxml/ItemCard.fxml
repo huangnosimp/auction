@@ -47,7 +47,7 @@
                      <Label fx:id="lblYourBid" styleClass="ac-bid-val" text="44tr" />
                   </VBox>
                   <Region HBox.hgrow="ALWAYS" />
-                  <Button fx:id="BidNowButton" onAction="#handleBidClick" prefHeight="25.0" prefWidth="68.0" styleClass="bid-btn-action" text="Bid Now" />
+                  <Button fx:id="BidNowButton"  prefHeight="25.0" prefWidth="68.0" styleClass="bid-btn-action" text="Bid Now" />
                </children>
             </HBox>
          </children>

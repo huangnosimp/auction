@@ -1,0 +1,108 @@
+/* Tổng thể nền */
+.root {
+    -fx-background-color: linear-gradient(to bottom right, #1a1c24, #121212);
+}
+
+/* Thẻ đăng nhập */
+.login-card {
+    -fx-background-color: #1e1f26;
+    -fx-background-radius: 15;
+    -fx-border-color: #2d2f3a;
+    -fx-border-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 20, 0, 0, 10);
+}
+
+/* Logo & Text */
+.logo-text {
+    -fx-fill: white;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+}
+
+.label-bright {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.label-dim {
+    -fx-text-fill: #8b8e99;
+    -fx-font-size: 14px;
+}
+
+/* Ô nhập liệu */
+.input-field {
+    -fx-background-color: #16171d;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #5a5d6a;
+    -fx-background-radius: 8;
+    -fx-border-color: #2d2f3a;
+    -fx-border-radius: 8;
+    -fx-padding: 12;
+}
+
+.input-field:focused {
+    -fx-border-color: #00e676;
+}
+
+/* Nút bấm chính */
+.primary-button {
+    -fx-background-color: #00e676;
+    -fx-text-fill: #121212;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #00c853;
+}
+
+/* Chuyển đổi Role */
+.toggle-container {
+    -fx-background-color: #16171d;
+    -fx-background-radius: 20;
+    -fx-padding: 2;
+}
+
+.toggle-left, .toggle-right {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b8e99;
+    -fx-padding: 8 20;
+    -fx-background-radius: 18;
+}
+
+.toggle-left:selected, .toggle-right:selected {
+    -fx-background-color: #2d2f3a;
+    -fx-text-fill: #00e676;
+}
+
+.link-text {
+    -fx-text-fill: #00e676;
+    -fx-cursor: hand;
+}
+
+/* --- Giữ nguyên các phần cũ từ Login.css --- */
+
+/* Bổ sung thêm cho CheckBox */
+.check-box .box {
+    -fx-background-color: #16171d;
+    -fx-border-color: #2d2f3a;
+    -fx-border-radius: 3;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #00e676; /* Màu xanh neon khi tích chọn */
+}
+
+.check-box .label {
+    -fx-text-fill: #8b8e99;
+    -fx-padding: 0 0 0 5;
+}
+
+/* Hiệu ứng khi hover vào link quay lại */
+.link-text:hover {
+    -fx-underline: true;
+    -fx-text-fill: #00c853;
+}

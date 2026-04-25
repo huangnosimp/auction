@@ -10,6 +10,7 @@ import javafx.scene.layout.StackPane;
 
 import javafx.event.ActionEvent;
 import javafx.scene.layout.VBox;
+import vn.io.huangnosimp.Manager.ControllerManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,7 +19,7 @@ import static vn.io.huangnosimp.Manager.UserSession.getDashboardInfo;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 
-public class DashboardController implements Initializable {
+public class DashboardController extends BaseController {
     @FXML private BorderPane mainBorderPane;
     @FXML private StackPane contentArea; // Cái này nằm ở file dashboard.fxml nên giữ lại
     @FXML private Button createButton;
@@ -47,34 +48,37 @@ public class DashboardController implements Initializable {
     public void handlebtnAvatar(ActionEvent event){
         changeView("AccountView.fxml", 1);
     }
+
     @FXML
     public void handlebtnDashboard(ActionEvent event){
         changeView("dashboard_home.fxml", 1);
         handleMenuAction(event);
     }
+
     @FXML
     public void handlebtnOpenSlots(ActionEvent event){
         changeView("open_slots.fxml", 1);
         handleMenuAction(event);
     }
+
     @FXML
     public void handleCreateClick(ActionEvent event){
         changeView("create_auction.fxml",2);
     }
+
     public Button getCreateButton(){
         return this.createButton;
     }
+
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void onInit(URL location, ResourceBundle resources){
         setMainBorderPane(mainBorderPane);
-        setMainController(this);
+        ControllerManager.setDashboardController(this);
         changeView("dashboard_home.fxml", 1);
         lblBalance.setText(String.valueOf(getDashboardInfo().getBalance()));
-        lblActiveBids.setText(String.valueOf(getDashboardInfo().getActiveBids()));
+        lblActiveBids.setText(String.valueOf(getDashboardInfo().getJoinedRooms()));
         lblOutbid.setText(String.valueOf(getDashboardInfo().getOutBids()));
         lblWinning.setText(String.valueOf(getDashboardInfo().getWinningBids()));
         lblWonTotal.setText(String.valueOf(getDashboardInfo().getWonTotal()));
     }
-
-
 }
