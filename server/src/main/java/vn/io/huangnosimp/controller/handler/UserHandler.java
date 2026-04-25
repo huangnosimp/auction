@@ -26,9 +26,9 @@ public class UserHandler {
             if (result == LoginResult.SUCCESS) {
                 return new Response(ResponseStatus.SUCCESS, "Login successful");
             } else if (result == LoginResult.USER_NOT_FOUND) {
-                return new Response(ResponseStatus.UNAUTHORIZED, "Invalid username");
+                return new Response(ResponseStatus.USERNAME_NOT_FOUND, "Invalid username");
             } else if (result == LoginResult.INVALID_PASSWORD) {
-                return new Response(ResponseStatus.UNAUTHORIZED, "Invalid password");
+                return new Response(ResponseStatus.INVALID_PASSWORD, "Invalid password");
             } else {
                 return new Response(ResponseStatus.FAILED, "Login failed");
             }

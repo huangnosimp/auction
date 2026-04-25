@@ -2,6 +2,7 @@ package vn.io.huangnosimp.service;
 
 import vn.io.huangnosimp.dto.response.AuctionResponseDTO;
 import vn.io.huangnosimp.enums.AuctionStatus;
+import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 import vn.io.huangnosimp.enums.TransactionType;
 import vn.io.huangnosimp.model.*;
@@ -62,7 +63,8 @@ public class AuctionService implements IAuctionService {
     }
 
     public AuctionResponseDTO createAuction(String sellerId, String itemName, String description, ItemType itemType,
-            ItemAttributesDTO attributes, double startPrice, long startTime, long endTime) {
+                                            ItemAttributesDTO attributes, double startPrice, long startTime,
+                                            long endTime, ItemCondition condition) {
         if (!isValidOpenAuctionInput(sellerId, itemName, description, itemType, attributes, startPrice)
                 || endTime <= startTime || startTime > System.currentTimeMillis()) {
             return null;
@@ -71,7 +73,7 @@ public class AuctionService implements IAuctionService {
         if (seller == null) {
             return null;
         }
-        Item item = itemService.createItem(sellerId, itemName, description, itemType, attributes);
+        Item item = itemService.createItem(sellerId, itemName, description, itemType, attributes, condition);
         Auction auction = new Auction(item, seller, startPrice, startTime, endTime);
         auctionRepository.save(auction);
         scheduler.scheduleAuction(auction);

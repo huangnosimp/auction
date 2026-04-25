@@ -10,9 +10,13 @@ import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.repository.IUserRepository;
 
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserService implements IUserService {
     private final IUserRepository userRepository;
+    private static final String EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+    private static final Pattern pattern = Pattern.compile(EMAIL_REGEX);
     public UserService(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -28,8 +32,15 @@ public class UserService implements IUserService {
 
     @Override
     public RegisterResult register(UserType type, String username, String password, String email) {
+        if (!isValidInput(type, username, password) || email == null || email.isBlank()) {
+            return RegisterResult.INVALID_INPUT;
+        }
         if (userRepository.checkUsername(username)) {
             return RegisterResult.USERNAME_TAKEN;
+        }
+        Matcher matcher = pattern.matcher(email);
+        if (!matcher.matches()) {
+            return RegisterResult.INVALID_EMAIL;
         }
         if (userRepository.checkEmail(email)) {
             return RegisterResult.EMAIL_TAKEN;
@@ -44,6 +55,9 @@ public class UserService implements IUserService {
 
     @Override
     public LoginResult login(UserType type, String username, String password, ClientHandle client) {
+        if (!isValidInput(type, username, password)) {
+            return LoginResult.INVALID_INPUT;
+        }
         User user = userRepository.findByUsername(username);
         if (user == null || !user.getClass().getSimpleName().equalsIgnoreCase(type.name())) {
             return LoginResult.USER_NOT_FOUND;
@@ -54,6 +68,10 @@ public class UserService implements IUserService {
             return LoginResult.SUCCESS;
         }
         return LoginResult.INVALID_PASSWORD;
+    }
+
+    private boolean isValidInput(UserType type, String username, String password) {
+        return type != null && username != null && !username.isBlank() && password != null && !password.isBlank();
     }
 
     @Override

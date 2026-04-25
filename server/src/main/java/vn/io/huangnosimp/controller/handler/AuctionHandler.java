@@ -21,7 +21,7 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             CreateAuctionRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), CreateAuctionRequestDTO.class);
-            AuctionResponseDTO auctionResponseDTO = auctionService.createAuction(client.getUserId(), dto.getItemName(), dto.getDescription(), dto.getItemType(), dto.getAttributes(), dto.getStartPrice(), dto.getStartTime(), dto.getEndTime());
+            AuctionResponseDTO auctionResponseDTO = auctionService.createAuction(client.getUserId(), dto.getItemName(), dto.getDescription(), dto.getItemType(), dto.getAttributes(), dto.getStartPrice(), dto.getStartTime(), dto.getEndTime(), dto.getCondition());
             if (auctionResponseDTO == null) {
                 return new Response(ResponseStatus.FAILED, "Create auction failed");
             }

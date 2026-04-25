@@ -5,6 +5,15 @@ public enum ResponseStatus {
     ERROR,
     UNAUTHORIZED,
     CONFLICT,
+    FAILED,
+    INVALID_INPUT,
+    //Login
     BANNED,
-    FAILED
+    USERNAME_NOT_FOUND,
+    INVALID_PASSWORD,
+    //Register
+    USERNAME_TAKEN,
+    EMAIL_TAKEN,
+    INVALID_USERNAME,
+    INVALID_EMAIL,
 }

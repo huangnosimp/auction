@@ -1,6 +1,7 @@
 package vn.io.huangnosimp.dto.request;
 
 import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
+import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 
 public class CreateAuctionRequestDTO {
@@ -11,8 +12,9 @@ public class CreateAuctionRequestDTO {
     private final double startPrice;
     private final long startTime;
     private final long endTime;
+    private final ItemCondition condition;
 
-    public CreateAuctionRequestDTO(String itemName, String description, ItemType itemType, ItemAttributesDTO attributes, double startPrice, long startTime, long endTime) {
+    public CreateAuctionRequestDTO(String itemName, String description, ItemType itemType, ItemAttributesDTO attributes, double startPrice, long startTime, long endTime, ItemCondition condition) {
         this.itemName = itemName;
         this.description = description;
         this.itemType = itemType;
@@ -20,6 +22,7 @@ public class CreateAuctionRequestDTO {
         this.startPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.condition = condition;
     }
 
     public String getItemName() {
@@ -48,5 +51,9 @@ public class CreateAuctionRequestDTO {
 
     public long getEndTime() {
         return endTime;
+    }
+
+    public ItemCondition getCondition() {
+        return condition;
     }
 }
