@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.Manager.UserSession;
+import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
 import vn.io.huangnosimp.dto.request.LoginRequestDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.enums.UserType;
@@ -16,6 +17,7 @@ import vn.io.huangnosimp.network.SocketClient;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.ResponseStatus;
+import vn.io.huangnosimp.util.GsonParser;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -72,24 +74,22 @@ public class LoginController implements Initializable {
             Request request = new Request(ActionType.LOGIN, loginRequestDTO);
             socketClient.sendRequestAsync(request)
                     .thenAccept(response -> {
-                        // 1. Xử lý logic dữ liệu ở luồng nền (không cần Platform.runLater)
+
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
 
-                            // Dùng hàm convert để tránh lỗi ép kiểu
-                            DashboardResponseDTO dashboardResponse = response.getDataAs(DashboardResponseDTO.class);
+                            DashboardResponseDTO dashboardResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), DashboardResponseDTO.class);
                             UserSession.setDashboardInfo(dashboardResponse);
 
-                            // 2. Chỉ dùng Platform.runLater khi chuyển màn hình (Tác động UI)
                             Platform.runLater(() -> {
-                                NavigationManager.switchScene("/views/dashboard.fxml");
+                                changeMainStage("dashboard.fxml");
                             });
 
-                        } else {
-                            // Hiển thị lỗi nếu đăng nhập thất bại
-                            Platform.runLater(() -> {
-                                showErrorAlert(response.getMessage());
-                            });
                         }
+                        else if (ResponseStatus.ERROR.equals(response.getStatus())){}
+                        else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){}
+                        else if (ResponseStatus.CONFLICT.equals(response.getStatus())){}
+                        else if (ResponseStatus.BANNED.equals(response.getStatus())){}
+                        else if (ResponseStatus.FAILED.equals(response.getStatus())){}
                     });
         }
     }

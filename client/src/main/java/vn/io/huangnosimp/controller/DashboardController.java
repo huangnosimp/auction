@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static vn.io.huangnosimp.Manager.UserSession.getDashboardInfo;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 
@@ -24,6 +25,11 @@ public class DashboardController implements Initializable {
     @FXML private Button btnOpenSlots;
     @FXML private HBox menuHbox;
     @FXML private VBox sideVbox;
+    @FXML private Label lblBalance;
+    @FXML private Label lblActiveBids;
+    @FXML private Label lblWinning;
+    @FXML private Label lblOutbid;
+    @FXML private Label lblWonTotal;
 
     @FXML
     public void handleMenuAction(ActionEvent event){
@@ -63,6 +69,11 @@ public class DashboardController implements Initializable {
         setMainBorderPane(mainBorderPane);
         setMainController(this);
         changeView("dashboard_home.fxml", 1);
+        lblBalance.setText(String.valueOf(getDashboardInfo().getBalance()));
+        lblActiveBids.setText(String.valueOf(getDashboardInfo().getActiveBids()));
+        lblOutbid.setText(String.valueOf(getDashboardInfo().getOutBids()));
+        lblWinning.setText(String.valueOf(getDashboardInfo().getWinningBids()));
+        lblWonTotal.setText(String.valueOf(getDashboardInfo().getWonTotal()));
     }
 
 
