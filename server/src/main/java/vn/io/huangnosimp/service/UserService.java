@@ -45,15 +45,22 @@ public class UserService implements IUserService {
     @Override
     public LoginResult login(UserType type, String username, String password, ClientHandle client) {
         User user = userRepository.findByUsername(username);
+
         if (user == null || !user.getClass().getSimpleName().equalsIgnoreCase(type.name())) {
             return LoginResult.USER_NOT_FOUND;
         }
-        if (BCrypt.checkpw(password, user.getPassword())) {
-            client.setUserId(user.getId());
-            client.setUserType(type);
-            return LoginResult.SUCCESS;
+
+        if (!BCrypt.checkpw(password, user.getPassword())) {
+            return LoginResult.INVALID_PASSWORD;
         }
-        return LoginResult.INVALID_PASSWORD;
+
+        if (user instanceof Member member && member.isBanned()) {
+            return LoginResult.BANNED;
+        }
+
+        client.setUserId(user.getId());
+        client.setUserType(type);
+        return LoginResult.SUCCESS;
     }
 
     @Override

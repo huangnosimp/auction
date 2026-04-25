@@ -36,7 +36,7 @@ public class Main {
         AuctionScheduler auctionScheduler = new AuctionScheduler(auctionService);
         auctionService.setScheduler(auctionScheduler);
         //Controllers
-        MessageRouter router = new MessageRouter();
+        MessageRouter router = new MessageRouter(userRepository);
         //User Handler
         router.registerHandler(ActionType.LOGIN, new UserHandler.LoginHandler(userService));
         router.registerHandler(ActionType.REGISTER, new UserHandler.RegisterHandler(userService));

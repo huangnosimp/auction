@@ -29,6 +29,8 @@ public class UserHandler {
                 return new Response(ResponseStatus.UNAUTHORIZED, "Invalid username");
             } else if (result == LoginResult.INVALID_PASSWORD) {
                 return new Response(ResponseStatus.UNAUTHORIZED, "Invalid password");
+            } else if (result == LoginResult.BANNED) {
+                return new Response(ResponseStatus.FORBIDDEN, "Your account has been banned. Please contact admin.");
             } else {
                 return new Response(ResponseStatus.FAILED, "Login failed");
             }
