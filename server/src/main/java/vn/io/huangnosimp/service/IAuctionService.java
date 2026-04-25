@@ -11,6 +11,5 @@ public interface IAuctionService {
     boolean cancelAuction(String auctionId);
     boolean joinAuction(String userId, String auctionId, ClientHandle client);
     boolean leaveAuction(String userId, String auctionId, ClientHandle client);
-    AuctionResponseDTO getAuctionDetail(String auctionId);
     void shutdown();
 }

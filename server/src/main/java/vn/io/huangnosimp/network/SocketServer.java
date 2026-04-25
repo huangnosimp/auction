@@ -1,4 +1,4 @@
-package vn.io.huangnosimp.model;
+package vn.io.huangnosimp.network;
 
 import vn.io.huangnosimp.controller.MessageRouter;
 

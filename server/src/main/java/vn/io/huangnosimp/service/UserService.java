@@ -80,6 +80,16 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public boolean updateBalance(String userId, double newBalance) {
+        return userRepository.updateBalance(userId, newBalance);
+    }
+
+    @Override
+    public boolean updateFrozenBalance(String userId, double newFrozenBalance) {
+        return userRepository.updateFrozenBalance(userId, newFrozenBalance);
+    }
+
+    @Override
     public boolean banUser(String userId) {
         return false;
     }

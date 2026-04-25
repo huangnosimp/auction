@@ -4,26 +4,25 @@ import java.util.List;
 
 public class DashboardResponseDTO {
     private double balance;
-    private int activeBids;
+    private int joinedRooms;
     private int winningBids;
     private int outBids;
     private int wonTotal;
-    private List<AuctionCardDTO> auctionCardInfolist;
+    private List<AuctionCardDTO> auctionCardInfo;
 
     public DashboardResponseDTO(
             double balance,
             int activeBids,
             int winningBids,
-
             int outBids,
             int wonTotal,
             List<AuctionCardDTO> auctionCardInfo) {
         this.balance = balance;
-        this.activeBids = activeBids;
+        this.joinedRooms = activeBids;
         this.winningBids = winningBids;
         this.outBids = outBids;
         this.wonTotal = wonTotal;
-        this.auctionCardInfolist = auctionCardInfo;
+        this.auctionCardInfo = auctionCardInfo;
     }
 
 
@@ -31,8 +30,8 @@ public class DashboardResponseDTO {
         return balance;
     }
 
-    public int getActiveBids() {
-        return activeBids;
+    public int getJoinedRooms() {
+        return joinedRooms;
     }
 
     public int getWinningBids() {
@@ -48,7 +47,7 @@ public class DashboardResponseDTO {
     }
 
     public List<AuctionCardDTO> getAuctionCardInfo() {
-        return auctionCardInfolist;
+        return auctionCardInfo;
     }
 
 }

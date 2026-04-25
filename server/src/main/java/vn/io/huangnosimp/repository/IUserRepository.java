@@ -9,6 +9,7 @@ public interface IUserRepository {
     User findByUsername(String username);
     User findById(String userId);
     boolean updateBalance(String userId, double newBalance);
+    boolean updateFrozenBalance(String userId, double newFrozenBalance);
     boolean banUser(String userId);
     boolean unbanUser(String userId);
 }

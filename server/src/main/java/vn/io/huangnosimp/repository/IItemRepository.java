@@ -8,6 +8,5 @@ public interface IItemRepository {
     void save(Item item);
     Item findById(String itemId);
     void updateOwner(String itemId, String ownerId);
-    List<Item> findByOwnerId(String ownerId);
     boolean delete(String itemId);
 }

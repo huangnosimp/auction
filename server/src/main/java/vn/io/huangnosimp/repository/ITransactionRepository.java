@@ -1,7 +1,7 @@
 package vn.io.huangnosimp.repository;
 
-import vn.io.huangnosimp.model.BidTransaction;
+import vn.io.huangnosimp.model.Transaction;
 
 public interface ITransactionRepository {
-    void saveTransaction(BidTransaction transaction, String sellerId);
+    void saveTransaction(Transaction transaction);
 }

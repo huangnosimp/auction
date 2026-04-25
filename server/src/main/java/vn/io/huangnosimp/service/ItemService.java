@@ -37,8 +37,4 @@ public class ItemService implements IItemService {
         return true;
     }
 
-    @Override
-    public List<Item> getItemsByOwner(String ownerId) {
-        return itemRepository.findByOwnerId(ownerId);
-    }
 }

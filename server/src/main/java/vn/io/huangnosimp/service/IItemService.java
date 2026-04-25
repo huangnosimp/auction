@@ -10,5 +10,4 @@ public interface IItemService {
     Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes);
     Item getItemById(String id);
     boolean transferOwnership(Item item, String newOwnerId);
-    List<Item> getItemsByOwner(String ownerId);
 }
