@@ -8,8 +8,8 @@ public abstract class User extends Entity {
 
     private String email;
 
-    protected User(String id, String username, String password, String email) {
-        super(id);
+    protected User(String id, String username, String password, String email, long createdAt) {
+        super(id, createdAt);
         this.username = username;
         this.password = password;
         this.email = email;

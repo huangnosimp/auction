@@ -12,6 +12,9 @@ public interface IUserService {
     LoginResult login(UserType type, String username, String password, ClientHandle client);
     boolean deposit(String userId, double amount);
     boolean withdraw(String userId, double amount);
+    boolean updateBalance(String userId, double newBalance);
+    boolean updateFrozenBalance(String userId, double newFrozenBalance);
     boolean banUser(String userId);
     boolean unbanUser(String userId);
+
 }

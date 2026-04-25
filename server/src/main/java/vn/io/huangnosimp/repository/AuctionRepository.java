@@ -7,7 +7,6 @@ import vn.io.huangnosimp.model.Item;
 import vn.io.huangnosimp.model.Member;
 
 import java.sql.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class AuctionRepository implements IAuctionRepository {
     private final DatabaseConnection databaseConnection;
@@ -24,9 +23,9 @@ public class AuctionRepository implements IAuctionRepository {
     public void save(Auction auction) {
         if (auction == null || auction.getId() == null) return;
         //add save bidders
-        String sql = "INSERT INTO Auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status, bidders) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE winner_id = VALUES(winner_id), end_time = VALUES(end_time), final_price = VALUES(final_price), status = VALUES(status), bidders = VALUES(bidders)";
+        String sql = "INSERT INTO Auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE winner_id = VALUES(winner_id), end_time = VALUES(end_time), final_price = VALUES(final_price), status = VALUES(status)";
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -40,7 +39,6 @@ public class AuctionRepository implements IAuctionRepository {
             stmt.setDouble(7, auction.getStartPrice());
             stmt.setDouble(8, auction.getCurrentPrice());
             stmt.setString(9, auction.getStatus() != null ? auction.getStatus().name() : "OPEN");
-            stmt.setString(10, auction.biddersToJson());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -87,15 +85,14 @@ public class AuctionRepository implements IAuctionRepository {
         double startingPrice = rs.getDouble("starting_price");
         double finalPrice = rs.getDouble("final_price");
         String statusStr = rs.getString("status");
-        String biddersJson = rs.getString("bidders");
+        long createdAt = rs.getTimestamp("created_at").getTime();
 
         Item item = itemRepository.findById(itemId);
         Member seller = (Member) userRepository.findById(sellerId);
-        ConcurrentHashMap<String, Member> bidders = Auction.biddersFromJson(biddersJson);
 
         if (item == null || seller == null) return null;
 
-        Auction auction = new Auction(id, item, seller, startingPrice, startTime, endTime, bidders);
+        Auction auction = new Auction(id, item, seller, startingPrice, startTime, endTime, createdAt);
         auction.setCurrentWinnerId(winnerId);
         auction.setCurrentPrice(finalPrice > 0 ? finalPrice : startingPrice);
         if (statusStr != null) {

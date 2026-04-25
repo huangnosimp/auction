@@ -12,9 +12,9 @@ public abstract class Entity {
         this.createdAt = System.currentTimeMillis();
     }
 
-    protected Entity(String id) {
+    protected Entity(String id, long createdAt) {
         this.id = id;
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = createdAt;
     }
 
 

@@ -5,8 +5,8 @@ public class Member extends User {
     protected double frozenBalance = 0.0;
     protected boolean isBanned = false;
 
-    public Member(String id, String username, String password, String email, double accountBalance, double frozenBalance, boolean isBanned) {
-        super(id, username, password, email);
+    public Member(String id, String username, String password, String email, double accountBalance, double frozenBalance, boolean isBanned, long createdAt) {
+        super(id, username, password, email, createdAt);
         this.accountBalance = accountBalance;
         this.frozenBalance = frozenBalance;
         this.isBanned = isBanned;
