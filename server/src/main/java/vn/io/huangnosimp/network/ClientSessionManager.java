@@ -62,4 +62,30 @@ public class ClientSessionManager {
             }
         }
     }
+
+    public boolean isUserInRoom(String auctionId, String userId) {
+        if (auctionId == null || userId == null) return false;
+        Set<ClientHandle> room = auctionRooms.get(auctionId);
+        if (room != null) {
+            for (ClientHandle client : room) {
+                if (userId.equals(client.getUserId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void sendToUser(String userId, Request request) {
+        if (userId == null) return;
+        for (ClientHandle client : activeClients) {
+            if (userId.equals(client.getUserId())) {
+                try {
+                    client.sendRequest(request);
+                } catch (Exception e) {
+                    System.err.println("[ClientSessionManager] Error sending to user " + userId + ": " + e.getMessage());
+                }
+            }
+        }
+    }
 }

@@ -1,7 +1,11 @@
 package vn.io.huangnosimp.service;
 
-import vn.io.huangnosimp.dto.response.AuctionResponseDTO;
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+import vn.io.huangnosimp.dto.response.AuctionActionResult;
+import vn.io.huangnosimp.dto.response.BidResult;
 import vn.io.huangnosimp.enums.AuctionStatus;
+import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 import vn.io.huangnosimp.enums.TransactionType;
 import vn.io.huangnosimp.model.*;
@@ -61,8 +65,9 @@ public class AuctionService implements IAuctionService {
         }
     }
 
-    public AuctionResponseDTO createAuction(String sellerId, String itemName, String description, ItemType itemType,
-            ItemAttributesDTO attributes, double startPrice, long startTime, long endTime) {
+    public AuctionCardDTO createAuction(String sellerId, String itemName, String description, ItemType itemType,
+                                            ItemAttributesDTO attributes, double startPrice, long startTime,
+                                            long endTime, ItemCondition condition, double minimumIncrement, double buyNowPrice) {
         if (!isValidOpenAuctionInput(sellerId, itemName, description, itemType, attributes, startPrice)
                 || endTime <= startTime || startTime > System.currentTimeMillis()) {
             return null;
@@ -71,11 +76,11 @@ public class AuctionService implements IAuctionService {
         if (seller == null) {
             return null;
         }
-        Item item = itemService.createItem(sellerId, itemName, description, itemType, attributes);
-        Auction auction = new Auction(item, seller, startPrice, startTime, endTime);
+        Item item = itemService.createItem(sellerId, itemName, description, itemType, attributes, condition);
+        Auction auction = new Auction(item, seller, startPrice, startTime, endTime, minimumIncrement, buyNowPrice);
         auctionRepository.save(auction);
         scheduler.scheduleAuction(auction);
-        return auction.toDTO(0, null);
+        return new AuctionCardDTO(auction.getId(), item.getName(), auction.getCurrentPrice(), 0, auction.getEndTime());
     }
 
     private boolean isValidOpenAuctionInput(String sellerId, String name, String description, ItemType type,
@@ -84,22 +89,29 @@ public class AuctionService implements IAuctionService {
                 && !description.isBlank() && type != null && attributes != null && startPrice > 0;
     }
 
-    public boolean placeBid(String bidderId, String auctionId, double amount, boolean triggerAutoBid) {
+    public BidResult placeBid(String bidderId, String auctionId, double amount, boolean triggerAutoBid) {
+        BidResult bidSuccess;
         Object lock = getAuctionLock(auctionId);
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
-            if (auction == null || auction.getStatus() != AuctionStatus.RUNNING) {
-                return false;
+            if (auction == null) {
+                return BidResult.AUCTION_NOT_FOUND;
+            }
+            if (auction.getStatus() != AuctionStatus.RUNNING) {
+                return BidResult.AUCTION_ENDED;
             }
             if (!auctionParticipantsRepository.isParticipant(auctionId, bidderId)) {
-                return false;
+                return BidResult.NOT_IN_ROOM;
             }
             Member bidder = userService.getMember(bidderId);
             if (bidder == null || bidder.getId().equals(auction.getSeller().getId())) {
-                return false;
+                return BidResult.ERROR;
             }
-            if (amount <= auction.getCurrentPrice()) {
-                return false;
+            
+            boolean isFirstBid = auction.getCurrentWinnerId() == null;
+            double requiredMinBid = isFirstBid ? auction.getCurrentPrice() : (auction.getCurrentPrice() + auction.getMinimumIncrement());
+            if (amount < requiredMinBid) {
+                return BidResult.BID_TOO_LOW;
             }
 
             String previousWinnerId = auction.getCurrentWinnerId();
@@ -108,12 +120,12 @@ public class AuctionService implements IAuctionService {
             if (previousWinnerId != null && previousWinnerId.equals(bidderId)) {
                 double delta = amount - previousPrice;
                 if (!bidder.freezeMoney(delta)) {
-                    return false;
+                    return BidResult.INSUFFICIENT_FUNDS;
                 }
                 auction.setCurrentPrice(amount);
             } else {
                 if (!bidder.freezeMoney(amount)) {
-                    return false;
+                    return BidResult.INSUFFICIENT_FUNDS;
                 }
                 if (previousWinnerId != null) {
                     Member previousWinner = userService.getMember(previousWinnerId);
@@ -121,13 +133,13 @@ public class AuctionService implements IAuctionService {
                         bidder.unfreezeMoney(amount);
                         userService.updateBalance(bidder.getId(), bidder.getAccountBalance());
                         userService.updateFrozenBalance(bidder.getId(), bidder.getFrozenBalance());
-                        return false;
+                        return BidResult.ERROR;
                     }
                     if (!previousWinner.unfreezeMoney(previousPrice)) {
                         bidder.unfreezeMoney(amount);
                         userService.updateBalance(bidder.getId(), bidder.getAccountBalance());
                         userService.updateFrozenBalance(bidder.getId(), bidder.getFrozenBalance());
-                        return false;
+                        return BidResult.ERROR;
                     }
                     userService.updateBalance(previousWinner.getId(), previousWinner.getAccountBalance());
                     userService.updateFrozenBalance(previousWinner.getId(), previousWinner.getFrozenBalance());
@@ -145,23 +157,32 @@ public class AuctionService implements IAuctionService {
 
             if (notificationService != null) {
                 notificationService.notifyBidPlaced(auctionId, auction.getCurrentPrice(), bidderId);
+                if (previousWinnerId != null && !previousWinnerId.equals(bidderId)) {
+                    notificationService.notifyOutbid(auctionId, previousWinnerId, auction.getCurrentPrice());
+                }
             }
 
             if (auction.needExtension() && scheduler != null) {
                 long newEndTime = System.currentTimeMillis() + 60 * 1000;
                 scheduler.extendTime(auction, newEndTime);
             }
-            return true;
+            bidSuccess = BidResult.SUCCESS;
         }
+
+        if (bidSuccess == BidResult.SUCCESS && triggerAutoBid && autoBidService != null) {
+            autoBidService.processAutoBids(auctionId);
+        }
+
+        return bidSuccess;
     }
 
-    public boolean cancelAuction(String auctionId) {
-        boolean success = false;
+    public AuctionActionResult cancelAuction(String auctionId) {
+        AuctionActionResult success;
         Object lock = getAuctionLock(auctionId);
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction == null) {
-                return false;
+                return AuctionActionResult.AUCTION_NOT_FOUND;
             }
             if (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
                 String currentWinnerId = auction.getCurrentWinnerId();
@@ -183,10 +204,12 @@ public class AuctionService implements IAuctionService {
                 if (scheduler != null) {
                     scheduler.cancelTimers(auctionId);
                 }
-                success = true;
+                success = AuctionActionResult.SUCCESS;
+            } else {
+                success = AuctionActionResult.INVALID_STATE;
             }
         }
-        if (success) {
+        if (success == AuctionActionResult.SUCCESS || success == AuctionActionResult.INVALID_STATE) {
             auctionLocks.remove(auctionId);
         }
         return success;
@@ -244,39 +267,124 @@ public class AuctionService implements IAuctionService {
     }
 
     @Override
-    public boolean joinAuction(String userId, String auctionId, ClientHandle client) {
-        Object lock = getAuctionLock(auctionId);
-        synchronized (lock) {
-            Auction auction = auctionRepository.findById(auctionId);
-            if (auction == null
-                    || (auction.getStatus() != AuctionStatus.OPEN && auction.getStatus() != AuctionStatus.RUNNING)) {
-                return false;
-            }
-            Member bidder = userService.getMember(userId);
-            if (bidder == null) {
-                return false;
-            }
-            auctionParticipantsRepository.addParticipant(auctionId, userId);
-            ClientSessionManager.getInstance().joinRoom(auctionId, client);
-            return true;
-        }
-    }
-
-    @Override
-    public boolean leaveAuction(String userId, String auctionId, ClientHandle client) {
+    public BidResult buyNow(String userId, String auctionId) {
         Object lock = getAuctionLock(auctionId);
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction == null) {
-                return false;
+                return BidResult.AUCTION_NOT_FOUND;
+            }
+            if (auction.getStatus() != AuctionStatus.RUNNING && auction.getStatus() != AuctionStatus.OPEN) {
+                return BidResult.AUCTION_ENDED;
+            }
+            if (auction.getBuyNowPrice() <= 0) {
+                return BidResult.ERROR;
+            }
+            Member buyer = userService.getMember(userId);
+            if (buyer == null || buyer.getId().equals(auction.getSeller().getId())) {
+                return BidResult.ERROR;
+            }
+            
+            double buyNowPrice = auction.getBuyNowPrice();
+            String previousWinnerId = auction.getCurrentWinnerId();
+            double previousPrice = auction.getCurrentPrice();
+
+            if (previousWinnerId != null && previousWinnerId.equals(userId)) {
+                double delta = buyNowPrice - previousPrice;
+                if (delta > 0 && !buyer.freezeMoney(delta)) {
+                    return BidResult.INSUFFICIENT_FUNDS;
+                }
+            } else {
+                if (!buyer.freezeMoney(buyNowPrice)) {
+                    return BidResult.INSUFFICIENT_FUNDS;
+                }
+            }
+
+            boolean transferSuccess = itemService.transferOwnership(auction.getItem(), buyer.getId());
+            if (!transferSuccess) {
+                if (previousWinnerId != null && previousWinnerId.equals(userId)) {
+                    buyer.unfreezeMoney(buyNowPrice - previousPrice);
+                } else {
+                    buyer.unfreezeMoney(buyNowPrice);
+                }
+                return BidResult.ERROR;
+            }
+
+            if (previousWinnerId != null && !previousWinnerId.equals(userId)) {
+                Member previousWinner = userService.getMember(previousWinnerId);
+                if (previousWinner != null) {
+                    previousWinner.unfreezeMoney(previousPrice);
+                    userService.updateBalance(previousWinner.getId(), previousWinner.getAccountBalance());
+                    userService.updateFrozenBalance(previousWinner.getId(), previousWinner.getFrozenBalance());
+                }
+            }
+
+            buyer.deductFrozenMoney(buyNowPrice);
+            userService.updateBalance(buyer.getId(), buyer.getAccountBalance());
+            userService.updateFrozenBalance(buyer.getId(), buyer.getFrozenBalance());
+
+            auction.setCurrentWinnerId(userId);
+            auction.setCurrentPrice(buyNowPrice);
+            auction.setStatusPaid();
+            auctionRepository.save(auction);
+
+            Member seller = auction.getSeller();
+            seller.receivePayment(buyNowPrice);
+            userService.updateBalance(seller.getId(), seller.getAccountBalance());
+
+            if (transactionRepository != null) {
+                transactionRepository.saveTransaction(new Transaction(userId, TransactionType.WITHDRAW, buyNowPrice));
+                transactionRepository.saveTransaction(new Transaction(seller.getId(), TransactionType.DEPOSIT, buyNowPrice));
+            }
+
+            if (notificationService != null) {
+                notificationService.notifyAuctionEnded(auctionId, buyer.getUsername(), buyNowPrice);
+            }
+
+            if (scheduler != null) {
+                scheduler.cancelTimers(auctionId);
+            }
+        }
+        auctionLocks.remove(auctionId);
+        return BidResult.SUCCESS;
+    }
+
+    @Override
+    public AuctionActionResult joinAuction(String userId, String auctionId, ClientHandle client) {
+        Object lock = getAuctionLock(auctionId);
+        synchronized (lock) {
+            Auction auction = auctionRepository.findById(auctionId);
+            if (auction == null) {
+                return AuctionActionResult.AUCTION_NOT_FOUND;
+            }
+            if (auction.getStatus() != AuctionStatus.OPEN && auction.getStatus() != AuctionStatus.RUNNING) {
+                return AuctionActionResult.INVALID_STATE;
             }
             Member bidder = userService.getMember(userId);
             if (bidder == null) {
-                return false;
+                return AuctionActionResult.ERROR;
+            }
+            auctionParticipantsRepository.addParticipant(auctionId, userId);
+            ClientSessionManager.getInstance().joinRoom(auctionId, client);
+            return AuctionActionResult.SUCCESS;
+        }
+    }
+
+    @Override
+    public AuctionActionResult leaveAuction(String userId, String auctionId, ClientHandle client) {
+        Object lock = getAuctionLock(auctionId);
+        synchronized (lock) {
+            Auction auction = auctionRepository.findById(auctionId);
+            if (auction == null) {
+                return AuctionActionResult.AUCTION_NOT_FOUND;
+            }
+            Member bidder = userService.getMember(userId);
+            if (bidder == null) {
+                return AuctionActionResult.ERROR;
             }
             auctionParticipantsRepository.removeParticipant(auctionId, userId);
             ClientSessionManager.getInstance().leaveRoom(auctionId, client);
-            return true;
+            return AuctionActionResult.SUCCESS;
         }
     }
 }

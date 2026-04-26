@@ -1,6 +1,7 @@
 package vn.io.huangnosimp.dto.request;
 
 import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
+import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 
 public class CreateAuctionRequestDTO {
@@ -11,8 +12,20 @@ public class CreateAuctionRequestDTO {
     private final double startPrice;
     private final long startTime;
     private final long endTime;
+    private final ItemCondition condition;
+    private final double minimumIncrement;
+    private final double buyNowPrice;
 
-    public CreateAuctionRequestDTO(String itemName, String description, ItemType itemType, ItemAttributesDTO attributes, double startPrice, long startTime, long endTime) {
+    public CreateAuctionRequestDTO(String itemName,
+                                   String description,
+                                   ItemType itemType,
+                                   ItemAttributesDTO attributes,
+                                   double startPrice,
+                                   long startTime,
+                                   long endTime,
+                                   ItemCondition condition,
+                                   double minimumIncrement,
+                                   double buyNowPrice) {
         this.itemName = itemName;
         this.description = description;
         this.itemType = itemType;
@@ -20,6 +33,9 @@ public class CreateAuctionRequestDTO {
         this.startPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.condition = condition;
+        this.minimumIncrement = minimumIncrement;
+        this.buyNowPrice = buyNowPrice;
     }
 
     public String getItemName() {
@@ -48,5 +64,17 @@ public class CreateAuctionRequestDTO {
 
     public long getEndTime() {
         return endTime;
+    }
+
+    public ItemCondition getCondition() {
+        return condition;
+    }
+
+    public double getMinimumIncrement() {
+        return minimumIncrement;
+    }
+
+    public double getBuyNowPrice() {
+        return buyNowPrice;
     }
 }

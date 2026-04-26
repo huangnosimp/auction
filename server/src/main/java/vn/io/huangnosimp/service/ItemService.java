@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.service;
 
+import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 import vn.io.huangnosimp.factory.ItemFactory;
 import vn.io.huangnosimp.model.*;
@@ -16,8 +17,8 @@ public class ItemService implements IItemService {
     }
 
     @Override
-    public Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes) {
-        Item item = ItemFactory.createItem(ownerId, name, description, type, attributes);
+    public Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes, ItemCondition condition) {
+        Item item = ItemFactory.createItem(ownerId, name, description, type, attributes, condition);
         itemRepository.save(item);
         return item;
     }

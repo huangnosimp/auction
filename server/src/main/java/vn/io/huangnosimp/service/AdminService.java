@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.service;
 
+import vn.io.huangnosimp.dto.response.AuctionActionResult;
 import vn.io.huangnosimp.enums.AuctionStatus;
 import vn.io.huangnosimp.model.Admin;
 import vn.io.huangnosimp.model.Member;
@@ -68,7 +69,11 @@ public class AdminService implements IAdminService {
 
     @Override
     public boolean forceCancelAuction(String auctionId) {
-        return auctionService.cancelAuction(auctionId);
+        AuctionActionResult result = auctionService.cancelAuction(auctionId);
+        return switch (result) {
+            case SUCCESS -> true;
+            case AUCTION_NOT_FOUND, UNAUTHORIZED, INVALID_STATE, ERROR -> false;
+        };
     }
 
     @Override

@@ -36,7 +36,7 @@ public class Main {
         AuctionScheduler auctionScheduler = new AuctionScheduler(auctionService);
         auctionService.setScheduler(auctionScheduler);
         //Controllers
-        MessageRouter router = new MessageRouter(userRepository);
+        MessageRouter router = new MessageRouter();
         //User Handler
         router.registerHandler(ActionType.LOGIN, new UserHandler.LoginHandler(userService));
         router.registerHandler(ActionType.REGISTER, new UserHandler.RegisterHandler(userService));
@@ -49,6 +49,7 @@ public class Main {
         router.registerHandler(ActionType.PLACE_BID, new AuctionHandler.PlaceBidHandler(auctionService));
         router.registerHandler(ActionType.JOIN_ROOM, new AuctionHandler.JoinRoomHandler(auctionService));
         router.registerHandler(ActionType.LEAVE_ROOM, new AuctionHandler.LeaveRoomHandler(auctionService));
+        router.registerHandler(ActionType.BUY_NOW, new AuctionHandler.BuyNowHandler(auctionService));
         //Admin Handler
         router.registerHandler(ActionType.ADMIN_GET_ALL_MEMBERS, new AdminHandler.GetAllMembersHandler(adminService));
         router.registerHandler(ActionType.ADMIN_LOCK_MEMBER, new AdminHandler.LockMemberHandler(adminService));
@@ -58,6 +59,7 @@ public class Main {
         router.registerHandler(ActionType.ADMIN_GET_REVENUE, new AdminHandler.GetRevenueHandler(adminService));
         //Statistic Handler
         router.registerHandler(ActionType.GET_DASHBOARD_INFO, new StatisticHandler.GetDashboardInfoHandler(statisticService));
+        router.registerHandler(ActionType.GET_AUCTION_DETAIL, new StatisticHandler.GetAuctionDetailHandler(statisticService));
         //Start Server
         SocketServer server = new SocketServer(26676, router);
         Runtime.getRuntime().addShutdownHook(new Thread(AuctionScheduler::shutdown));
