@@ -1,6 +1,6 @@
 package vn.io.huangnosimp.controller.handler;
 
-import vn.io.huangnosimp.dto.response.AuctionResponseDTO;
+import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.util.GsonParser;
 import vn.io.huangnosimp.dto.request.*;
@@ -21,7 +21,7 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             CreateAuctionRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), CreateAuctionRequestDTO.class);
-            AuctionResponseDTO auctionResponseDTO = auctionService.createAuction(client.getUserId(), dto.getItemName(), dto.getDescription(), dto.getItemType(), dto.getAttributes(), dto.getStartPrice(), dto.getStartTime(), dto.getEndTime());
+            AuctionDetailResponseDTO auctionResponseDTO = auctionService.createAuction(client.getUserId(), dto.getItemName(), dto.getDescription(), dto.getItemType(), dto.getAttributes(), dto.getStartPrice(), dto.getStartTime(), dto.getEndTime());
             if (auctionResponseDTO == null) {
                 return new Response(ResponseStatus.FAILED, "Create auction failed");
             }

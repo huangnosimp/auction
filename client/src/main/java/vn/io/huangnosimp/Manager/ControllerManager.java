@@ -4,6 +4,7 @@ import vn.io.huangnosimp.controller.*;
 public class ControllerManager {
     private static DashboardController dashboardController;
     private static dashboard_homeController dashboardHomeController;
+    private static liveAuctionController liveAuctionController;
 
     //dashBoard
     public static  DashboardController getDashboardController(){
@@ -17,6 +18,12 @@ public class ControllerManager {
         return dashboardHomeController; }
     public static void setDashboardHomeController(dashboard_homeController c) {
         dashboardHomeController = c; }
-
+    //liveAuction
+    public void setLiveAuctionController(liveAuctionController c){
+        liveAuctionController = c;
+    }
+    public liveAuctionController getLiveAuctionController(){
+        return liveAuctionController;
+    }
 
 }

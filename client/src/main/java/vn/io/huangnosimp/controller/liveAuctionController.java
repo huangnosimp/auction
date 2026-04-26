@@ -13,9 +13,17 @@ import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
 
 import javafx.event.ActionEvent;
+import vn.io.huangnosimp.Manager.AuctionCountdownUtil;
+import vn.io.huangnosimp.Manager.FormatUtil;
+import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+
 import java.net.URL;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
+import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
+import static vn.io.huangnosimp.Manager.FormatUtil.parseNumber;
 import static vn.io.huangnosimp.Manager.ViewManager.changeView;
 
 public class liveAuctionController implements Initializable {
@@ -23,30 +31,31 @@ public class liveAuctionController implements Initializable {
     @FXML private NumberAxis xAxis;
     @FXML private NumberAxis yAxis;
     @FXML private Label myBidLabel;
+    @FXML private Label timeLabel;
+    @FXML private Label currentPriceLabel;
+    @FXML private Label startPriceLabel;
+    @FXML private Label leadBidderLabel;
+    @FXML private Label minNextBidLabel;
+
     @FXML private Button btnIncrease;
     @FXML private Button btnDecrease;
     private long minCount = 100000;
     private Timeline holdTimer;
     private Runnable currentAction;
-    private long parseLabeltoLong(String labelText){
-        String cleanText = labelText.replace(".","").trim();
-        return Long.parseLong(cleanText);
-    }
-    private String LongtoLabel(long value){
-        String formatted = String.format("%,d", value);
-        String finalValue = formatted.replace(",", ".").trim();
-        return finalValue;
-    }
+    private long endtime;
+    private Timeline timeline;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+
     public void handleIncreaseButton(){
-        long currentBid = parseLabeltoLong(myBidLabel.getText());
+        double currentBid = parseNumber(myBidLabel.getText());
         currentBid+=minCount;
-        myBidLabel.setText(LongtoLabel(currentBid));
+        myBidLabel.setText(formatNumber(currentBid));
     }
     public void handleDecreaseButton(){
-        long currentBid = parseLabeltoLong(myBidLabel.getText());
+        double currentBid = parseNumber(myBidLabel.getText());
         if(currentBid - minCount >= minCount){
             currentBid -= minCount;
-            myBidLabel.setText(LongtoLabel(currentBid));
+            myBidLabel.setText(formatNumber(currentBid));
         }
         else{
             holdTimer.stop();
@@ -73,6 +82,14 @@ public class liveAuctionController implements Initializable {
         holdTimer.stop();
         currentAction = null;
     }    // Dừng lại ngay khi thả chuột
+    private void setUpliveAuction(AuctionDetailResponseDTO DTO){
+        currentPriceLabel.setText(FormatUtil.formatNumber(DTO.getCurrentPrice())+"₫");
+        startPriceLabel.setText("Khởi điểm: "+FormatUtil.formatNumber(DTO.getStartPrice())+"₫");
+        leadBidderLabel.setText(DTO.getLeadBidder());
+        minNextBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
+        myBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
+
+    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         xAxis.setLabel("Year");
@@ -90,6 +107,7 @@ public class liveAuctionController implements Initializable {
             handleIncreaseButton(); // Gọi lại hàm tăng số bạn đã viết
         }));
         holdTimer.setCycleCount(Animation.INDEFINITE); // Chạy vô hạn cho đến khi thả chuột
-
+        AuctionCountdownUtil countdown = new AuctionCountdownUtil(timeLabel, endtime);
+        countdown.start();
     }
 }

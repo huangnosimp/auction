@@ -39,6 +39,17 @@ public class ViewManager {
             e.printStackTrace();
         }
     }
+    public static <T> T changeViewWithController(String fxmlFile){
+        try{
+            FXMLLoader loader = new FXMLLoader(ViewManager.class.getResource("/fxml/" + fxmlFile));
+            Parent root = loader.load();
+            mainBorderPane.setCenter(root);
+            return loader.getController();
+        }catch (IOException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
     public static void changeMainStage(String fxmlFile){
         try{
             FXMLLoader loader = new FXMLLoader(ViewManager.class.getResource("/fxml/" + fxmlFile));

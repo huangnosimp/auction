@@ -142,26 +142,26 @@
                         <Label styleClass="field-label" text="Starting price ($)" />
                         <TextField fx:id="startPriceField" promptText="0.00" styleClass="form-input" />
                     </VBox>
+
                     <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label styleClass="field-label" text="Bid increment ($)" />
-                        <Spinner fx:id="bidIncrementSpinner" editable="true" initialValue="10" max="100000" min="1" styleClass="form-spinner" />
-                    </VBox>
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <HBox alignment="CENTER_LEFT" spacing="6">
-                            <Label styleClass="field-label" text="Buy It Now" />
-                            <Label styleClass="tag-optional" text="optional" />
+                        <Label styleClass="field-label" text="Bid increment" />
+                        <HBox spacing="6">
+                            <TextField fx:id="bidIncrementField" promptText="e.g. 1" styleClass="form-input" HBox.hgrow="ALWAYS" />
+                            <ComboBox fx:id="bidIncrementUnitCombo" styleClass="form-combo" value="Million">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Thousand" />
+                                        <String fx:value="Million" />
+                                        <String fx:value="Billion" />
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
                         </HBox>
-                        <TextField fx:id="buyNowField" promptText="—" styleClass="form-input" />
+                        <Label fx:id="bidIncrementEquivalentLabel" styleClass="upload-hint" text="Equivalent: 1.000.000 đ" />
                     </VBox>
                 </HBox>
 
-                <VBox spacing="6">
-                    <HBox alignment="CENTER_LEFT" spacing="6">
-                        <Label styleClass="field-label" text="Reserve price" />
-                        <Label styleClass="tag-optional" text="secret floor – optional" />
-                    </HBox>
-                    <TextField fx:id="reservePriceField" promptText="Hidden minimum price – leave blank if none" styleClass="form-input" />
-                </VBox>
+                <VBox spacing="6" />
             </VBox>
 
             <!-- SCHEDULE & DURATION -->
@@ -182,6 +182,9 @@
                         <ComboBox fx:id="durationCombo" maxWidth="Infinity" styleClass="form-combo" value="1 day">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="15 minutes" />
+                                    <String fx:value="30 minutes" />
+                                    <String fx:value="45 minutes" />
                                     <String fx:value="1 hour" />
                                     <String fx:value="3 hours" />
                                     <String fx:value="6 hours" />

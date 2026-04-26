@@ -1,10 +1,7 @@
 package vn.io.huangnosimp.model;
 
-import vn.io.huangnosimp.dto.response.AuctionResponseDTO;
-import java.util.concurrent.ConcurrentHashMap;
-import com.google.gson.reflect.TypeToken;
+import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 import vn.io.huangnosimp.enums.AuctionStatus;
-import vn.io.huangnosimp.util.GsonParser;
 
 public class Auction extends Entity {
     private final Item item;
@@ -129,8 +126,8 @@ public class Auction extends Entity {
         return timeLeft <= 10 * 1000;
     }
 
-    public AuctionResponseDTO toDTO(int participantCount, String currentWinnerUserName) {
-        return new AuctionResponseDTO(
+    public AuctionDetailResponseDTO toDTO(int participantCount, String currentWinnerUserName) {
+        return new AuctionDetailResponseDTO(
                 participantCount,
                 this.item.getName(),
                 this.item.getDescription(),

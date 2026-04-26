@@ -169,19 +169,22 @@ public class CreateAuctionController implements Initializable{
         int hour = parts.length > 0 ? Integer.parseInt(parts[0].trim()) : 0;
         int min  = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 0;
         return LocalDateTime.of(date, LocalTime.of(hour, min))
-                .toInstant(ZoneOffset.UTC).toEpochMilli();
+                .toInstant(ZoneOffset.UTC).getEpochSecond();
     }
 
     private long calculateEndTime(long startTime) {
         long duration = switch (durationCombo.getValue()) {
-            case "1 hour"   -> 3_600_000L;
-            case "3 hours"  -> 10_800_000L;
-            case "6 hours"  -> 21_600_000L;
-            case "12 hours" -> 43_200_000L;
-            case "1 day"    -> 86_400_000L;
-            case "3 days"   -> 259_200_000L;
-            case "7 days"   -> 604_800_000L;
-            default         -> 86_400_000L;
+            case "15 minutes" -> 900L;
+            case "30 minutes" -> 1_800L;
+            case "45 minutes" -> 2_700L;
+            case "1 hour"   -> 3_600L;
+            case "3 hours"  -> 10_800L;
+            case "6 hours"  -> 21_600L;
+            case "12 hours" -> 43_200L;
+            case "1 day"    -> 86_400L;
+            case "3 days"   -> 259_200L;
+            case "7 days"   -> 604_800L;
+            default         -> 86_400L;
         };
         return startTime + duration;
     }
