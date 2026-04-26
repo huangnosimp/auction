@@ -1,9 +1,14 @@
 package vn.io.huangnosimp.repository;
 
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
+
+import java.util.List;
+
+import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+
 public interface IStatisticRepository {
-    double getAccountBalance(String userId);
-    int getJoinedActiveRoomsCount(String userId);
-    int getWinningBidsCount(String userId);
-    int getOutBidsCount(String userId);
-    int getWonTotalCount(String userId);
+    DashboardResponseDTO getUserScalarStatistics(String userId);
+    List<AuctionCardDTO> getActiveRooms(String userId);
+    AuctionDetailResponseDTO getAuctionDetail(String auctionId);
 }

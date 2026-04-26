@@ -1,14 +1,13 @@
 package vn.io.huangnosimp.repository;
 
 import vn.io.huangnosimp.database.DatabaseConnection;
+import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.model.Art;
 import vn.io.huangnosimp.model.Electronics;
 import vn.io.huangnosimp.model.Item;
 import vn.io.huangnosimp.model.Vehicle;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ItemRepository implements IItemRepository {
     private final DatabaseConnection databaseConnection;
@@ -21,9 +20,9 @@ public class ItemRepository implements IItemRepository {
         if (item == null || item.getId() == null)
             return;
         String sql = "INSERT INTO Items (id, created_at, owner_id, name, description, item_type, " +
-                "artist, creation_year, brand, warranty_period, engine_type, mileage, custom_category, dynamic_attributes) "
+                "artist, creation_year, brand, warranty_period, engine_type, mileage, conditions) "
                 +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -37,14 +36,14 @@ public class ItemRepository implements IItemRepository {
             String itemType = item.getClass().getSimpleName().toUpperCase();
             stmt.setString(6, itemType);
 
-            stmt.setNull(7, java.sql.Types.VARCHAR);
-            stmt.setNull(8, java.sql.Types.INTEGER);
-            stmt.setNull(9, java.sql.Types.VARCHAR);
-            stmt.setNull(10, java.sql.Types.INTEGER);
-            stmt.setNull(11, java.sql.Types.VARCHAR);
-            stmt.setNull(12, java.sql.Types.INTEGER);
-            stmt.setNull(13, java.sql.Types.VARCHAR);
-            stmt.setNull(14, java.sql.Types.VARCHAR);
+            stmt.setNull(7, Types.VARCHAR);
+            stmt.setNull(8, Types.INTEGER);
+            stmt.setNull(9, Types.VARCHAR);
+            stmt.setNull(10, Types.INTEGER);
+            stmt.setNull(11, Types.VARCHAR);
+            stmt.setNull(12, Types.INTEGER);
+
+            stmt.setString(13, item.getCondition().name());
 
             switch (item) {
                 case Art art -> {
@@ -117,20 +116,21 @@ public class ItemRepository implements IItemRepository {
         String name = rs.getString("name");
         String description = rs.getString("description");
         String itemType = rs.getString("item_type");
+        ItemCondition conditions = ItemCondition.valueOf(rs.getString("conditions"));
 
         Item item = null;
         if ("ART".equals(itemType)) {
             String artist = rs.getString("artist");
             int creationYear = rs.getInt("creation_year");
-            item = new Art(ownerId, name, description, artist, creationYear);
+            item = new Art(ownerId, name, description, artist, creationYear, conditions);
         } else if ("ELECTRONICS".equals(itemType)) {
             String brand = rs.getString("brand");
             int warrantyPeriod = rs.getInt("warranty_period");
-            item = new Electronics(ownerId, name, description, brand, warrantyPeriod);
+            item = new Electronics(ownerId, name, description, brand, warrantyPeriod, conditions);
         } else if ("VEHICLE".equals(itemType)) {
             String engineType = rs.getString("engine_type");
             int mileage = rs.getInt("mileage");
-            item = new Vehicle(ownerId, name, description, engineType, mileage);
+            item = new Vehicle(ownerId, name, description, engineType, mileage, conditions);
         }
 
 

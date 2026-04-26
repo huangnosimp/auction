@@ -1,4 +1,3 @@
-// PricePointDTO.java
 package vn.io.huangnosimp.dto.response;
 
 public class PricePointDTO {

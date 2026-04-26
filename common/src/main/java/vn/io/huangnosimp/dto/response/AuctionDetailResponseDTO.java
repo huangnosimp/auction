@@ -1,15 +1,17 @@
 package vn.io.huangnosimp.dto.response;
 
+import vn.io.huangnosimp.enums.ItemCondition;
+import vn.io.huangnosimp.enums.ItemType;
+
 import java.util.List;
 
 public class AuctionDetailResponseDTO {
 
-    private final String auctionId;        // ID phiên đấu giá
 
     // Thông tin sản phẩm
     private final String productName;      // Tên sản phẩm
-    private final String category;         // Danh mục (Electronics, Art, Vehicle...)
-    private final String condition;        // Tình trạng (New, Like New, Used)
+    private final ItemType category;         // Danh mục (Electronics, Art, Vehicle...)
+    private final ItemCondition condition;        // Tình trạng (New, Like New, Used)
     private final String description;      // Mô tả chi tiết sản phẩm
 
     // Định giá
@@ -33,15 +35,13 @@ public class AuctionDetailResponseDTO {
     private final List<BidHistoryDTO> bidHistory;   // Danh sách lịch sử đặt giá (hiển thị ListView)
     private final List<PricePointDTO> priceHistory; // Danh sách điểm giá (vẽ LineChart)
 
-    public AuctionDetailResponseDTO(String auctionId,
-                                    String productName, String category, String condition, String description,
+    public AuctionDetailResponseDTO(String productName, ItemType category, ItemCondition condition, String description,
                                     double startPrice, double bidIncrement, double buyNowPrice, double reservePrice,
                                     long startTime, long endTime,
                                     double currentPrice, double minNextBid,
                                     String leadBidder, long lastBidTime,
                                     int participantCount, int bidCount,
                                     List<BidHistoryDTO> bidHistory, List<PricePointDTO> priceHistory) {
-        this.auctionId = auctionId;
         this.productName = productName;
         this.category = category;
         this.condition = condition;
@@ -61,10 +61,16 @@ public class AuctionDetailResponseDTO {
         this.priceHistory = priceHistory;
     }
 
-    public String getAuctionId() { return auctionId; }
     public String getProductName() { return productName; }
-    public String getCategory() { return category; }
-    public String getCondition() { return condition; }
+
+    public ItemType getCategory() {
+        return category;
+    }
+
+    public ItemCondition getCondition() {
+        return condition;
+    }
+
     public String getDescription() { return description; }
     public double getStartPrice() { return startPrice; }
     public double getBidIncrement() { return bidIncrement; }

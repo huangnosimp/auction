@@ -12,13 +12,17 @@ public class Auction extends Entity {
     private final long startTime;
     private long endTime;
     private volatile AuctionStatus status;
+    private double minimumIncrement;
+    private double buyNowPrice;
 
     public Auction(
             Item item,
             Member seller,
             double startPrice,
             long startTime,
-            long endTime) {
+            long endTime,
+            double minBid,
+            double buyNowPrice) {
         super();
         this.item = item;
         this.seller = seller;
@@ -26,6 +30,8 @@ public class Auction extends Entity {
         currentPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.minimumIncrement = minBid;
+        this.buyNowPrice = buyNowPrice;
     }
 
     public Auction(
@@ -126,19 +132,11 @@ public class Auction extends Entity {
         return timeLeft <= 10 * 1000;
     }
 
-    public AuctionDetailResponseDTO toDTO(int participantCount, String currentWinnerUserName) {
-        return new AuctionDetailResponseDTO(
-                participantCount,
-                this.item.getName(),
-                this.item.getDescription(),
-                this.getId(),
-                currentWinnerUserName,
-                this.seller.getUsername(),
-                this.currentPrice,
-                this.startPrice,
-                this.startTime,
-                this.endTime,
-                this.status
-        );
+    public double getMinimumIncrement() {
+        return minimumIncrement;
+    }
+
+    public double getBuyNowPrice() {
+        return buyNowPrice;
     }
 }

@@ -2,8 +2,8 @@ package vn.io.huangnosimp.model;
 
 public class Member extends User {
     protected double accountBalance;
-    protected double frozenBalance = 0.0;
-    protected boolean isBanned = false;
+    protected double frozenBalance;
+    protected boolean isBanned;
 
     public Member(String id, String username, String password, String email, double accountBalance, double frozenBalance, boolean isBanned, long createdAt) {
         super(id, username, password, email, createdAt);
