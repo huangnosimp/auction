@@ -28,6 +28,7 @@ public class UserHandler {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Login successful");
                 case USER_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Invalid username");
                 case INVALID_PASSWORD -> new Response(ResponseStatus.FAILED, "Invalid password");
+                case BANNED -> new Response(ResponseStatus.FORBIDDEN, "Your account has been banned. Please contact admin.");
                 default -> new Response(ResponseStatus.FAILED, "Login failed");
             };
         }
