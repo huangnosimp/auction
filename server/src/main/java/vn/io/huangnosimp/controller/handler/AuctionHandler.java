@@ -1,6 +1,9 @@
 package vn.io.huangnosimp.controller.handler;
 
-import vn.io.huangnosimp.dto.response.AuctionResponseDTO;
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+import vn.io.huangnosimp.dto.response.AuctionActionResult;
+import vn.io.huangnosimp.dto.response.BidResult;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.util.GsonParser;
 import vn.io.huangnosimp.dto.request.*;
@@ -21,11 +24,15 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             CreateAuctionRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), CreateAuctionRequestDTO.class);
-            AuctionResponseDTO auctionResponseDTO = auctionService.createAuction(client.getUserId(), dto.getItemName(), dto.getDescription(), dto.getItemType(), dto.getAttributes(), dto.getStartPrice(), dto.getStartTime(), dto.getEndTime(), dto.getCondition());
-            if (auctionResponseDTO == null) {
+            AuctionCardDTO auctionCardDTO = auctionService.createAuction(
+                    client.getUserId(), dto.getItemName(), dto.getDescription(),
+                    dto.getItemType(), dto.getAttributes(), dto.getStartPrice(),
+                    dto.getStartTime(), dto.getEndTime(), dto.getCondition(),
+                    dto.getMinimumIncrement(), dto.getBuyNowPrice());
+            if (auctionCardDTO == null) {
                 return new Response(ResponseStatus.FAILED, "Create auction failed");
             }
-            return new Response(ResponseStatus.SUCCESS, "Create auction successfully", auctionResponseDTO);
+            return new Response(ResponseStatus.SUCCESS, "Create auction successfully", auctionCardDTO);
         }
     }
 
@@ -39,12 +46,14 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             CancelAuctionRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), CancelAuctionRequestDTO.class);
-            boolean result = auctionService.cancelAuction(dto.getAuctionId());
-            if (result) {
-                return new Response(ResponseStatus.SUCCESS, "Cancel auction successfully");
-            } else {
-                return new Response(ResponseStatus.FAILED, "Cancel auction failed");
-            }
+            AuctionActionResult result = auctionService.cancelAuction(dto.getAuctionId());
+            return switch (result) {
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Cancel auction successfully");
+                case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
+                case INVALID_STATE -> new Response(ResponseStatus.FAILED, "Cannot cancel a running or completed auction");
+                case UNAUTHORIZED -> new Response(ResponseStatus.FAILED, "Unauthorized to cancel this auction");
+                default -> new Response(ResponseStatus.FAILED, "Cancel auction failed");
+            };
         }
     }
 
@@ -58,12 +67,16 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             PlaceBidRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), PlaceBidRequestDTO.class);
-            boolean result = auctionService.placeBid(client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), false);
-            if (result) {
-                return new Response(ResponseStatus.SUCCESS, "Place bid successfully");
-            } else {
-                return new Response(ResponseStatus.FAILED, "Place bid failed");
-            }
+            BidResult result = auctionService.placeBid(client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), false);
+            return switch (result) {
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Place bid successfully");
+                case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
+                case AUCTION_ENDED -> new Response(ResponseStatus.FAILED, "Auction has already ended");
+                case INSUFFICIENT_FUNDS -> new Response(ResponseStatus.FAILED, "Insufficient funds");
+                case BID_TOO_LOW -> new Response(ResponseStatus.FAILED, "Bid amount is too low");
+                case ALREADY_HIGHEST_BIDDER -> new Response(ResponseStatus.FAILED, "You are already the highest bidder");
+                default -> new Response(ResponseStatus.FAILED, "Place bid failed");
+            };
         }
     }
     public static class JoinRoomHandler implements RequestHandler {
@@ -74,11 +87,13 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             JoinRoomRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), JoinRoomRequestDTO.class);
-            boolean result = auctionService.joinAuction(client.getUserId(), dto.getAuctionId(), client);
-            if (result) {
-                return new Response(ResponseStatus.SUCCESS, "Join room successfully");
-            }
-            return new Response(ResponseStatus.FAILED, "Join room failed");
+            AuctionActionResult result = auctionService.joinAuction(client.getUserId(), dto.getAuctionId(), client);
+            return switch (result) {
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Join room successfully");
+                case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
+                case INVALID_STATE -> new Response(ResponseStatus.FAILED, "Auction is not open for joining");
+                default -> new Response(ResponseStatus.FAILED, "Join room failed");
+            };
         }
     }
     public static class LeaveRoomHandler implements RequestHandler {
@@ -91,11 +106,32 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             LeaveRoomRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), LeaveRoomRequestDTO.class);
-            boolean result = auctionService.leaveAuction(client.getUserId(), dto.getAuctionId(), client);
-            if (result) {
-                return new Response(ResponseStatus.SUCCESS, "Leave room successfully");
-            }
-            return new Response(ResponseStatus.FAILED, "Leave room failed");
+            AuctionActionResult result = auctionService.leaveAuction(client.getUserId(), dto.getAuctionId(), client);
+            return switch (result) {
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Leave room successfully");
+                case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
+                default -> new Response(ResponseStatus.FAILED, "Leave room failed");
+            };
+        }
+    }
+    public static class BuyNowHandler implements RequestHandler {
+        private final IAuctionService auctionService;
+
+        public BuyNowHandler(IAuctionService auctionService) {
+            this.auctionService = auctionService;
+        }
+
+        @Override
+        public Response handle(Request request, ClientHandle client) {
+            BuyNowRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), BuyNowRequestDTO.class);
+            BidResult result = auctionService.buyNow(client.getUserId(), dto.getAuctionId());
+            return switch (result) {
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Buy now successfully");
+                case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
+                case AUCTION_ENDED -> new Response(ResponseStatus.FAILED, "Auction has already ended");
+                case INSUFFICIENT_FUNDS -> new Response(ResponseStatus.FAILED, "Insufficient funds");
+                default -> new Response(ResponseStatus.FAILED, "Buy now failed");
+            };
         }
     }
 }

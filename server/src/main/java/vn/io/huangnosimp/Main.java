@@ -47,8 +47,10 @@ public class Main {
         router.registerHandler(ActionType.PLACE_BID, new AuctionHandler.PlaceBidHandler(auctionService));
         router.registerHandler(ActionType.JOIN_ROOM, new AuctionHandler.JoinRoomHandler(auctionService));
         router.registerHandler(ActionType.LEAVE_ROOM, new AuctionHandler.LeaveRoomHandler(auctionService));
+        router.registerHandler(ActionType.BUY_NOW, new AuctionHandler.BuyNowHandler(auctionService));
         //Statistic Handler
         router.registerHandler(ActionType.GET_DASHBOARD_INFO, new StatisticHandler.GetDashboardInfoHandler(statisticService));
+        router.registerHandler(ActionType.GET_AUCTION_DETAIL, new StatisticHandler.GetAuctionDetailHandler(statisticService));
         //Start Server
         SocketServer server = new SocketServer(26676, router);
         Runtime.getRuntime().addShutdownHook(new Thread(AuctionScheduler::shutdown));

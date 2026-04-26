@@ -1,8 +1,14 @@
 package vn.io.huangnosimp.repository;
 
 import vn.io.huangnosimp.database.DatabaseConnection;
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
+import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+import vn.io.huangnosimp.dto.response.BidHistoryDTO;
+import vn.io.huangnosimp.dto.response.PricePointDTO;
 
 import java.sql.*;
+import java.util.List;
 
 public class StatisticRepository implements IStatisticRepository {
     private final DatabaseConnection databaseConnection;
@@ -12,83 +18,145 @@ public class StatisticRepository implements IStatisticRepository {
     }
 
     @Override
-    public double getAccountBalance(String userId) {
-        String sql = "SELECT account_balance FROM users WHERE id = ?";
+    public DashboardResponseDTO getUserScalarStatistics(String userId) {
+        String sql = "SELECT " +
+                "u.account_balance, " +
+                "(SELECT COUNT(*) FROM auctions a WHERE a.winner_id = u.id AND a.status = 'RUNNING') AS winning_bids, " +
+                "(SELECT COUNT(DISTINCT a.id) FROM auctions a JOIN bidtransactions bt ON a.id = bt.auction_id WHERE bt.bidder_id = u.id AND a.winner_id != u.id AND a.status = 'RUNNING') AS out_bids, " +
+                "(SELECT COUNT(*) FROM auctions a WHERE a.winner_id = u.id AND a.status = 'PAID') AS won_total " +
+                "FROM users u " +
+                "WHERE u.id = ?";
+                
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, userId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getDouble("account_balance");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                double balance = rs.getDouble("account_balance");
+                int winningBids = rs.getInt("winning_bids");
+                int outBids = rs.getInt("out_bids");
+                int wonTotal = rs.getInt("won_total");
+                return new vn.io.huangnosimp.dto.response.DashboardResponseDTO(balance, 0, winningBids, outBids, wonTotal, java.util.Collections.emptyList());
             }
         } catch (SQLException e) {
-            System.err.println("DB error when fetching account balance: " + e.getMessage());
+            System.err.println("DB error when fetching user scalar statistics: " + e.getMessage());
         }
-        return 0.0;
+        return new vn.io.huangnosimp.dto.response.DashboardResponseDTO(0.0, 0, 0, 0, 0, java.util.Collections.emptyList());
     }
 
     @Override
-    public int getJoinedActiveRoomsCount(String userId) {
-        String sql = "SELECT COUNT(*) FROM auctionparticipants ap JOIN auctions a ON ap.auction_id = a.id WHERE ap.user_id = ? AND a.status IN ('OPEN', 'RUNNING')";
+    public List<AuctionCardDTO> getActiveRooms(String userId) {
+        List<AuctionCardDTO> rooms = new java.util.ArrayList<>();
+        String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
+                     "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
+                     "(SELECT IFNULL(MAX(bid_amount), 0) FROM bidtransactions bt WHERE bt.auction_id = a.id AND bt.bidder_id = ?) AS your_bid, " +
+                     "a.end_time " +
+                     "FROM auctions a " +
+                     "JOIN auctionparticipants ap ON a.id = ap.auction_id " +
+                     "JOIN items i ON a.item_id = i.id " +
+                     "WHERE ap.user_id = ? AND a.status IN ('OPEN', 'RUNNING')";
+                     
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, userId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-        } catch (SQLException e) {
-            System.err.println("DB error when fetching joined active rooms count: " + e.getMessage());
-        }
-        return 0;
-    }
-
-    @Override
-    public int getWinningBidsCount(String userId) {
-        String sql = "SELECT COUNT(*) FROM auctions WHERE winner_id = ? AND status = 'RUNNING'";
-        try (Connection connection = databaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, userId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-        } catch (SQLException e) {
-            System.err.println("DB error when fetching winning bids count: " + e.getMessage());
-        }
-        return 0;
-    }
-
-    @Override
-    public int getOutBidsCount(String userId) {
-        String sql = "SELECT COUNT(DISTINCT a.id) FROM auctions a JOIN bidtransactions bt ON a.id = bt.auction_id WHERE bt.bidder_id = ? AND a.winner_id != ? AND a.status = 'RUNNING'";
-        try (Connection connection = databaseConnection.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, userId);
             statement.setString(2, userId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                String auctionId = rs.getString("auction_id");
+                String productName = rs.getString("product_name");
+                double currentPrice = rs.getDouble("current_price");
+                double yourBid = rs.getDouble("your_bid");
+                long endTime = rs.getTimestamp("end_time").getTime();
+                rooms.add(new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, endTime));
             }
         } catch (SQLException e) {
-            System.err.println("DB error when fetching outbids count: " + e.getMessage());
+            System.err.println("DB error when fetching active rooms: " + e.getMessage());
         }
-        return 0;
+        return rooms;
     }
 
     @Override
-    public int getWonTotalCount(String userId) {
-        String sql = "SELECT COUNT(*) FROM auctions WHERE winner_id = ? AND status = 'PAID'";
+    public AuctionDetailResponseDTO getAuctionDetail(String auctionId) {
+        AuctionDetailResponseDTO result = null;
+
+        String auctionSql = "SELECT a.id, a.starting_price, a.final_price, a.start_time, a.end_time, a.status, " +
+                "i.name AS product_name, i.item_type, i.conditions, i.description, " +
+                "w.username AS winner_username, " +
+                "(SELECT COUNT(*) FROM auctionparticipants WHERE auction_id = a.id) AS participant_count, " +
+                "(SELECT COUNT(*) FROM bidtransactions WHERE auction_id = a.id) AS bid_count " +
+                "FROM auctions a " +
+                "JOIN items i ON a.item_id = i.id " +
+                "LEFT JOIN users w ON a.winner_id = w.id " +
+                "WHERE a.id = ?";
+
+        String bidsSql = "SELECT b.bid_amount, b.bid_time, u.username " +
+                "FROM bidtransactions b " +
+                "JOIN users u ON b.bidder_id = u.id " +
+                "WHERE b.auction_id = ? ORDER BY b.bid_time ASC";
+
         try (Connection connection = databaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, userId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
+             PreparedStatement auctionStmt = connection.prepareStatement(auctionSql);
+             PreparedStatement bidsStmt = connection.prepareStatement(bidsSql)) {
+
+            auctionStmt.setString(1, auctionId);
+            ResultSet rsAuction = auctionStmt.executeQuery();
+
+            if (rsAuction.next()) {
+                String productName = rsAuction.getString("product_name");
+                String itemTypeStr = rsAuction.getString("item_type");
+                String conditionStr = rsAuction.getString("conditions");
+                String description = rsAuction.getString("description");
+                double startPrice = rsAuction.getDouble("starting_price");
+                double finalPrice = rsAuction.getDouble("final_price");
+                long startTime = rsAuction.getTimestamp("start_time").getTime();
+                long endTime = rsAuction.getTimestamp("end_time").getTime();
+                String leadBidder = rsAuction.getString("winner_username");
+                int participantCount = rsAuction.getInt("participant_count");
+                int bidCount = rsAuction.getInt("bid_count");
+
+                vn.io.huangnosimp.enums.ItemType category = null;
+                try { category = vn.io.huangnosimp.enums.ItemType.valueOf(itemTypeStr); } catch (Exception ignored) {}
+
+                vn.io.huangnosimp.enums.ItemCondition condition = null;
+                try { condition = vn.io.huangnosimp.enums.ItemCondition.valueOf(conditionStr); } catch (Exception ignored) {}
+
+                double currentPrice = finalPrice > 0 ? finalPrice : startPrice;
+                double bidIncrement = 0.0;
+                double buyNowPrice = 0.0;
+                double minNextBid = currentPrice + bidIncrement;
+
+                java.util.List<BidHistoryDTO> bidHistory = new java.util.ArrayList<>();
+                java.util.List<PricePointDTO> priceHistory = new java.util.ArrayList<>();
+
+                priceHistory.add(new PricePointDTO(startTime, startPrice));
+
+                bidsStmt.setString(1, auctionId);
+                ResultSet rsBids = bidsStmt.executeQuery();
+                long lastBidTime = startTime;
+
+                while (rsBids.next()) {
+                    double bidAmount = rsBids.getDouble("bid_amount");
+                    long bidTime = rsBids.getTimestamp("bid_time").getTime();
+                    String bidderName = rsBids.getString("username");
+
+                    bidHistory.add(0, new BidHistoryDTO(bidderName, bidAmount, bidTime));
+                    priceHistory.add(new PricePointDTO(bidTime, bidAmount));
+                    lastBidTime = bidTime;
+                }
+
+                result = new AuctionDetailResponseDTO(
+                        productName, category, condition, description,
+                        startPrice, bidIncrement, buyNowPrice, startPrice,
+                        startTime, endTime, currentPrice, minNextBid,
+                        leadBidder, lastBidTime, participantCount, bidCount,
+                        bidHistory, priceHistory
+                );
             }
+
         } catch (SQLException e) {
-            System.err.println("DB error when fetching won total count: " + e.getMessage());
+            System.err.println("DB error when fetching auction details: " + e.getMessage());
         }
-        return 0;
+
+        return result;
     }
 }

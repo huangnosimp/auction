@@ -4,6 +4,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import vn.io.huangnosimp.dto.response.LoginResult;
 import vn.io.huangnosimp.dto.response.RegisterResult;
+import vn.io.huangnosimp.dto.response.TransactionResult;
 import vn.io.huangnosimp.enums.UserType;
 import vn.io.huangnosimp.model.*;
 import vn.io.huangnosimp.network.ClientHandle;
@@ -75,36 +76,52 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public synchronized boolean deposit(String userId, double amount) {
+    public synchronized TransactionResult deposit(String userId, double amount) {
+        if (amount <= 0) return TransactionResult.INVALID_AMOUNT;
         User user = userRepository.findById(userId);
-        if (user instanceof Member member && amount > 0) {
+        if (user instanceof Member member) {
             double newBalance = member.getAccountBalance() + amount;
-            return userRepository.updateBalance(userId, newBalance);
+            if (userRepository.updateBalance(userId, newBalance)) {
+                return TransactionResult.SUCCESS;
+            }
+            return TransactionResult.ERROR;
         }
-        return false;
+        return TransactionResult.USER_NOT_FOUND;
     }
 
     @Override
-    public synchronized boolean withdraw(String userId, double amount) {
+    public synchronized TransactionResult withdraw(String userId, double amount) {
+        if (amount <= 0) return TransactionResult.INVALID_AMOUNT;
         User user = userRepository.findById(userId);
-        if (user instanceof Member member && amount > 0) {
+        if (user instanceof Member member) {
             if (member.getAccountBalance() < amount) {
-                return false;
+                return TransactionResult.INSUFFICIENT_FUNDS;
             }
             double newBalance = member.getAccountBalance() - amount;
-            return userRepository.updateBalance(userId, newBalance);
+            if (userRepository.updateBalance(userId, newBalance)) {
+                return TransactionResult.SUCCESS;
+            }
+            return TransactionResult.ERROR;
         }
-        return false;
+        return TransactionResult.USER_NOT_FOUND;
     }
 
     @Override
-    public boolean updateBalance(String userId, double newBalance) {
-        return userRepository.updateBalance(userId, newBalance);
+    public TransactionResult updateBalance(String userId, double newBalance) {
+        if (newBalance < 0) return TransactionResult.INVALID_AMOUNT;
+        if (userRepository.updateBalance(userId, newBalance)) {
+            return TransactionResult.SUCCESS;
+        }
+        return TransactionResult.ERROR;
     }
 
     @Override
-    public boolean updateFrozenBalance(String userId, double newFrozenBalance) {
-        return userRepository.updateFrozenBalance(userId, newFrozenBalance);
+    public TransactionResult updateFrozenBalance(String userId, double newFrozenBalance) {
+        if (newFrozenBalance < 0) return TransactionResult.INVALID_AMOUNT;
+        if (userRepository.updateFrozenBalance(userId, newFrozenBalance)) {
+            return TransactionResult.SUCCESS;
+        }
+        return TransactionResult.ERROR;
     }
 
     @Override

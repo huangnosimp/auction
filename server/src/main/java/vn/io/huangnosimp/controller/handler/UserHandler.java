@@ -9,6 +9,7 @@ import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.controller.RequestHandler;
 import vn.io.huangnosimp.dto.response.LoginResult;
 import vn.io.huangnosimp.dto.response.RegisterResult;
+import vn.io.huangnosimp.dto.response.TransactionResult;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.network.*;
 import vn.io.huangnosimp.service.IUserService;
@@ -23,15 +24,12 @@ public class UserHandler {
         public Response handle(Request request, ClientHandle client) {
             LoginRequestDTO loginRequestDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJson(request.getData()), LoginRequestDTO.class);
             LoginResult result = userService.login(loginRequestDTO.getUserType(), loginRequestDTO.getUsername(), loginRequestDTO.getPassword(), client);
-            if (result == LoginResult.SUCCESS) {
-                return new Response(ResponseStatus.SUCCESS, "Login successful");
-            } else if (result == LoginResult.USER_NOT_FOUND) {
-                return new Response(ResponseStatus.USERNAME_NOT_FOUND, "Invalid username");
-            } else if (result == LoginResult.INVALID_PASSWORD) {
-                return new Response(ResponseStatus.INVALID_PASSWORD, "Invalid password");
-            } else {
-                return new Response(ResponseStatus.FAILED, "Login failed");
-            }
+            return switch (result) {
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Login successful");
+                case USER_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Invalid username");
+                case INVALID_PASSWORD -> new Response(ResponseStatus.FAILED, "Invalid password");
+                default -> new Response(ResponseStatus.FAILED, "Login failed");
+            };
         }
     }
     public static class LogoutHandler implements RequestHandler {
@@ -51,15 +49,12 @@ public class UserHandler {
         public Response handle(Request request, ClientHandle client) {
             RegisterRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), RegisterRequestDTO.class);
             RegisterResult result = userService.register(dto.getUserType(), dto.getUsername(), dto.getPassword(), dto.getEmail());
-            if (result == RegisterResult.SUCCESS) {
-                return new Response(ResponseStatus.SUCCESS, "Registration successful");
-            } else if (result == RegisterResult.USERNAME_TAKEN) {
-                return new Response(ResponseStatus.CONFLICT, "Username already taken");
-            } else if (result == RegisterResult.EMAIL_TAKEN) {
-                return new Response(ResponseStatus.CONFLICT, "Email already taken");
-            }else {
-                return new Response(ResponseStatus.FAILED, "Register failed");
-            }
+            return switch (result) {
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Registration successful");
+                case USERNAME_TAKEN -> new Response(ResponseStatus.FAILED, "Username already taken");
+                case EMAIL_TAKEN -> new Response(ResponseStatus.FAILED, "Email already taken");
+                default -> new Response(ResponseStatus.FAILED, "Register failed");
+            };
         }
     }
     public static class DepositHandler implements RequestHandler {
@@ -71,12 +66,13 @@ public class UserHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             DepositWithdrawRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), DepositWithdrawRequestDTO.class);
-            boolean success = userService.deposit(client.getUserId(), dto.getAmount());
-            if (success) {
-                return new Response(ResponseStatus.SUCCESS, "Deposit successful");
-            } else {
-                return new Response(ResponseStatus.FAILED, "Deposit failed");
-            }
+            TransactionResult result = userService.deposit(client.getUserId(), dto.getAmount());
+            return switch (result) {
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Deposit successful");
+                case INVALID_AMOUNT -> new Response(ResponseStatus.FAILED, "Invalid deposit amount");
+                case USER_NOT_FOUND -> new Response(ResponseStatus.FAILED, "User not found");
+                default -> new Response(ResponseStatus.FAILED, "Deposit failed");
+            };
         }
     }
     public static class WithdrawHandler implements RequestHandler {
@@ -88,12 +84,14 @@ public class UserHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             DepositWithdrawRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), DepositWithdrawRequestDTO.class);
-            boolean success = userService.withdraw(client.getUserId(), dto.getAmount());
-            if (success) {
-                return new Response(ResponseStatus.SUCCESS, "Withdraw successful");
-            } else {
-                return new Response(ResponseStatus.FAILED, "Withdraw failed");
-            }
+            TransactionResult result = userService.withdraw(client.getUserId(), dto.getAmount());
+            return switch (result) {
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Withdraw successful");
+                case INVALID_AMOUNT -> new Response(ResponseStatus.FAILED, "Invalid withdraw amount");
+                case INSUFFICIENT_FUNDS -> new Response(ResponseStatus.FAILED, "Insufficient funds");
+                case USER_NOT_FOUND -> new Response(ResponseStatus.FAILED, "User not found");
+                default -> new Response(ResponseStatus.FAILED, "Withdraw failed");
+            };
         }
     }
 }
