@@ -90,7 +90,7 @@ public class AuctionService implements IAuctionService {
     }
 
     public BidResult placeBid(String bidderId, String auctionId, double amount, boolean triggerAutoBid) {
-        BidResult bidSuccess = BidResult.ERROR;
+        BidResult bidSuccess;
         Object lock = getAuctionLock(auctionId);
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
@@ -101,7 +101,7 @@ public class AuctionService implements IAuctionService {
                 return BidResult.AUCTION_ENDED;
             }
             if (!auctionParticipantsRepository.isParticipant(auctionId, bidderId)) {
-                return BidResult.ERROR;
+                return BidResult.NOT_IN_ROOM;
             }
             Member bidder = userService.getMember(bidderId);
             if (bidder == null || bidder.getId().equals(auction.getSeller().getId())) {
@@ -177,7 +177,7 @@ public class AuctionService implements IAuctionService {
     }
 
     public AuctionActionResult cancelAuction(String auctionId) {
-        AuctionActionResult success = AuctionActionResult.ERROR;
+        AuctionActionResult success;
         Object lock = getAuctionLock(auctionId);
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);

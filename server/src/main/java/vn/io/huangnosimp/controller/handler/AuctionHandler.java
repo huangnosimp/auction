@@ -75,6 +75,7 @@ public class AuctionHandler {
                 case INSUFFICIENT_FUNDS -> new Response(ResponseStatus.FAILED, "Insufficient funds");
                 case BID_TOO_LOW -> new Response(ResponseStatus.FAILED, "Bid amount is too low");
                 case ALREADY_HIGHEST_BIDDER -> new Response(ResponseStatus.FAILED, "You are already the highest bidder");
+                case NOT_IN_ROOM -> new Response(ResponseStatus.FAILED, "You must join the auction room before placing a bid");
                 default -> new Response(ResponseStatus.FAILED, "Place bid failed");
             };
         }

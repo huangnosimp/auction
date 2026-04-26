@@ -70,6 +70,8 @@ public class UserService implements IUserService {
         }
 
         if (user instanceof Member member && member.isBanned()) {
+            client.setUserId(null);
+            client.setUserType(null);
             return LoginResult.BANNED;
         }
 
