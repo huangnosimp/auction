@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserRepository implements IUserRepository {
     private final DatabaseConnection databaseConnection;
@@ -30,16 +32,6 @@ public class UserRepository implements IUserRepository {
             System.err.println("DB error when checking username: " + e.getMessage());
             return false;
         }
-    }
-
-    @Override
-    public boolean banUser(String userId) {
-        return false;
-    }
-
-    @Override
-    public boolean unbanUser(String userId) {
-        return false;
     }
 
     @Override
@@ -152,5 +144,40 @@ public class UserRepository implements IUserRepository {
             case "ADMIN" -> new Admin(id, username, password, email, createdAt);
             default -> null;
         };
+    }
+
+    @Override
+    public boolean updateStatus(String userId, boolean isBanned) {
+        String sql = "UPDATE Users SET is_banned = ? WHERE id = ?";
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setBoolean(1, isBanned);
+            stmt.setString(2, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("DB error updating ban status: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public List<User> findAll() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users";
+
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                User user = mapRowToUser(rs);
+                if (user != null) {
+                    users.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error when finding all users: " + e.getMessage());
+        }
+        return users;
     }
 }

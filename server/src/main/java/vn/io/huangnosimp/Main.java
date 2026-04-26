@@ -1,6 +1,7 @@
 package vn.io.huangnosimp;
 
 import vn.io.huangnosimp.controller.MessageRouter;
+import vn.io.huangnosimp.controller.handler.AdminHandler;
 import vn.io.huangnosimp.controller.handler.AuctionHandler;
 import vn.io.huangnosimp.controller.handler.StatisticHandler;
 import vn.io.huangnosimp.controller.handler.UserHandler;
@@ -27,6 +28,7 @@ public class Main {
         ItemService itemService = new ItemService(itemRepository);
         IStatisticService statisticService = new StatisticService(statisticRepository);
         AuctionService auctionService = new AuctionService(auctionRepository, userService, itemService, transactionRepository, auctionParticipantsRepository, bidTransactionRepository);
+        AdminService adminService = new AdminService(userRepository, auctionRepository, auctionService);
 
         NotificationService notificationService = new NotificationService();
         auctionService.setNotificationService(notificationService);
@@ -34,7 +36,7 @@ public class Main {
         AuctionScheduler auctionScheduler = new AuctionScheduler(auctionService);
         auctionService.setScheduler(auctionScheduler);
         //Controllers
-        MessageRouter router = new MessageRouter();
+        MessageRouter router = new MessageRouter(userRepository);
         //User Handler
         router.registerHandler(ActionType.LOGIN, new UserHandler.LoginHandler(userService));
         router.registerHandler(ActionType.REGISTER, new UserHandler.RegisterHandler(userService));
@@ -47,6 +49,13 @@ public class Main {
         router.registerHandler(ActionType.PLACE_BID, new AuctionHandler.PlaceBidHandler(auctionService));
         router.registerHandler(ActionType.JOIN_ROOM, new AuctionHandler.JoinRoomHandler(auctionService));
         router.registerHandler(ActionType.LEAVE_ROOM, new AuctionHandler.LeaveRoomHandler(auctionService));
+        //Admin Handler
+        router.registerHandler(ActionType.ADMIN_GET_ALL_MEMBERS, new AdminHandler.GetAllMembersHandler(adminService));
+        router.registerHandler(ActionType.ADMIN_LOCK_MEMBER, new AdminHandler.LockMemberHandler(adminService));
+        router.registerHandler(ActionType.ADMIN_UNLOCK_MEMBER, new AdminHandler.UnlockMemberHandler(adminService));
+        router.registerHandler(ActionType.ADMIN_GET_ALL_AUCTIONS, new AdminHandler.GetAllAuctionsHandler(adminService));
+        router.registerHandler(ActionType.ADMIN_FORCE_CANCEL, new AdminHandler.ForceCancelAuctionHandler(adminService));
+        router.registerHandler(ActionType.ADMIN_GET_REVENUE, new AdminHandler.GetRevenueHandler(adminService));
         //Statistic Handler
         router.registerHandler(ActionType.GET_DASHBOARD_INFO, new StatisticHandler.GetDashboardInfoHandler(statisticService));
         //Start Server

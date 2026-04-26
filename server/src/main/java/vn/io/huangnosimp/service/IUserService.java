@@ -14,7 +14,4 @@ public interface IUserService {
     boolean withdraw(String userId, double amount);
     boolean updateBalance(String userId, double newBalance);
     boolean updateFrozenBalance(String userId, double newFrozenBalance);
-    boolean banUser(String userId);
-    boolean unbanUser(String userId);
-
 }

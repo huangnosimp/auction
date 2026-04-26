@@ -1,19 +1,24 @@
 package vn.io.huangnosimp.controller;
 
+import vn.io.huangnosimp.model.Member;
+import vn.io.huangnosimp.model.User;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
+import vn.io.huangnosimp.repository.IUserRepository;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MessageRouter {
     private final Map<ActionType, RequestHandler> handlers;
+    private final IUserRepository userRepository;
 
-    public MessageRouter() {
+    public MessageRouter(IUserRepository userRepository) {
         this.handlers = new ConcurrentHashMap<>();
+        this.userRepository = userRepository;
     }
 
     public void registerHandler(ActionType type, RequestHandler handler) {
@@ -29,6 +34,14 @@ public class MessageRouter {
         if (action != ActionType.LOGIN && action != ActionType.REGISTER) {
             if (client.getUserId() == null) {
                 return new Response(ResponseStatus.UNAUTHORIZED, "Unauthorized: please login first");
+            }
+
+            //Check ban
+            User user = userRepository.findById(client.getUserId());
+            if (user instanceof Member member && member.isBanned()) {
+                client.setUserId(null);
+                client.setUserType(null);
+                return new Response(ResponseStatus.FORBIDDEN, "Your account has been banned by Admin.");
             }
         }
         System.out.println("[Router] Routing package: " + action + " for user: " + client.getUserId());
