@@ -137,12 +137,28 @@
             <VBox spacing="14">
                 <Label styleClass="section-label" text="PRICING &amp; BIDDING" />
 
+                <!-- Hàng 1: Starting price + Bid increment -->
                 <HBox spacing="14">
+
+                    <!-- Starting price -->
                     <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label styleClass="field-label" text="Starting price ($)" />
-                        <TextField fx:id="startPriceField" promptText="0.00" styleClass="form-input" />
+                        <Label styleClass="field-label" text="Starting price" />
+                        <HBox spacing="6">
+                            <TextField fx:id="startPriceField" promptText="e.g. 1" styleClass="form-input" HBox.hgrow="ALWAYS" />
+                            <ComboBox fx:id="startPriceUnitCombo" styleClass="form-combo" value="Million">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Thousand" />
+                                        <String fx:value="Million" />
+                                        <String fx:value="Billion" />
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+                        </HBox>
+                        <Label fx:id="startPriceEquivalentLabel" styleClass="upload-hint" text="Equivalent: 1.000.000 đ" />
                     </VBox>
 
+                    <!-- Bid increment -->
                     <VBox spacing="6" HBox.hgrow="ALWAYS">
                         <Label styleClass="field-label" text="Bid increment" />
                         <HBox spacing="6">
@@ -159,9 +175,36 @@
                         </HBox>
                         <Label fx:id="bidIncrementEquivalentLabel" styleClass="upload-hint" text="Equivalent: 1.000.000 đ" />
                     </VBox>
+
                 </HBox>
 
-                <VBox spacing="6" />
+                <!-- Hàng 2: Buy Now toggle -->
+                <HBox alignment="CENTER_LEFT" spacing="0" styleClass="toggle-row">
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label styleClass="toggle-title" text="Buy Now" />
+                        <Label styleClass="toggle-hint" text="Allow buyers to purchase immediately at a fixed price without waiting for the auction to end" />
+                    </VBox>
+                    <CheckBox fx:id="buyNowCheck" selected="false" styleClass="form-toggle" onAction="#handleBuyNowToggle" />
+                </HBox>
+
+                <!-- Buy Now price - ẩn khi chưa bật toggle -->
+                <VBox fx:id="buyNowBox" managed="false" visible="false" spacing="6">
+                    <Label styleClass="field-label" text="Buy Now price" />
+                    <HBox spacing="6">
+                        <TextField fx:id="buyNowPriceField" promptText="e.g. 10" styleClass="form-input" HBox.hgrow="ALWAYS" />
+                        <ComboBox fx:id="buyNowUnitCombo" styleClass="form-combo" value="Million">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Thousand" />
+                                    <String fx:value="Million" />
+                                    <String fx:value="Billion" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </HBox>
+                    <Label fx:id="buyNowEquivalentLabel" styleClass="upload-hint" text="Equivalent: 10.000.000 đ" />
+                </VBox>
+
             </VBox>
 
             <!-- SCHEDULE & DURATION -->

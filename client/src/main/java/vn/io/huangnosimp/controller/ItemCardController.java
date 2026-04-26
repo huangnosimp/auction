@@ -6,9 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import javafx.event.ActionEvent;
-import vn.io.huangnosimp.Manager.SocketManager;
-import vn.io.huangnosimp.Manager.UserSession;
-import vn.io.huangnosimp.Manager.ViewManager;
+import javafx.scene.layout.VBox;
+import vn.io.huangnosimp.Manager.*;
 import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
@@ -24,13 +23,16 @@ public class ItemCardController {
     @FXML private Label lblYourBid;
     @FXML private Button BidNowButton;
     private String auctionId;
+    @FXML private VBox yourBidVbox;
     public void addInfo(AuctionCardDTO dto){
-        productNamelabel.setText(dto.getProductName());
-        lblTime.setText("");
-        lblCurrentBid.setText(String.valueOf(dto.getCurrentPrice()));
+        productNamelabel.setText(dto.getItemName());
+        AuctionCountdownUtil countdownUtil = new AuctionCountdownUtil(lblTime, dto.getStartTime(), dto.getEndTime());
+        countdownUtil.start();
+        lblCurrentBid.setText(FormatUtil.formatNumber(dto.getCurrentPrice())+" đ");
         lblYourBid.setText(String.valueOf(dto.getYourBid()));
         this.auctionId = dto.getAuctionId();
         BidNowButton.setText("Inspect");
+        yourBidVbox.setVisible(false);
     }
     @FXML public void handleBidNowbutton(ActionEvent event){
         GetAuctionDetailRequestDTO getDetail = new GetAuctionDetailRequestDTO(auctionId);
@@ -40,7 +42,7 @@ public class ItemCardController {
                         AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionDetailResponseDTO.class);
                         Platform.runLater(()->{
                             UserSession.setAuctionDetail(auctionResponse);
-                            ViewManager.changeView("liveAuction.fxml");
+                            ViewManager.changeView("liveAuction.fxml", 2);
                         });
                     }
                 });

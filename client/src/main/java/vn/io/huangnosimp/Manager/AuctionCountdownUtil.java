@@ -8,11 +8,12 @@ import java.time.Instant;
 public class AuctionCountdownUtil {
     private Timeline timeline;
     private Label timeLabel;
-    private long remaining; // Số giây còn lại
+    private long remaining;
+    private long startTime; // Thêm startTime
 
-    public AuctionCountdownUtil(Label label, long endTime) {
+    public AuctionCountdownUtil(Label label, long startTime, long endTime) {
         this.timeLabel = label;
-        // Tính remaining 1 lần duy nhất lúc khởi tạo
+        this.startTime = startTime;
         this.remaining = endTime - Instant.now().getEpochSecond();
 
         timeline = new Timeline(
@@ -24,18 +25,31 @@ public class AuctionCountdownUtil {
     }
 
     private void update() {
+        long now = Instant.now().getEpochSecond();
+
+        // Chưa tới giờ bắt đầu
+        if (now < startTime) {
+            long waitSeconds = startTime - now;
+            long hours   = waitSeconds / 3600;
+            long minutes = (waitSeconds % 3600) / 60;
+            long seconds = waitSeconds % 60;
+            timeLabel.setText(String.format("Bắt đầu sau: %02d:%02d:%02d", hours, minutes, seconds));
+            return;
+        }
+
+        // Đã kết thúc
         if (remaining <= 0) {
             timeLabel.setText("Đã kết thúc!");
             timeline.stop();
             return;
         }
 
+        // Đang diễn ra
         long hours   = remaining / 3600;
         long minutes = (remaining % 3600) / 60;
         long seconds = remaining % 60;
-
         timeLabel.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
-        remaining--; // Giảm 1 giây sau mỗi lần cập nhật
+        remaining--;
     }
 
     public void start() { timeline.play(); }

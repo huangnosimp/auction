@@ -17,8 +17,7 @@
 
       <VBox prefHeight="167.0" prefWidth="174.0" spacing="12" style="-fx-padding: 12;">
          <children>
-            <Label fx:id="productNamelabel" styleClass="ac-product" text="Hoang soi" />
-            <Label styleClass="status-badge s-outbid" text="OUTBID" />
+            <Label fx:id="productNamelabel" styleClass="ac-product" text="Hoang soi" textFill="WHITE" />
 
             <GridPane vgap="5">
                <columnConstraints>
@@ -42,7 +41,7 @@
 
             <HBox alignment="CENTER_LEFT" spacing="5">
                <children>
-                  <VBox>
+                  <VBox fx:id="yourBidVbox">
                      <Label styleClass="ac-bid-sub" text="Your bid" />
                      <Label fx:id="lblYourBid" styleClass="ac-bid-val" text="44tr" />
                   </VBox>

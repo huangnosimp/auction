@@ -14,6 +14,7 @@ import vn.io.huangnosimp.dto.request.CreateAuctionRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
+import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
@@ -50,16 +51,24 @@ public class CreateAuctionController implements Initializable{
 
     // Pricing
     @FXML private TextField startPriceField;
-    @FXML private Spinner<Integer> bidIncrementSpinner;
-    @FXML private TextField buyNowField;
-    @FXML private TextField reservePriceField;
+    @FXML private VBox buyNowBox;
+    @FXML private CheckBox buyNowCheck;
+    @FXML private TextField buyNowPriceField;
+    @FXML private ComboBox<String> buyNowUnitCombo;
+    @FXML private Label buyNowEquivalentLabel;
+    @FXML private TextField bidIncrementField;
 
     // Schedule
     @FXML private DatePicker startDatePicker;
     @FXML private TextField startTimeField;
     @FXML private ComboBox<String> durationCombo;
     @FXML private CheckBox autoExtendCheck;
-    private DashboardController parent;
+
+    @FXML private ComboBox<String> startPriceUnitCombo;
+    @FXML private ComboBox<String> bidIncrementUnitCombo;
+
+
+
     @FXML
     private void handleCategoryChange() {
         String selected = categoryCombo.getValue();
@@ -75,23 +84,47 @@ public class CreateAuctionController implements Initializable{
         }
     }
     @FXML
+    private void handleBuyNowToggle() {
+        boolean enabled = buyNowCheck.isSelected();
+        buyNowBox.setVisible(enabled);
+        buyNowBox.setManaged(enabled);
+    }
+
+
+    @FXML
     private void handleLaunchButton() {
         if (!validate()) return;
 
         ItemAttributesDTO attributes = buildAttributes();
         if (attributes == null) return;
 
+        ItemCondition condition = getItemCondition();
+        if(condition==null) return;
+
         long startTime = calculateStartTime();
         long endTime   = calculateEndTime(startTime);
+
+        double startPrice = calculateRealPrice(startPriceField, startPriceUnitCombo);
+        double bidIncrement = calculateRealPrice(bidIncrementField, bidIncrementUnitCombo);
+        double buyNowPrice;
+        if(buyNowPriceField.getText().isBlank()){
+            buyNowPrice=0;
+        }
+        else{
+            buyNowPrice = calculateRealPrice(buyNowPriceField, buyNowUnitCombo);
+        }
 
         CreateAuctionRequestDTO dto = new CreateAuctionRequestDTO(
                 itemNameField.getText().trim(),
                 descriptionArea.getText().trim(),
                 ItemType.valueOf(categoryCombo.getValue().toUpperCase()),
                 attributes,
-                Double.parseDouble(startPriceField.getText().trim()),
+                startPrice,
                 startTime,
-                endTime
+                endTime,
+                condition,
+                bidIncrement,
+                buyNowPrice
         );
 
         SocketManager.getClient().sendRequestAsync(new Request(ActionType.CREATE_AUCTION, dto))
@@ -129,7 +162,14 @@ public class CreateAuctionController implements Initializable{
         }
         return true;
     }
-
+    private ItemCondition getItemCondition(){
+        return switch (conditionChoice.getValue()){
+            case "New" ->{yield ItemCondition.NEW;}
+            case "Like New"->{yield ItemCondition.LIKE_NEW;}
+            case "Used" ->{yield ItemCondition.USED;}
+            default -> null;
+        };
+    }
     private ItemAttributesDTO buildAttributes() {
         return switch (categoryCombo.getValue()) {
             case "Art" -> {
@@ -162,14 +202,26 @@ public class CreateAuctionController implements Initializable{
             default -> null;
         };
     }
-
+    private double calculateRealPrice(TextField value, ComboBox<String> Case){
+        if(Case.getValue().equals("Thousand")){
+            return Double.parseDouble(value.getText().trim())*1000;
+        }
+        if(Case.getValue().equals("Million")){
+            return Double.parseDouble(value.getText().trim())*1000000;
+        }
+        if(Case.getValue().equals("Billion")){
+            return Double.parseDouble(value.getText().trim())*1000000000;
+        }
+        return 0;
+    }
     private long calculateStartTime() {
         LocalDate date = startDatePicker.getValue();
         String[] parts = startTimeField.getText().split(":");
         int hour = parts.length > 0 ? Integer.parseInt(parts[0].trim()) : 0;
         int min  = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 0;
         return LocalDateTime.of(date, LocalTime.of(hour, min))
-                .toInstant(ZoneOffset.UTC).getEpochSecond();
+                .toInstant(ZoneOffset.of("+07:00")) // ← đổi thành GMT+7
+                .getEpochSecond();
     }
 
     private long calculateEndTime(long startTime) {

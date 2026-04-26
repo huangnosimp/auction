@@ -107,7 +107,6 @@ public class liveAuctionController implements Initializable {
             handleIncreaseButton(); // Gọi lại hàm tăng số bạn đã viết
         }));
         holdTimer.setCycleCount(Animation.INDEFINITE); // Chạy vô hạn cho đến khi thả chuột
-        AuctionCountdownUtil countdown = new AuctionCountdownUtil(timeLabel, endtime);
-        countdown.start();
+
     }
 }
