@@ -7,6 +7,8 @@ import vn.io.huangnosimp.model.Item;
 import vn.io.huangnosimp.model.Member;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AuctionRepository implements IAuctionRepository {
     private final DatabaseConnection databaseConnection;
@@ -75,6 +77,7 @@ public class AuctionRepository implements IAuctionRepository {
         }
         return false;
     }
+
     private Auction mapRowToAuction(ResultSet rs) throws SQLException {
         String id = rs.getString("id");
         String itemId = rs.getString("item_id");
@@ -98,7 +101,27 @@ public class AuctionRepository implements IAuctionRepository {
         if (statusStr != null) {
             auction.setStatus(AuctionStatus.valueOf(statusStr));
         }
-
         return auction;
+    }
+
+    @Override
+    public List<Auction> findAll() {
+        List<Auction> auctions = new ArrayList<>();
+        String sql = "SELECT * FROM Auctions";
+
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Auction auction = mapRowToAuction(rs);
+                if (auction != null) {
+                    auctions.add(auction);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error when finding all auctions: " + e.getMessage());
+        }
+        return auctions;
     }
 }
