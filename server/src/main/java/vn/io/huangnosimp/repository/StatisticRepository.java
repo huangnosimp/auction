@@ -50,7 +50,7 @@ public class StatisticRepository implements IStatisticRepository {
         String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "(SELECT IFNULL(MAX(bid_amount), 0) FROM bidtransactions bt WHERE bt.auction_id = a.id AND bt.bidder_id = ?) AS your_bid, " +
-                     "a.end_time " +
+                     "a.start_time AS start_time, a.end_time AS end_time " +
                      "FROM auctions a " +
                      "JOIN auctionparticipants ap ON a.id = ap.auction_id " +
                      "JOIN items i ON a.item_id = i.id " +
@@ -66,8 +66,9 @@ public class StatisticRepository implements IStatisticRepository {
                 String productName = rs.getString("product_name");
                 double currentPrice = rs.getDouble("current_price");
                 double yourBid = rs.getDouble("your_bid");
+                long startTime = rs.getTimestamp("start_time").getTime();
                 long endTime = rs.getTimestamp("end_time").getTime();
-                rooms.add(new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, endTime));
+                rooms.add(new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, startTime, endTime));
             }
         } catch (SQLException e) {
             System.err.println("DB error when fetching active rooms: " + e.getMessage());
