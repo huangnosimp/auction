@@ -1,10 +1,7 @@
 package vn.io.huangnosimp;
 
 import vn.io.huangnosimp.controller.MessageRouter;
-import vn.io.huangnosimp.controller.handler.AdminHandler;
-import vn.io.huangnosimp.controller.handler.AuctionHandler;
-import vn.io.huangnosimp.controller.handler.StatisticHandler;
-import vn.io.huangnosimp.controller.handler.UserHandler;
+import vn.io.huangnosimp.controller.handler.*;
 import vn.io.huangnosimp.database.DatabaseConnection;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.network.SocketServer;
@@ -23,11 +20,15 @@ public class Main {
         IAuctionParticipantsRepository auctionParticipantsRepository = new AuctionParticipantsRepository(dbConnection);
         IBidTransactionRepository bidTransactionRepository = new BidTransactionRepository(dbConnection);
         IStatisticRepository statisticRepository = new StatisticRepository(dbConnection);
+        IAutoBidRepository autoBidRepository = new AutoBidRepository();
         //Services
         UserService userService = new UserService(userRepository);
         ItemService itemService = new ItemService(itemRepository);
         IStatisticService statisticService = new StatisticService(statisticRepository);
+        AutoBidService autoBidService = new AutoBidService(autoBidRepository, userRepository, auctionRepository);
         AuctionService auctionService = new AuctionService(auctionRepository, userService, itemService, transactionRepository, auctionParticipantsRepository, bidTransactionRepository);
+        autoBidService.setAuctionService(auctionService);
+        auctionService.setAutoBidService(autoBidService);
         AdminService adminService = new AdminService(userRepository, auctionRepository, auctionService);
 
         NotificationService notificationService = new NotificationService();
@@ -57,6 +58,9 @@ public class Main {
         router.registerHandler(ActionType.ADMIN_GET_ALL_AUCTIONS, new AdminHandler.GetAllAuctionsHandler(adminService));
         router.registerHandler(ActionType.ADMIN_FORCE_CANCEL, new AdminHandler.ForceCancelAuctionHandler(adminService));
         router.registerHandler(ActionType.ADMIN_GET_REVENUE, new AdminHandler.GetRevenueHandler(adminService));
+        //AutoBid Handler
+        router.registerHandler(ActionType.REGISTER_AUTO_BID, new AutoBidHandler.RegisterHandler(autoBidService));
+        router.registerHandler(ActionType.UNREGISTER_AUTO_BID, new AutoBidHandler.UnregisterHandler(autoBidService));
         //Statistic Handler
         router.registerHandler(ActionType.GET_DASHBOARD_INFO, new StatisticHandler.GetDashboardInfoHandler(statisticService));
         router.registerHandler(ActionType.GET_AUCTION_DETAIL, new StatisticHandler.GetAuctionDetailHandler(statisticService));
