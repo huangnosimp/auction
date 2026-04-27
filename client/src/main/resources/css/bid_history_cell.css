@@ -1,0 +1,61 @@
+/* ═══════════════════════════════════════ */
+/*         bid_history_cell.css            */
+/* ═══════════════════════════════════════ */
+
+/* ── Cell gốc ── */
+.bid-cell {
+    -fx-background-color: #1e2029;
+    -fx-background-radius: 6;
+    -fx-border-color: #2a2d3a;
+    -fx-border-radius: 6;
+    -fx-border-width: 0.5;
+}
+
+/* ── Cell cao nhất ── */
+.bid-cell-top {
+    -fx-background-color: #1a2e1a;
+    -fx-border-color: #2d5a2d;
+}
+
+/* ── Avatar ── */
+.bid-avatar {
+    -fx-background-color: #1e3a5a;
+    -fx-background-radius: 13;
+    -fx-text-fill: #5aabea;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-min-width: 26;
+    -fx-min-height: 26;
+    -fx-max-width: 26;
+    -fx-max-height: 26;
+    -fx-alignment: center;
+}
+
+.bid-cell-top .bid-avatar {
+    -fx-background-color: #1a3a1a;
+    -fx-text-fill: #4fc97e;
+}
+
+/* ── Tên người đặt ── */
+.bid-name {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* ── Thời gian ── */
+.bid-time {
+    -fx-text-fill: #666666;
+    -fx-font-size: 10px;
+}
+
+/* ── Số tiền ── */
+.bid-amount {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.bid-cell-top .bid-amount {
+    -fx-text-fill: #4fc97e;
+}

@@ -19,18 +19,29 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
             SceneManager.setStage(primaryStage);
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard.fxml"));
-            Parent root = loader.load();
+            URL fxmlLocation = getClass().getResource("/fxml/LoginView.fxml");
+            if (fxmlLocation == null) {
+                throw new Exception("Không tìm thấy file LoginView.fxml!");
+            }
 
-            Scene scene = new Scene(root);
+            Parent root = FXMLLoader.load(fxmlLocation);
+            primaryStage.setScene(new Scene(root, 1000, 800));
             primaryStage.setTitle("Dashboard");
-            primaryStage.setScene(scene);
-            primaryStage.setMinWidth(800);
-            primaryStage.setMinHeight(500);
             primaryStage.show();
+
+            new Thread(() -> {
+                try {
+                    SocketClient socketClient = new SocketClient("20.255.57.143", 26676);
+                    socketClient.connect();
+                    SocketManager.setClient(socketClient);
+                    System.out.println("Kết nối server thành công!");
+                } catch (Exception e) {
+                    System.err.println("Lỗi kết nối Server: " + e.getMessage());
+                }
+            }).start();
+
         } catch (Exception e) {
             e.printStackTrace();
-            Platform.exit();
         }
     }
 

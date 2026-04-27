@@ -20,8 +20,8 @@ public class AuctionDetailResponseDTO {
     private final double buyNowPrice;      // Giá mua ngay (0 nếu không có)
 
     // Lịch trình
-    private final long startTime;          // Thời điểm bắt đầu (epoch milliseconds)
-    private final long endTime;            // Thời điểm kết thúc (epoch milliseconds)
+    private final long startTime;          // Thời điểm bắt đầu (epoch seconds)
+    private final long endTime;            // Thời điểm kết thúc (epoch seconds)
 
     // Trạng thái hiện tại
     private final double currentPrice;     // Giá hiện tại cao nhất

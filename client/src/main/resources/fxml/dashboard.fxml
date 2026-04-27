@@ -95,9 +95,6 @@
                     <Label styleClass="side-section-title" text="RECENT ACTIVITY" />
                     <VBox fx:id="activityList" spacing="8" />
                 </VBox>
-
-                <!-- Create Auction (giữ nguyên) -->
-                <Button fx:id="createButton" maxWidth="Infinity" minHeight="32" onAction="#handleCreateClick" text="Create Auction" />
             </VBox>
         </AnchorPane>
     </left>

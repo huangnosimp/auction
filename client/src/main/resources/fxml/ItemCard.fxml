@@ -17,8 +17,8 @@
 
       <VBox prefHeight="167.0" prefWidth="174.0" spacing="12" style="-fx-padding: 12;">
          <children>
-            <Label styleClass="ac-product" text="Hoang soi" />
-            <Label styleClass="status-badge s-outbid" text="OUTBID" />
+            <Label fx:id="productNamelabel" styleClass="ac-product" text="Hoang soi" textFill="WHITE" />
+            <Label fx:id="outbidlbl" styleClass="status-badge s-outbid" text="OUTBID" />
 
             <GridPane vgap="5">
                <columnConstraints>
@@ -26,7 +26,7 @@
                   <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                </columnConstraints>
                <children>
-                  <Label styleClass="ac-key" text="Ends in:" GridPane.rowIndex="0" />
+                  <Label fx:id="statuslbl" styleClass="ac-key" text="Ends in:" GridPane.rowIndex="0" />
                   <Label fx:id="lblTime" styleClass="ac-val-time" text="02h 15m" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
                   <Label styleClass="ac-key" text="Current bid:" GridPane.rowIndex="1" />
@@ -42,12 +42,12 @@
 
             <HBox alignment="CENTER_LEFT" spacing="5">
                <children>
-                  <VBox>
+                  <VBox fx:id="yourBidVbox">
                      <Label styleClass="ac-bid-sub" text="Your bid" />
                      <Label fx:id="lblYourBid" styleClass="ac-bid-val" text="44tr" />
                   </VBox>
                   <Region HBox.hgrow="ALWAYS" />
-                  <Button fx:id="BidNowButton" onAction="#handleBidClick" prefHeight="25.0" prefWidth="68.0" styleClass="bid-btn-action" text="Bid Now" />
+                  <Button fx:id="BidNowButton" onAction="#handleBidNowbutton" prefHeight="25.0" prefWidth="68.0" styleClass="bid-btn-action" text="Bid Now" />
                </children>
             </HBox>
          </children>

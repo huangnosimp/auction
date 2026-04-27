@@ -9,6 +9,10 @@ import javafx.scene.layout.FlowPane;
 import javafx.animation.FadeTransition;
 import javafx.util.Duration;
 import javafx.event.ActionEvent; // đúng loại sự kiện
+import vn.io.huangnosimp.Manager.ControllerManager;
+import vn.io.huangnosimp.Manager.ViewManager;
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -16,11 +20,14 @@ import java.util.ResourceBundle;
 public class dashboard_homeController implements Initializable {
     @FXML private Button btnFab1;
     @FXML private FlowPane auctionFlowPane;
-    public void addToDashboard(){
+
+    public void addToDashboard(AuctionCardDTO dto){
         try {
             String fxmlPath = "/fxml/ItemCard.fxml";
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent cardNode = loader.load();
+            ItemCardController cardController = loader.getController();
+            cardController.addInfo(dto);
             auctionFlowPane.getChildren().add(cardNode);
             FadeTransition ft = new FadeTransition(Duration.millis(500), cardNode);
             ft.setFromValue(0.0);
@@ -31,12 +38,12 @@ public class dashboard_homeController implements Initializable {
             e.printStackTrace();
         }
     }
-    public void handleButtonClick(ActionEvent event){
-        addToDashboard();
+    public void handleCreateAuction(ActionEvent event){
+        ViewManager.changeView("create_auction.fxml", 2);
 
     }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Thiết lập số dư tại đây vì lblBalance nằm ở file này
+        ControllerManager.setDashboardHomeController(this);
     }
 }

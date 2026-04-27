@@ -7,29 +7,30 @@
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="0" styleClass="auction-form-root" stylesheets="@../css/create_auction.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.CreateAuctionController">
+
     <HBox alignment="CENTER_LEFT" spacing="10" styleClass="form-header">
         <Label styleClass="form-header-icon" text="+" />
         <Label styleClass="form-header-title" text="Create new auction" />
         <Label styleClass="form-header-badge" text="Live bidding" />
     </HBox>
 
-
     <ScrollPane fitToWidth="true" styleClass="form-scroll" VBox.vgrow="ALWAYS">
         <VBox spacing="28" styleClass="form-body">
             <padding><Insets bottom="28" left="28" right="28" top="28" /></padding>
 
+            <!-- ITEM INFORMATION -->
             <VBox spacing="14">
                 <Label styleClass="section-label" text="ITEM INFORMATION" />
 
                 <VBox spacing="6">
                     <Label styleClass="field-label" text="Item title" />
-                    <TextField promptText="e.g. iPhone 15 Pro Max 256GB – Space Black" styleClass="form-input" />
+                    <TextField fx:id="itemNameField" promptText="e.g. iPhone 15 Pro Max 256GB – Space Black" styleClass="form-input" />
                 </VBox>
 
                 <HBox spacing="14">
                     <VBox spacing="6" HBox.hgrow="ALWAYS">
                         <Label styleClass="field-label" text="Category" />
-                        <ComboBox maxWidth="Infinity" promptText="Select category..." styleClass="form-combo">
+                        <ComboBox fx:id="categoryCombo" maxWidth="Infinity" onAction="#handleCategoryChange" promptText="Select category..." styleClass="form-combo">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
                                     <String fx:value="Art" />
@@ -42,7 +43,7 @@
 
                     <VBox spacing="6" HBox.hgrow="ALWAYS">
                         <Label styleClass="field-label" text="Condition" />
-                        <ChoiceBox maxWidth="Infinity" styleClass="form-choice">
+                        <ChoiceBox fx:id="conditionChoice" maxWidth="Infinity" styleClass="form-choice">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
                                     <String fx:value="New" />
@@ -56,7 +57,66 @@
 
                 <VBox spacing="6">
                     <Label styleClass="field-label" text="Description" />
-                    <TextArea prefRowCount="3" promptText="Describe item condition, features, defects (if any)..." styleClass="form-textarea" />
+                    <TextArea fx:id="descriptionArea" prefRowCount="3" promptText="Describe item condition, features, defects (if any)..." styleClass="form-textarea" />
+                </VBox>
+
+                <!-- ATTRIBUTES ĐỘNG THEO CATEGORY -->
+                <VBox fx:id="attributesBox" spacing="14">
+
+                    <!-- Art attributes -->
+                    <VBox fx:id="artAttributes" managed="false" prefHeight="16.0" prefWidth="6.0" spacing="14" visible="false">
+                        <Label styleClass="section-label" text="ART DETAILS" />
+                        <HBox spacing="14">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label styleClass="field-label" text="Artist" />
+                                <TextField fx:id="artistField" promptText="e.g. Vincent van Gogh" styleClass="form-input" />
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label styleClass="field-label" text="Creation year" />
+                                <TextField fx:id="creationYearField" promptText="e.g. 1889" styleClass="form-input" />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Electronics attributes -->
+                    <VBox fx:id="electronicsAttributes" managed="false" spacing="14" visible="false">
+                        <Label styleClass="section-label" text="ELECTRONICS DETAILS" />
+                        <HBox spacing="14">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label styleClass="field-label" text="Brand" />
+                                <TextField fx:id="brandField" promptText="e.g. Apple" styleClass="form-input" />
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label styleClass="field-label" text="Warranty (months)" />
+                                <Spinner fx:id="warrantySpinner" editable="true" initialValue="12" max="120" min="0" styleClass="form-spinner" />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Vehicle attributes -->
+                    <VBox fx:id="vehicleAttributes" managed="false" spacing="14" visible="false">
+                        <Label styleClass="section-label" text="VEHICLE DETAILS" />
+                        <HBox spacing="14">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label styleClass="field-label" text="Engine type" />
+                                <ComboBox fx:id="engineTypeCombo" maxWidth="Infinity" promptText="Select engine..." styleClass="form-combo">
+                                    <items>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <String fx:value="Petrol" />
+                                            <String fx:value="Diesel" />
+                                            <String fx:value="Electric" />
+                                            <String fx:value="Hybrid" />
+                                        </FXCollections>
+                                    </items>
+                                </ComboBox>
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label styleClass="field-label" text="Mileage (km)" />
+                                <TextField fx:id="mileageField" promptText="e.g. 15000" styleClass="form-input" />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
                 </VBox>
 
                 <VBox spacing="8">
@@ -73,49 +133,109 @@
                 </VBox>
             </VBox>
 
+            <!-- PRICING & BIDDING -->
             <VBox spacing="14">
                 <Label styleClass="section-label" text="PRICING &amp; BIDDING" />
 
+                <!-- Hàng 1: Starting price + Bid increment -->
                 <HBox spacing="14">
+
+                    <!-- Starting price -->
                     <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label styleClass="field-label" text="Starting price ($)" />
-                        <TextField promptText="0.00" styleClass="form-input" />
-                    </VBox>
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label styleClass="field-label" text="Bid increment ($)" />
-                        <Spinner editable="true" initialValue="10" max="100000" min="1" styleClass="form-spinner" />
-                    </VBox>
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <HBox alignment="CENTER_LEFT" spacing="6">
-                            <Label styleClass="field-label" text="Buy It Now" />
-                            <Label styleClass="tag-optional" text="optional" />
+                        <Label styleClass="field-label" text="Starting price" />
+                        <HBox spacing="6">
+                            <TextField fx:id="startPriceField" promptText="e.g. 1" styleClass="form-input" HBox.hgrow="ALWAYS" />
+                            <ComboBox fx:id="startPriceUnitCombo" styleClass="form-combo" value="Million">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Thousand" />
+                                        <String fx:value="Million" />
+                                        <String fx:value="Billion" />
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
                         </HBox>
-                        <TextField promptText="—" styleClass="form-input" />
+                        <Label fx:id="startPriceEquivalentLabel" styleClass="upload-hint" text="Equivalent: 1.000.000 đ" />
                     </VBox>
+
+                    <!-- Bid increment -->
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Bid increment" />
+                        <HBox spacing="6">
+                            <TextField fx:id="bidIncrementField" promptText="e.g. 1" styleClass="form-input" HBox.hgrow="ALWAYS" />
+                            <ComboBox fx:id="bidIncrementUnitCombo" styleClass="form-combo" value="Million">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Thousand" />
+                                        <String fx:value="Million" />
+                                        <String fx:value="Billion" />
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+                        </HBox>
+                        <Label fx:id="bidIncrementEquivalentLabel" styleClass="upload-hint" text="Equivalent: 1.000.000 đ" />
+                    </VBox>
+
                 </HBox>
 
-                <VBox spacing="6">
-                    <HBox alignment="CENTER_LEFT" spacing="6">
-                        <Label styleClass="field-label" text="Reserve price" />
-                        <Label styleClass="tag-optional" text="secret floor – optional" />
+                <!-- Hàng 2: Buy Now toggle -->
+                <HBox alignment="CENTER_LEFT" spacing="0" styleClass="toggle-row">
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label styleClass="toggle-title" text="Buy Now" />
+                        <Label styleClass="toggle-hint" text="Allow buyers to purchase immediately at a fixed price without waiting for the auction to end" />
+                    </VBox>
+                    <CheckBox fx:id="buyNowCheck" selected="false" styleClass="form-toggle" onAction="#handleBuyNowToggle" />
+                </HBox>
+
+                <!-- Buy Now price - ẩn khi chưa bật toggle -->
+                <VBox fx:id="buyNowBox" managed="false" visible="false" spacing="6">
+                    <Label styleClass="field-label" text="Buy Now price" />
+                    <HBox spacing="6">
+                        <TextField fx:id="buyNowPriceField" promptText="e.g. 10" styleClass="form-input" HBox.hgrow="ALWAYS" />
+                        <ComboBox fx:id="buyNowUnitCombo" styleClass="form-combo" value="Million">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Thousand" />
+                                    <String fx:value="Million" />
+                                    <String fx:value="Billion" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
                     </HBox>
-                    <TextField promptText="Hidden minimum price – leave blank if none" styleClass="form-input" />
+                    <Label fx:id="buyNowEquivalentLabel" styleClass="upload-hint" text="Equivalent: 10.000.000 đ" />
                 </VBox>
+
             </VBox>
 
+            <!-- SCHEDULE & DURATION -->
             <VBox spacing="14">
                 <Label styleClass="section-label" text="SCHEDULE &amp; DURATION" />
 
                 <HBox spacing="14">
                     <VBox spacing="6" HBox.hgrow="ALWAYS">
                         <Label styleClass="field-label" text="Start date &amp; time" />
-                        <DatePicker maxWidth="Infinity" promptText="Pick a date..." styleClass="form-datepicker" />
+                        <DatePicker fx:id="startDatePicker" maxWidth="Infinity" promptText="Pick a date..." styleClass="form-datepicker" />
+                    </VBox>
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Start time" />
+                        <TextField fx:id="startTimeField" promptText="HH:mm  e.g. 14:30" styleClass="form-input" />
                     </VBox>
                     <VBox spacing="6" HBox.hgrow="ALWAYS">
                         <Label styleClass="field-label" text="Duration" />
-                        <ComboBox maxWidth="Infinity" styleClass="form-combo" value="1 day">
+                        <ComboBox fx:id="durationCombo" maxWidth="Infinity" styleClass="form-combo" value="1 day">
                             <items>
-
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="15 minutes" />
+                                    <String fx:value="30 minutes" />
+                                    <String fx:value="45 minutes" />
+                                    <String fx:value="1 hour" />
+                                    <String fx:value="3 hours" />
+                                    <String fx:value="6 hours" />
+                                    <String fx:value="12 hours" />
+                                    <String fx:value="1 day" />
+                                    <String fx:value="3 days" />
+                                    <String fx:value="7 days" />
+                                </FXCollections>
                             </items>
                         </ComboBox>
                     </VBox>
@@ -135,7 +255,7 @@
 
     <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="form-footer">
         <Button onAction="#handleCancelButton" styleClass="btn-cancel" text="Cancel" />
-        <Button fx:id="launchButton" styleClass="btn-submit" text="Launch auction" />
+        <Button fx:id="launchButton" onAction="#handleLaunchButton" styleClass="btn-submit" text="Launch auction" />
     </HBox>
 
 </VBox>
