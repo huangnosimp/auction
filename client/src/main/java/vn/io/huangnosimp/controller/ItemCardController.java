@@ -16,16 +16,27 @@ import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
 
+import java.time.Instant;
+
 public class ItemCardController {
     @FXML private Label productNamelabel;
     @FXML private Label lblTime;
     @FXML private Label lblCurrentBid;
     @FXML private Label lblYourBid;
+    @FXML private Label statuslbl;
+    @FXML private Label outbidlbl;
     @FXML private Button BidNowButton;
     private String auctionId;
     @FXML private VBox yourBidVbox;
     public void addInfo(AuctionCardDTO dto){
         productNamelabel.setText(dto.getItemName());
+        long now = Instant.now().getEpochSecond();
+        if(now < dto.getStartTime()){
+            statuslbl.setText("Start in: ");
+        }
+        else {
+            statuslbl.setText("End in: ");
+        }
         AuctionCountdownUtil countdownUtil = new AuctionCountdownUtil(lblTime, dto.getStartTime(), dto.getEndTime());
         countdownUtil.start();
         lblCurrentBid.setText(FormatUtil.formatNumber(dto.getCurrentPrice())+" đ");
@@ -33,6 +44,7 @@ public class ItemCardController {
         this.auctionId = dto.getAuctionId();
         BidNowButton.setText("Inspect");
         yourBidVbox.setVisible(false);
+        outbidlbl.setVisible(false);
     }
     @FXML public void handleBidNowbutton(ActionEvent event){
         GetAuctionDetailRequestDTO getDetail = new GetAuctionDetailRequestDTO(auctionId);

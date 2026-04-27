@@ -33,7 +33,7 @@ public class AuctionCountdownUtil {
             long hours   = waitSeconds / 3600;
             long minutes = (waitSeconds % 3600) / 60;
             long seconds = waitSeconds % 60;
-            timeLabel.setText(String.format("Bắt đầu sau: %02d:%02d:%02d", hours, minutes, seconds));
+            timeLabel.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
             return;
         }
 

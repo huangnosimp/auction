@@ -36,15 +36,16 @@ public class liveAuctionController implements Initializable {
     @FXML private Label startPriceLabel;
     @FXML private Label leadBidderLabel;
     @FXML private Label minNextBidLabel;
+    @FXML private Label bidStepLabel;
+    @FXML private Label bidCountLabel;
+    @FXML private Label participantCountLabel;
 
     @FXML private Button btnIncrease;
     @FXML private Button btnDecrease;
-    private long minCount = 100000;
+    private double minCount;
     private Timeline holdTimer;
     private Runnable currentAction;
-    private long endtime;
-    private Timeline timeline;
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+
 
     public void handleIncreaseButton(){
         double currentBid = parseNumber(myBidLabel.getText());
@@ -76,7 +77,17 @@ public class liveAuctionController implements Initializable {
             holdTimer.playFromStart();
         }
     }
-
+    private String caculateBidIncreament(double value){
+        if(value > 1000000000){
+            return value/1000000000+" Billions";
+        }
+        else if (value>1000000){
+            return value/1000000+" Millions";
+        }
+        else {
+            return String.valueOf(value);
+        }
+    }
     @FXML
     private void onMouseReleased(MouseEvent event) {
         holdTimer.stop();
@@ -88,7 +99,12 @@ public class liveAuctionController implements Initializable {
         leadBidderLabel.setText(DTO.getLeadBidder());
         minNextBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
         myBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
-
+        AuctionCountdownUtil clock = new AuctionCountdownUtil(timeLabel, DTO.getStartTime(), DTO.getEndTime());
+        clock.start();
+        bidStepLabel.setText(caculateBidIncreament(DTO.getBidIncrement()));
+        bidCountLabel.setText(String.valueOf(DTO.getBidCount()));
+        participantCountLabel.setText(String.valueOf(DTO.getParticipantCount()));
+        minCount = DTO.getBidIncrement();
     }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
