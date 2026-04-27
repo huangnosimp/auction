@@ -80,7 +80,7 @@ public class AuctionService implements IAuctionService {
         Auction auction = new Auction(item, seller, startPrice, startTime, endTime, minimumIncrement, buyNowPrice);
         auctionRepository.save(auction);
         scheduler.scheduleAuction(auction);
-        return new AuctionCardDTO(auction.getId(), item.getName(), auction.getCurrentPrice(), 0, auction.getEndTime());
+        return new AuctionCardDTO(auction.getId(), item.getName(), auction.getCurrentPrice(), 0, auction.getStartTime(), auction.getEndTime());
     }
 
     private boolean isValidOpenAuctionInput(String sellerId, String name, String description, ItemType type,
