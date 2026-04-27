@@ -15,6 +15,7 @@ import javafx.util.Duration;
 import javafx.event.ActionEvent;
 import vn.io.huangnosimp.Manager.AuctionCountdownUtil;
 import vn.io.huangnosimp.Manager.FormatUtil;
+import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 
 import java.net.URL;
@@ -123,6 +124,6 @@ public class liveAuctionController implements Initializable {
             handleIncreaseButton(); // Gọi lại hàm tăng số bạn đã viết
         }));
         holdTimer.setCycleCount(Animation.INDEFINITE); // Chạy vô hạn cho đến khi thả chuột
-
+        setUpliveAuction(UserSession.getAuctionDetail());
     }
 }

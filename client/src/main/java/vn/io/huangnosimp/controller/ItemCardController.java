@@ -29,7 +29,7 @@ public class ItemCardController {
     private String auctionId;
     @FXML private VBox yourBidVbox;
     public void addInfo(AuctionCardDTO dto){
-        productNamelabel.setText(dto.getItemName());
+        productNamelabel.setText(dto.getProductName());
         long now = Instant.now().getEpochSecond();
         if(now < dto.getStartTime()){
             statuslbl.setText("Start in: ");
