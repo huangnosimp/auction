@@ -1,36 +1,58 @@
 package vn.io.huangnosimp.controller;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
 import javafx.event.ActionEvent;
-import vn.io.huangnosimp.Manager.AuctionCountdownUtil;
-import vn.io.huangnosimp.Manager.FormatUtil;
-import vn.io.huangnosimp.Manager.UserSession;
+import vn.io.huangnosimp.Manager.*;
+import vn.io.huangnosimp.dto.request.AutoBidRequestDTO;
+import vn.io.huangnosimp.dto.request.BuyNowRequestDTO;
+import vn.io.huangnosimp.dto.request.CancelAuctionRequestDTO;
+import vn.io.huangnosimp.dto.request.RegisterRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+import vn.io.huangnosimp.dto.response.BidHistoryDTO;
+import vn.io.huangnosimp.dto.response.PricePointDTO;
+import vn.io.huangnosimp.network.IServerMessageListener;
+import vn.io.huangnosimp.network.SocketClient;
+import vn.io.huangnosimp.protocol.ActionType;
+import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.Response;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import static vn.io.huangnosimp.Manager.AuctionCountdownUtil.formatEpochSecond;
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 import static vn.io.huangnosimp.Manager.FormatUtil.parseNumber;
 import static vn.io.huangnosimp.Manager.ViewManager.changeView;
 
-public class liveAuctionController implements Initializable {
+public class liveAuctionController implements Initializable, IServerMessageListener {
     @FXML private LineChart<Number, Number> lineChart;
     @FXML private NumberAxis xAxis;
     @FXML private NumberAxis yAxis;
+    private XYChart.Series<Number, Number> priceSeries = new XYChart.Series<>();
+    private int bidIndex = 0;
+
     @FXML private Label myBidLabel;
     @FXML private Label timeLabel;
     @FXML private Label currentPriceLabel;
@@ -40,14 +62,54 @@ public class liveAuctionController implements Initializable {
     @FXML private Label bidStepLabel;
     @FXML private Label bidCountLabel;
     @FXML private Label participantCountLabel;
+    @FXML private Label productTitleLabel;
+    @FXML private Label categoryLabel;
+    @FXML private Label conditionLabel;
+    @FXML private Label descriptionLabel;
+    @FXML private Label sidebarBuyNowPriceLabel;
+    @FXML private Label startDateLabel;
 
     @FXML private Button btnIncrease;
     @FXML private Button btnDecrease;
+    @FXML private Button AutoBid;
+    @FXML private Button btnPlaceBid;
+    @FXML private Button btnBuyNow;
+    @FXML private HBox Hbox1;
+    @FXML private VBox Vbox1;
+    @FXML private Separator spr;
+    @FXML private Separator spr1;
+    @FXML ListView bidHistoryList;
+
+    @FXML private HBox toastBox;
+    @FXML private Label toastTitle, toastSub, toastIconLabel;
+    @FXML private Circle toastIconCircle;
+
     private double minCount;
     private Timeline holdTimer;
     private Runnable currentAction;
+    private String auctionId;
 
-
+    private void setUpliveAuction(AuctionDetailResponseDTO DTO){
+        currentPriceLabel.setText(FormatUtil.formatNumber(DTO.getCurrentPrice())+"₫");
+        startPriceLabel.setText("Khởi điểm: "+FormatUtil.formatNumber(DTO.getStartPrice())+"₫");
+        leadBidderLabel.setText(DTO.getLeadBidder());
+        minNextBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
+        myBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
+        AuctionCountdownUtil clock = new AuctionCountdownUtil(timeLabel, DTO.getStartTime(), DTO.getEndTime());
+        clock.start();
+        bidStepLabel.setText(caculateBidIncreament(DTO.getBidIncrement()));
+        bidCountLabel.setText(String.valueOf(DTO.getBidCount()));
+        participantCountLabel.setText(String.valueOf(DTO.getParticipantCount()));
+        minCount = DTO.getBidIncrement();
+        loadChartHistory(DTO.getPriceHistory());
+        loadBidHistory(DTO.getBidHistory());
+        productTitleLabel.setText(DTO.getProductName());
+        categoryLabel.setText(String.valueOf(DTO.getCategory()));
+        conditionLabel.setText(String.valueOf(DTO.getCondition()));
+        descriptionLabel.setText(DTO.getDescription());
+        sidebarBuyNowPriceLabel.setText(formatNumber(DTO.getBuyNowPrice())+" đ");
+        startDateLabel.setText(formatEpochSecond(DTO.getStartTime()));
+    }
     public void handleIncreaseButton(){
         double currentBid = parseNumber(myBidLabel.getText());
         currentBid+=minCount;
@@ -94,32 +156,102 @@ public class liveAuctionController implements Initializable {
         holdTimer.stop();
         currentAction = null;
     }    // Dừng lại ngay khi thả chuột
-    private void setUpliveAuction(AuctionDetailResponseDTO DTO){
-        currentPriceLabel.setText(FormatUtil.formatNumber(DTO.getCurrentPrice())+"₫");
-        startPriceLabel.setText("Khởi điểm: "+FormatUtil.formatNumber(DTO.getStartPrice())+"₫");
-        leadBidderLabel.setText(DTO.getLeadBidder());
-        minNextBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
-        myBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
-        AuctionCountdownUtil clock = new AuctionCountdownUtil(timeLabel, DTO.getStartTime(), DTO.getEndTime());
-        clock.start();
-        bidStepLabel.setText(caculateBidIncreament(DTO.getBidIncrement()));
-        bidCountLabel.setText(String.valueOf(DTO.getBidCount()));
-        participantCountLabel.setText(String.valueOf(DTO.getParticipantCount()));
-        minCount = DTO.getBidIncrement();
-    }
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        xAxis.setLabel("Year");
-        xAxis.setAutoRanging(false);
-        xAxis.setLowerBound(2020);
-        xAxis.setUpperBound(2026);
-        xAxis.setTickUnit(1);
 
-        yAxis.setLabel("Sales in Dollars");
+    public void setInvisible(){
+        Hbox1.setVisible(false);
+        Vbox1.setVisible(false);
+        spr.setVisible(false);
+        spr1.setVisible(false);
+        btnPlaceBid.setVisible(false);
+        btnBuyNow.setVisible(false);
+        AutoBid.setText("Cancel Auction");
+    }
+    public void setupLineChart(){
+        lineChart.setAnimated(false);
+        lineChart.setCreateSymbols(false);
+        lineChart.setLegendVisible(false);
+        lineChart.setTitle("Auction");
+        xAxis.setLabel("Lượt đặt");
+        xAxis.setAutoRanging(true);
+        xAxis.setTickLabelsVisible(false);
+
+        yAxis.setLabel("Giá (đ)");
         yAxis.setAutoRanging(true);
 
-        lineChart.setTitle("Auction");
-        lineChart.setData(SalesData.getSalesData());
+        priceSeries.setName("Price");
+        lineChart.getData().add(priceSeries);
+    }
+    public void loadChartHistory(List<PricePointDTO> history){
+        priceSeries.getData().clear();
+        bidIndex = 0;
+        for(PricePointDTO dto : history){
+            bidIndex++;
+            priceSeries.getData().add(new XYChart.Data<>(bidIndex, dto.getPrice()));
+        }
+    }
+    public void loadBidHistory(List<BidHistoryDTO> history){
+        for(BidHistoryDTO dto : history) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/bid_history_cell.fxml"));
+                Parent cell = loader.load();
+                BidHistoryCellController controller = loader.getController();
+                controller.setData(dto, true);
+                bidHistoryList.getItems().add(cell);
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
+    public void handleBuyNowButton(){
+        BuyNowRequestDTO buyNowRequest = new BuyNowRequestDTO(auctionId);
+        Request request = new Request(ActionType.BUY_NOW, auctionId);
+        btnBuyNow.setDisable(true);
+        SocketManager.getClient().sendRequestAsync(request)
+                .thenAccept(response -> {
+                    btnBuyNow.setDisable(false);
+                });
+    }
+    @FXML
+    public void handleCancelAndAutobid(){
+        if(AutoBid.getText().equals("Auto Bid")){
+
+        }
+        else{
+            CancelAuctionRequestDTO cancelAuctionRequest = new CancelAuctionRequestDTO(auctionId);
+            Request request = new Request(ActionType.CANCEL_AUCTION, cancelAuctionRequest);
+            AutoBid.setDisable(true);
+            SocketManager.getClient().sendRequestAsync(request)
+                    .thenAccept(cancelResponse->{
+                        if("SUCCESS".equals(String.valueOf(cancelResponse.getStatus()))){
+                            Platform.runLater(()->{
+                                ControllerManager.getDashboardController().showToast("SUCCESS", cancelResponse.getMessage(), true);
+                            });
+                        }
+                        else {
+                            Platform.runLater(()->{
+                                ControllerManager.getDashboardController().showToast("FAILED", cancelResponse.getMessage(), false);
+                            });
+                        }
+                    });
+        }
+    }
+    public void setAuctionId(String id){
+        this.auctionId = id;
+    }
+    public void onResponseReceived(Response response){
+
+    }
+    public void onRequestReceived(Request notification){}
+    public void onDisconnected(String reason){}
+    @FXML
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        SocketManager.getClient().addListener(this);
+        setupLineChart();
+        setUpliveAuction(UserSession.getAuctionDetail());
         holdTimer = new Timeline(new KeyFrame(Duration.millis(200), event -> {
             handleIncreaseButton(); // Gọi lại hàm tăng số bạn đã viết
         }));

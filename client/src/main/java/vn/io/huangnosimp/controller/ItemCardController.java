@@ -28,7 +28,7 @@ public class ItemCardController {
     @FXML private Button BidNowButton;
     private String auctionId;
     @FXML private VBox yourBidVbox;
-    public void addInfo(AuctionCardDTO dto){
+    public void addInfo(AuctionCardDTO dto, String type){
         productNamelabel.setText(dto.getProductName());
         long now = Instant.now().getEpochSecond();
         if(now < dto.getStartTime()){
@@ -42,9 +42,15 @@ public class ItemCardController {
         lblCurrentBid.setText(FormatUtil.formatNumber(dto.getCurrentPrice())+" đ");
         lblYourBid.setText(String.valueOf(dto.getYourBid()));
         this.auctionId = dto.getAuctionId();
-        BidNowButton.setText("Inspect");
-        yourBidVbox.setVisible(false);
-        outbidlbl.setVisible(false);
+
+        if(type.equals("Inspect")){
+            BidNowButton.setText("Inspect");
+            yourBidVbox.setVisible(false);
+            outbidlbl.setVisible(false);
+        }
+        else{
+            BidNowButton.setText("Bid Now");
+        }
     }
     @FXML public void handleBidNowbutton(ActionEvent event){
         GetAuctionDetailRequestDTO getDetail = new GetAuctionDetailRequestDTO(auctionId);
@@ -54,7 +60,11 @@ public class ItemCardController {
                         AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionDetailResponseDTO.class);
                         Platform.runLater(()->{
                             UserSession.setAuctionDetail(auctionResponse);
-                            ViewManager.changeView("liveAuction.fxml", 2);
+                            liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
+                            if(BidNowButton.getText().equals("Inspect")) {
+                                controller.setInvisible();
+                            }
+                            controller.setAuctionId(auctionId);
                         });
                     }
                 });

@@ -27,7 +27,7 @@ public class dashboard_homeController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent cardNode = loader.load();
             ItemCardController cardController = loader.getController();
-            cardController.addInfo(dto);
+            cardController.addInfo(dto, "Inspect");
             auctionFlowPane.getChildren().add(cardNode);
             FadeTransition ft = new FadeTransition(Duration.millis(500), cardNode);
             ft.setFromValue(0.0);

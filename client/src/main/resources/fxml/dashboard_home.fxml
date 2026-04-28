@@ -7,32 +7,6 @@
 
     <VBox spacing="16" styleClass="left-panel" HBox.hgrow="ALWAYS">
 
-        <!-- STATS ROW -->
-        <HBox spacing="12" styleClass="stats-row">
-            <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
-                <Label styleClass="stat-label" text="Active Bids" />
-                <HBox alignment="CENTER_LEFT" spacing="8">
-                    <Label fx:id="lblExpenses" styleClass="stat-value" text="3,450 / $5,000" />
-                    <Label styleClass="badge-warning" text="69%" />
-                </HBox>
-                <ProgressBar fx:id="progressExpenses" progress="0.69" styleClass="expense-progress" />
-                <Label styleClass="stat-sub" text="Left: $1,550" />
-            </VBox>
-            <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
-                <Label styleClass="stat-label" text="Winning" />
-                <Label fx:id="lblRoi" styleClass="stat-value green-value" text="245%" />
-                <HBox alignment="CENTER_LEFT" spacing="4">
-                    <Label styleClass="arrow-up" text="▲" />
-                    <Label styleClass="stat-sub green-sub" text="+12% this week" />
-                </HBox>
-            </VBox>
-            <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
-                <Label styleClass="stat-label" text="Outbid" />
-                <Label fx:id="lblCtr" styleClass="stat-value" text="3,2%" />
-                <Label styleClass="stat-sub" text="Median value" />
-            </VBox>
-        </HBox>
-
         <!-- AUCTIONS CARD GRID -->
         <VBox spacing="12" styleClass="table-section" VBox.vgrow="ALWAYS">
 
