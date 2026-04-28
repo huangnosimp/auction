@@ -25,8 +25,8 @@ public class AuctionRepository implements IAuctionRepository {
     public void save(Auction auction) {
         if (auction == null || auction.getId() == null) return;
         //add save bidders
-        String sql = "INSERT INTO Auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+        String sql = "INSERT INTO Auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status, minimum_increment, buy_now_price) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE winner_id = VALUES(winner_id), end_time = VALUES(end_time), final_price = VALUES(final_price), status = VALUES(status)";
 
         try (Connection conn = databaseConnection.getConnection();
@@ -41,6 +41,8 @@ public class AuctionRepository implements IAuctionRepository {
             stmt.setDouble(7, auction.getStartPrice());
             stmt.setDouble(8, auction.getCurrentPrice());
             stmt.setString(9, auction.getStatus() != null ? auction.getStatus().name() : "OPEN");
+            stmt.setDouble(10, auction.getMinimumIncrement());
+            stmt.setDouble(11, auction.getBuyNowPrice());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
