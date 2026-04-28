@@ -1,10 +1,8 @@
 package vn.io.huangnosimp.controller.handler;
 
-import vn.io.huangnosimp.dto.response.AuctionCardDTO;
-import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
-import vn.io.huangnosimp.dto.response.AuctionActionResult;
-import vn.io.huangnosimp.dto.response.BidResult;
+import vn.io.huangnosimp.dto.response.*;
 import vn.io.huangnosimp.network.ClientHandle;
+import vn.io.huangnosimp.service.IUserService;
 import vn.io.huangnosimp.util.GsonParser;
 import vn.io.huangnosimp.dto.request.*;
 import vn.io.huangnosimp.protocol.Request;
@@ -59,17 +57,20 @@ public class AuctionHandler {
 
     public static class PlaceBidHandler implements RequestHandler {
         private final IAuctionService auctionService;
+        private final IUserService userService;
 
-        public PlaceBidHandler(IAuctionService auctionService) {
+        public PlaceBidHandler(IAuctionService auctionService, IUserService userService) {
             this.auctionService = auctionService;
+            this.userService = userService;
         }
 
         @Override
         public Response handle(Request request, ClientHandle client) {
             PlaceBidRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), PlaceBidRequestDTO.class);
             BidResult result = auctionService.placeBid(client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), false);
+            PlaceBidResponseDTO responseDTO = new PlaceBidResponseDTO(userService.getMember(client.getUserId()).getUsername(), dto.getBidAmount(), System.currentTimeMillis());
             return switch (result) {
-                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Place bid successfully");
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Place bid successfully", responseDTO);
                 case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
                 case AUCTION_ENDED -> new Response(ResponseStatus.FAILED, "Auction has already ended");
                 case INSUFFICIENT_FUNDS -> new Response(ResponseStatus.FAILED, "Insufficient funds");
