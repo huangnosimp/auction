@@ -11,7 +11,7 @@
         <HBox alignment="CENTER_LEFT" spacing="0" styleClass="navbar">
             <!-- Logo -->
             <HBox alignment="CENTER_LEFT" spacing="4" styleClass="logo-container">
-                <Label styleClass="logo-ofc" text="HOANGCHIM88." />
+                <Label styleClass="logo-ofc" text="AUCTION88." />
                 <Label styleClass="logo-digital" text="Digital" />
             </HBox>
 
@@ -43,8 +43,10 @@
         </StackPane>
     </center>
     <left>
-        <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="224.0" style="-fx-background-color: #171414;" BorderPane.alignment="CENTER">
-            <VBox fx:id="sideVbox" spacing="10" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
+        <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="224.0"
+                    style="-fx-background-color: #171414;" BorderPane.alignment="CENTER">
+            <VBox spacing="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
+                  AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
 
                 <!-- Balance card (giữ nguyên) -->
                 <VBox spacing="4" styleClass="stat-card">

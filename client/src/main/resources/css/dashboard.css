@@ -278,6 +278,58 @@
     -fx-padding: 4;
 }
 
+
+/* Container chung */
+.content-container {
+    -fx-background-color: #1e1e1e; /* Màu nền tối khớp với dashboard */
+}
+
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* TableView Styling */
+.history-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #333333;
+    -fx-border-radius: 5;
+}
+
+.history-table .column-header-background {
+    -fx-background-color: #2a2a2a;
+}
+
+.history-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 40;
+}
+
+.history-table .column-header .label {
+    -fx-text-fill: #888888;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.history-table .table-row-cell {
+    -fx-background-color: #252525;
+    -fx-border-color: transparent transparent #333333 transparent;
+    -fx-text-fill: white;
+}
+
+.history-table .table-row-cell:filled:hover {
+    -fx-background-color: #2d2d2d;
+}
+
+.history-table .table-cell {
+    -fx-text-fill: white;
+    -fx-padding: 10;
+}
+
+/* Status colors */
+.status-won { -fx-text-fill: #00ff88; }
+.status-lost { -fx-text-fill: #ff4444; }
+.status-active { -fx-text-fill: #00ccff; }
 .tab-btn {
     -fx-background-color: transparent;
     -fx-text-fill: #8b8fa8;

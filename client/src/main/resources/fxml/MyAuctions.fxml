@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+
+<VBox spacing="20" styleClass="content-container"
+      stylesheets="@../css/dashboard.css"  xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="vn.io.huangnosimp.controller.MyAuctionsController">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT">
+        <Label text="MY AUCTION HISTORY" styleClass="section-title" />
+    </HBox>
+
+    <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS" styleClass="history-table">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="50" />
+            <TableColumn fx:id="colItem" text="Item Name" prefWidth="200" />
+            <TableColumn fx:id="colMyBid" text="Your Bid" prefWidth="120" />
+            <TableColumn fx:id="colStatus" text="Status" prefWidth="120" />
+            <TableColumn fx:id="colTime" text="End Time" prefWidth="150" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+</VBox>
