@@ -28,4 +28,5 @@ public enum ActionType {
 
     GET_DASHBOARD_INFO,
     GET_AUCTION_DETAIL,
+    GET_AUCTION_CARD,
 }
