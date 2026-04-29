@@ -6,5 +6,6 @@ public enum RegisterResult {
     EMAIL_TAKEN,
     INVALID_USERNAME,
     INVALID_EMAIL,
+    INVALID_INPUT,
     ERROR
 }

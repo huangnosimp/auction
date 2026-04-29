@@ -1,12 +1,21 @@
 package vn.io.huangnosimp.controller;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.ViewManager;
+import vn.io.huangnosimp.dto.request.RegisterRequestDTO;
+import vn.io.huangnosimp.enums.UserType;
+import vn.io.huangnosimp.protocol.ActionType;
+import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.ResponseStatus;
 
 public class SignUpController {
 
     @FXML private TextField fullNameField;
+    @FXML private TextField userNameField;
     @FXML private TextField emailField;
     @FXML private TextField phoneField;
     @FXML private PasswordField passwordField;
@@ -16,6 +25,7 @@ public class SignUpController {
     @FXML
     private void handleSignUp(ActionEvent event) {
         String fullName = fullNameField.getText();
+        String username = userNameField.getText();
         String email = emailField.getText();
         String phone = phoneField.getText();
         String pass = passwordField.getText();
@@ -36,10 +46,24 @@ public class SignUpController {
             showAlert(Alert.AlertType.WARNING, "Terms & Conditions", "You must agree to the terms to continue.");
             return;
         }
+        RegisterRequestDTO registerRequestDTO = new RegisterRequestDTO(UserType.MEMBER, username, pass, email);
+        Request registerRequest = new Request(ActionType.REGISTER, registerRequestDTO);
+        SocketManager.getClient().sendRequestAsync(registerRequest)
+                .thenAccept(registerResponse -> {
+                    if(ResponseStatus.SUCCESS.equals(registerResponse.getStatus())){
+                        Platform.runLater(()-> {
+                                    showAlert(Alert.AlertType.INFORMATION, "Success", "Account created successfully! Please login.");
+                                    ViewManager.changeMainStage("LoginView.fxml");
+                                }
+                        );
+                    }
+                    else if (ResponseStatus.CONFLICT.equals(registerResponse.getStatus())) {
 
-        // Nếu mọi thứ ổn, thực hiện đăng ký
-        System.out.println("Registering user: " + email);
-        showAlert(Alert.AlertType.INFORMATION, "Success", "Account created successfully! Please login.");
+                    }
+                    else if (ResponseStatus.FAILED.equals(registerResponse.getStatus())) {
+
+                    }
+                });
     }
 
     @FXML

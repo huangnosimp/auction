@@ -20,13 +20,14 @@
                 <Button fx:id="btnDashboard" onAction="#handlebtnDashboard" styleClass="nav-btn, nav-btn-active" text="Dashboard" />
                 <Button fx:id="btnOpenSlots" onAction="#handlebtnOpenSlots" styleClass="nav-btn" text="Open Slots" />
                 <Button fx:id="btnAuctions" styleClass="nav-btn" text="My Auctions" />
+                <Button fx:id="btnFighters" styleClass="nav-btn" text=".........." />
             </HBox>
 
             <!-- Right actions -->
             <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="nav-right">
                 <Button fx:id="btnSupport" styleClass="support-btn" text="⊕  Personal Support" />
                 <Button fx:id="btnNotif" styleClass="icon-btn" text="🔔" />
-                <Button fx:id="btnAvatar" styleClass="avatar-btn">
+                <Button fx:id="btnAvatar" onAction="#handlebtnAvatar" styleClass="avatar-btn">
                     <graphic>
                         <Label styleClass="avatar-label" text="👤" />
                     </graphic>
@@ -78,6 +79,10 @@
                             <Label fx:id="lblWonTotal" styleClass="mini-val, amber-value" text="12" />
                             <Label styleClass="mini-key" text="Won Total" />
                         </VBox>
+                  <rowConstraints>
+                     <RowConstraints />
+                     <RowConstraints />
+                  </rowConstraints>
                     </GridPane>
                 </VBox>
 
@@ -92,10 +97,6 @@
                     <Label styleClass="side-section-title" text="RECENT ACTIVITY" />
                     <VBox fx:id="activityList" spacing="8" />
                 </VBox>
-
-                <!-- Create Auction (giữ nguyên) -->
-                <Button fx:id="createButton" maxWidth="Infinity" minHeight="32"
-                        onAction="#handleCreateClick" text="Create Auction" />
             </VBox>
         </AnchorPane>
     </left>

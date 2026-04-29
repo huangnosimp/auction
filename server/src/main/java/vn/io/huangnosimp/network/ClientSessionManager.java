@@ -28,9 +28,10 @@ public class ClientSessionManager {
     public void removeClient(ClientHandle client) {
         if (client != null) {
             activeClients.remove(client);
-            for (Set<ClientHandle> room : auctionRooms.values()) {
+            auctionRooms.values().removeIf(room -> {
                 room.remove(client);
-            }
+                return room.isEmpty();
+            });
         }
     }
 
@@ -42,10 +43,10 @@ public class ClientSessionManager {
 
     public void leaveRoom(String auctionId, ClientHandle client) {
         if (auctionId != null && client != null) {
-            Set<ClientHandle> room = auctionRooms.get(auctionId);
-            if (room != null) {
+            auctionRooms.computeIfPresent(auctionId, (key, room) -> {
                 room.remove(client);
-            }
+                return room.isEmpty() ? null : room;
+            });
         }
     }
 
@@ -57,6 +58,32 @@ public class ClientSessionManager {
                     client.sendRequest(request);
                 } catch (Exception e) {
                     System.err.println("[ClientSessionManager] Error broadcasting to room: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    public boolean isUserInRoom(String auctionId, String userId) {
+        if (auctionId == null || userId == null) return false;
+        Set<ClientHandle> room = auctionRooms.get(auctionId);
+        if (room != null) {
+            for (ClientHandle client : room) {
+                if (userId.equals(client.getUserId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void sendToUser(String userId, Request request) {
+        if (userId == null) return;
+        for (ClientHandle client : activeClients) {
+            if (userId.equals(client.getUserId())) {
+                try {
+                    client.sendRequest(request);
+                } catch (Exception e) {
+                    System.err.println("[ClientSessionManager] Error sending to user " + userId + ": " + e.getMessage());
                 }
             }
         }

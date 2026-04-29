@@ -1,4 +1,4 @@
-package vn.io.huangnosimp.model;
+package vn.io.huangnosimp.network;
 
 import vn.io.huangnosimp.util.GsonParser;
 import vn.io.huangnosimp.protocol.Request;
@@ -14,6 +14,7 @@ public class ClientHandle implements Runnable {
     private  final Socket clientSocket;
     private final MessageRouter router;
     private String userId;
+
     private UserType userType;
     private PrintWriter out;
 
@@ -69,6 +70,9 @@ public class ClientHandle implements Runnable {
                     Response response = router.route(request, this);
 
                     if (response != null) {
+                        if (request != null && request.getRequestId() != null) {
+                            response.setRequestId(request.getRequestId());
+                        }
                         sendResponse(response);
                     }
                 } catch (JsonSyntaxException e) {

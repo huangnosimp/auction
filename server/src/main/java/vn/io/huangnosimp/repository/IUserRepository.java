@@ -2,6 +2,8 @@ package vn.io.huangnosimp.repository;
 
 import vn.io.huangnosimp.model.User;
 
+import java.util.List;
+
 public interface IUserRepository {
     boolean checkUsername(String username);
     boolean checkEmail(String email);
@@ -9,6 +11,7 @@ public interface IUserRepository {
     User findByUsername(String username);
     User findById(String userId);
     boolean updateBalance(String userId, double newBalance);
-    boolean banUser(String userId);
-    boolean unbanUser(String userId);
+    boolean updateFrozenBalance(String userId, double newFrozenBalance);
+    boolean updateStatus(String userId, boolean isBanned);
+    List<User> findAll();
 }

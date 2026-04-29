@@ -1,4 +1,4 @@
-package vn.io.huangnosimp.model;
+package vn.io.huangnosimp.network;
 
 import vn.io.huangnosimp.controller.MessageRouter;
 
@@ -9,8 +9,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SocketServer {
+    private static final int THREAD_NUMBER = 50;
     private final int port;
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(50);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_NUMBER);
     private final MessageRouter messageRouter;
     public SocketServer(int port, MessageRouter messageRouter) {
         this.port = port;

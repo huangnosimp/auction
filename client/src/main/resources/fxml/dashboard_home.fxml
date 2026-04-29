@@ -35,18 +35,27 @@
 
         <!-- AUCTIONS CARD GRID -->
         <VBox spacing="12" styleClass="table-section" VBox.vgrow="ALWAYS">
+
+            <!-- Header -->
             <HBox alignment="CENTER_LEFT" spacing="8">
                 <Label styleClass="section-title" text="🔥 Auctions" />
-                <Label styleClass="section-subtitle" text="(Live bidding)" />
                 <Region HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#handleButtonClick" text="Button" />
+                <Button fx:id="btnCreateAuction" mnemonicParsing="false" onAction="#handleCreateAuction" styleClass="tab-action-btn" text="+ Tạo phiên" />
             </HBox>
 
+            <!-- Tab Bar -->
+            <HBox spacing="4" styleClass="tab-bar">
+                <Button fx:id="tabJoined" mnemonicParsing="false" styleClass="tab-btn tab-btn-active" text="Đang tham gia" />
+                <Button fx:id="tabMyAuctions" mnemonicParsing="false" styleClass="tab-btn" text="Phiên của tôi" />
+            </HBox>
+
+            <!-- Content -->
             <ScrollPane fitToWidth="true" styleClass="auction-scroll" VBox.vgrow="ALWAYS">
                 <content>
                     <FlowPane fx:id="auctionFlowPane" hgap="12" prefWrapLength="600" styleClass="auction-flow-pane" vgap="12" />
                 </content>
             </ScrollPane>
+
         </VBox>
     </VBox>
 

@@ -1,36 +1,28 @@
 package vn.io.huangnosimp.model;
 
-import vn.io.huangnosimp.dto.response.AuctionResponseDTO;
-import java.util.concurrent.ConcurrentHashMap;
-import com.google.gson.reflect.TypeToken;
+import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 import vn.io.huangnosimp.enums.AuctionStatus;
-import vn.io.huangnosimp.util.GsonParser;
 
 public class Auction extends Entity {
-    private final ConcurrentHashMap<String, Member> bidders;
     private final Item item;
-
     private final Member seller;
-
     private String currentWinnerId;
-
     private double currentPrice;
-
     private final double startPrice;
-
     private final long startTime;
-
     private long endTime;
-
     private volatile AuctionStatus status;
-
+    private double minimumIncrement;
+    private double buyNowPrice;
 
     public Auction(
             Item item,
             Member seller,
             double startPrice,
             long startTime,
-            long endTime) {
+            long endTime,
+            double minBid,
+            double buyNowPrice) {
         super();
         this.item = item;
         this.seller = seller;
@@ -38,24 +30,23 @@ public class Auction extends Entity {
         currentPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
-        bidders = new ConcurrentHashMap<>();
+        this.minimumIncrement = minBid;
+        this.buyNowPrice = buyNowPrice;
     }
+
     public Auction(
             String id,
             Item item,
             Member seller,
             double startPrice,
             long startTime,
-            long endTime,
-            ConcurrentHashMap<String, Member> bidders) {
-        super(id);
+            long endTime, long createdAt) {
+        super(id, createdAt);
         this.item = item;
         this.seller = seller;
         this.startPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.bidders = bidders;
-        this.setStatus(status);
     }
 
     public Item getItem() {
@@ -70,23 +61,16 @@ public class Auction extends Entity {
         return currentWinnerId;
     }
 
-
     public double getCurrentPrice() {
         return currentPrice;
     }
-
 
     public double getStartPrice() {
         return startPrice;
     }
 
-
     public long getStartTime() {
         return startTime;
-    }
-
-    public ConcurrentHashMap<String, Member> getBidders() {
-        return bidders;
     }
 
     public long getEndTime() {
@@ -143,92 +127,16 @@ public class Auction extends Entity {
         this.status = AuctionStatus.CANCELED;
     }
 
-    public Member getBidder(String bidderId) {
-        return this.bidders.get(bidderId);
-    }
-
-    public void addBidder(Member bidder) {
-        if (bidder == null || bidder.getId() == null) {
-            return;
-        }
-        this.bidders.put(bidder.getId(), bidder);
-    }
-
-    public void removeBidder(Member bidder) {
-        this.bidders.remove(bidder.getId());
-    }
-
-    public synchronized boolean placeBid(Member bidder, double amount) {
-        if (bidder == null || this.status != AuctionStatus.RUNNING) {
-            return false;
-        }
-        if (bidders.get(bidder.getId()) == null) {
-            return false;
-        }
-        if (amount <= this.currentPrice) {
-            return false;
-        }
-        String previousWinnerId = this.currentWinnerId;
-        double previousPrice = this.currentPrice;
-        if (previousWinnerId != null && previousWinnerId.equals(bidder.getId())) {
-            double delta = amount - previousPrice;
-            if (!bidder.freezeMoney(delta)) {
-                return false;
-            }
-            this.addBidder(bidder);
-            this.currentPrice = amount;
-            return true;
-        }
-        if (!bidder.freezeMoney(amount)) {
-            return false;
-        }
-        if (previousWinnerId != null) {
-            Member previousWinner = this.bidders.get(previousWinnerId);
-            if (previousWinner != null && !previousWinner.unfreezeMoney(previousPrice)) {
-                bidder.unfreezeMoney(amount);
-                return false;
-            }
-        }
-
-        this.currentWinnerId = bidder.getId();
-        this.currentPrice = amount;
-        return true;
-    }
-
     public boolean needExtension() {
         long timeLeft = this.endTime - System.currentTimeMillis();
         return timeLeft <= 10 * 1000;
     }
 
-    public String biddersToJson() {
-        return GsonParser.GSON.toJson(this.bidders);
+    public double getMinimumIncrement() {
+        return minimumIncrement;
     }
 
-    public static ConcurrentHashMap<String, Member> biddersFromJson(String json) {
-        return GsonParser.GSON.fromJson(json, new TypeToken<ConcurrentHashMap<String, Member>>(){}.getType());
-    }
-
-    public AuctionResponseDTO toDTO() {
-        String currentWinnerUserName = null;
-        if (this.currentWinnerId != null) {
-            Member currentWinner = this.bidders.get(this.currentWinnerId);
-            if (currentWinner != null) {
-                currentWinnerUserName = currentWinner.getUsername();
-            }
-        }
-
-        return new AuctionResponseDTO(
-                this.bidders.size(),
-                this.item.getName(),
-                this.item.getDescription(),
-                this.getId(),
-                currentWinnerUserName,
-                this.seller.getUsername(),
-                this.currentPrice,
-                this.startPrice,
-                this.startTime,
-                this.endTime,
-                this.status
-        );
+    public double getBuyNowPrice() {
+        return buyNowPrice;
     }
 }

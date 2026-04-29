@@ -4,18 +4,21 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="vbox1" prefHeight="301.0" prefWidth="208.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
+<VBox fx:id="vbox1" prefHeight="205.0" prefWidth="7.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
    <children>
       <StackPane prefHeight="130.0" styleClass="image-container">
          <children>
-            <ImageView fx:id="imgProduct" fitHeight="130.0" fitWidth="190.0" pickOnBounds="true" preserveRatio="false" />
-            <Label styleClass="status-badge s-outbid" text="OUTBID" StackPane.alignment="TOP_RIGHT" />
+            <ImageView fx:id="imgProduct" fitHeight="108.0" fitWidth="172.0" pickOnBounds="true" preserveRatio="false">
+               <image>
+                  <Image url="@../../../../../../../../Pictures/Screenshots/663931052_1585208462781645_6387264792352467664_n.jpg" />
+               </image></ImageView>
          </children>
       </StackPane>
 
-      <VBox spacing="12" style="-fx-padding: 12;">
+      <VBox prefHeight="167.0" prefWidth="174.0" spacing="12" style="-fx-padding: 12;">
          <children>
-            <Label styleClass="ac-product" text="Apple MacBook Pro" />
+            <Label fx:id="productNamelabel" styleClass="ac-product" text="Hoang soi" textFill="WHITE" />
+            <Label fx:id="outbidlbl" styleClass="status-badge s-outbid" text="OUTBID" />
 
             <GridPane vgap="5">
                <columnConstraints>
@@ -23,7 +26,7 @@
                   <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                </columnConstraints>
                <children>
-                  <Label styleClass="ac-key" text="Ends in:" GridPane.rowIndex="0" />
+                  <Label fx:id="statuslbl" styleClass="ac-key" text="Ends in:" GridPane.rowIndex="0" />
                   <Label fx:id="lblTime" styleClass="ac-val-time" text="02h 15m" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
                   <Label styleClass="ac-key" text="Current bid:" GridPane.rowIndex="1" />
@@ -39,12 +42,12 @@
 
             <HBox alignment="CENTER_LEFT" spacing="5">
                <children>
-                  <VBox>
+                  <VBox fx:id="yourBidVbox">
                      <Label styleClass="ac-bid-sub" text="Your bid" />
                      <Label fx:id="lblYourBid" styleClass="ac-bid-val" text="44tr" />
                   </VBox>
                   <Region HBox.hgrow="ALWAYS" />
-                  <Button fx:id="BidNowButton" onAction="#handleBidClick" prefHeight="25.0" prefWidth="68.0" styleClass="bid-btn-action" text="Bid Now" />
+                  <Button fx:id="BidNowButton" onAction="#handleBidNowbutton" prefHeight="25.0" prefWidth="68.0" styleClass="bid-btn-action" text="Bid Now" />
                </children>
             </HBox>
          </children>

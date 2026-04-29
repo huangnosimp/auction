@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserRepository implements IUserRepository {
     private final DatabaseConnection databaseConnection;
@@ -33,18 +35,8 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public boolean banUser(String userId) {
-        return false;
-    }
-
-    @Override
-    public boolean unbanUser(String userId) {
-        return false;
-    }
-
-    @Override
     public boolean checkEmail(String email) {
-        String sql = "SELECT 1 FROM Users WHERE email = ? LIMIT 1";
+        String sql = "SELECT 1 FROM users WHERE email = ? LIMIT 1";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, email);
@@ -59,7 +51,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public boolean saveUser(String userId, String username, String password, String email, String role) {
-        String sql = "INSERT INTO Users (id, username, email, role) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (id, username, password, email, role) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = databaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, userId);
@@ -122,6 +114,20 @@ public class UserRepository implements IUserRepository {
             return false;
         }
     }
+
+    @Override
+    public boolean updateFrozenBalance(String userId, double newFrozenBalance) {
+        String sql = "UPDATE Users SET frozen_balance = ? WHERE id = ?";
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setDouble(1, newFrozenBalance);
+            stmt.setString(2, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("DB error when updating frozen balance: " + e.getMessage());
+            return false;
+        }
+    }
     private User mapRowToUser(ResultSet rs) throws SQLException {
         String id = rs.getString("id");
         String username = rs.getString("username");
@@ -131,11 +137,47 @@ public class UserRepository implements IUserRepository {
         double accountBalance = rs.getDouble("account_balance");
         double frozenBalance = rs.getDouble("frozen_balance");
         boolean isBanned = rs.getBoolean("is_banned");
+        long createdAt = rs.getTimestamp("created_at").getTime();
 
         return switch (role) {
-            case "MEMBER" -> new Member(id, username, password, email, accountBalance, frozenBalance, isBanned);
-            case "ADMIN" -> new Admin(id, username, password, email);
+            case "MEMBER" -> new Member(id, username, password, email, accountBalance, frozenBalance, isBanned, createdAt);
+            case "ADMIN" -> new Admin(id, username, password, email, createdAt);
             default -> null;
         };
+    }
+
+    @Override
+    public boolean updateStatus(String userId, boolean isBanned) {
+        String sql = "UPDATE Users SET is_banned = ? WHERE id = ?";
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setBoolean(1, isBanned);
+            stmt.setString(2, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("DB error updating ban status: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public List<User> findAll() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users";
+
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                User user = mapRowToUser(rs);
+                if (user != null) {
+                    users.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error when finding all users: " + e.getMessage());
+        }
+        return users;
     }
 }

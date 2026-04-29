@@ -1,10 +1,13 @@
 package vn.io.huangnosimp.controller;
 
+import vn.io.huangnosimp.model.Member;
+import vn.io.huangnosimp.model.User;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
+import vn.io.huangnosimp.repository.IUserRepository;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

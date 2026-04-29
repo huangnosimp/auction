@@ -271,6 +271,12 @@
 }
 .expiring-name { -fx-text-fill: #dddddd; -fx-font-size: 11px; -fx-font-weight: bold; }
 .expiring-bid  { -fx-text-fill: #8b8fa8; -fx-font-size: 10px; }
+/* Tab bar */
+.tab-bar {
+    -fx-background-color: #1a1c22;
+    -fx-background-radius: 8px;
+    -fx-padding: 4;
+}
 
 
 /* Container chung */
@@ -324,3 +330,41 @@
 .status-won { -fx-text-fill: #00ff88; }
 .status-lost { -fx-text-fill: #ff4444; }
 .status-active { -fx-text-fill: #00ccff; }
+.tab-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 16 6 16;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+.tab-btn:hover {
+    -fx-background-color: #2a2d38;
+    -fx-text-fill: #f0f2f8;
+}
+.tab-btn-active {
+    -fx-background-color: #2e3245;
+    -fx-text-fill: #ffffff;
+}
+.tab-btn-active:hover {
+    -fx-background-color: #353a52;
+}
+
+/* Nút tạo phiên */
+.tab-action-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #00e676;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 12 5 12;
+    -fx-background-radius: 6px;
+    -fx-border-color: #00e676;
+    -fx-border-width: 1;
+    -fx-border-radius: 6px;
+    -fx-cursor: hand;
+}
+.tab-action-btn:hover {
+    -fx-background-color: #00e67622;
+}

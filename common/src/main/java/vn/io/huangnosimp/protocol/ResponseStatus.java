@@ -6,5 +6,7 @@ public enum ResponseStatus {
     UNAUTHORIZED,
     CONFLICT,
     BANNED,
-    FAILED
+    FORBIDDEN,
+    FAILED,
+    INVALID_INPUT
 }

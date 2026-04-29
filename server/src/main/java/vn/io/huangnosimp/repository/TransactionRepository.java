@@ -1,7 +1,7 @@
 package vn.io.huangnosimp.repository;
 
 import vn.io.huangnosimp.database.DatabaseConnection;
-import vn.io.huangnosimp.model.BidTransaction;
+import vn.io.huangnosimp.model.Transaction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,17 +16,16 @@ public class TransactionRepository implements ITransactionRepository {
     }
 
     @Override
-    public void saveTransaction(BidTransaction transaction, String sellerId) {
-        String sql = "INSERT INTO Transactions (id, auction_id, buyer_id, seller_id, amount, transaction_time) VALUES (?, ?, ?, ?, ?, ?)";
+    public void saveTransaction(Transaction transaction) {
+        String sql = "INSERT INTO Transactions (id, user_id, amount, transaction_time, transaction_type) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, transaction.getId());
-            stmt.setString(2, transaction.getAuctionId());
-            stmt.setString(3, transaction.getBidderId());
-            stmt.setString(4, sellerId);
-            stmt.setDouble(5, transaction.getAmount());
+            stmt.setString(2, transaction.getUserId());
+            stmt.setDouble(3, transaction.getAmount());
             stmt.setTimestamp(6, new Timestamp(transaction.getCreatedAt()));
+            stmt.setString(4, transaction.getTransactionType().name());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
