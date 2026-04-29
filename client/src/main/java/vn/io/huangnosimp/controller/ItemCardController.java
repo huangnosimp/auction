@@ -19,17 +19,21 @@ import vn.io.huangnosimp.util.GsonParser;
 import java.time.Instant;
 
 public class ItemCardController {
-    @FXML private Label productNamelabel;
-    @FXML private Label lblTime;
+    @FXML private Label lblProductName;
+    @FXML private Label lblTimeRemaining;
     @FXML private Label lblCurrentBid;
-    @FXML private Label lblYourBid;
     @FXML private Label statuslbl;
-    @FXML private Label outbidlbl;
+
+    @FXML private Label lblBidderCount;
+    @FXML private Label lblBidCount;
+    @FXML private Label lblYourBid;
+
     @FXML private Button BidNowButton;
+
     private String auctionId;
-    @FXML private VBox yourBidVbox;
+
     public void addInfo(AuctionCardDTO dto, String type){
-        productNamelabel.setText(dto.getProductName());
+        lblProductName.setText(dto.getProductName());
         long now = Instant.now().getEpochSecond();
         if(now < dto.getStartTime()){
             statuslbl.setText("Start in: ");
@@ -37,19 +41,18 @@ public class ItemCardController {
         else {
             statuslbl.setText("End in: ");
         }
-        AuctionCountdownUtil countdownUtil = new AuctionCountdownUtil(lblTime, dto.getStartTime(), dto.getEndTime());
+        AuctionCountdownUtil countdownUtil = new AuctionCountdownUtil(lblTimeRemaining, dto.getStartTime(), dto.getEndTime());
         countdownUtil.start();
-        lblCurrentBid.setText(FormatUtil.formatNumber(dto.getCurrentPrice())+" đ");
-        lblYourBid.setText(String.valueOf(dto.getYourBid()));
+        lblCurrentBid.setText(FormatUtil.formatNumber(dto.getCurrentPrice()));
         this.auctionId = dto.getAuctionId();
-
-        if(type.equals("Inspect")){
-            BidNowButton.setText("Inspect");
-            yourBidVbox.setVisible(false);
-            outbidlbl.setVisible(false);
+        if(type.equals("Joining")){
+            lblYourBid.setText(String.valueOf(dto.getYourBid())+" đ");
         }
-        else{
-            BidNowButton.setText("Bid Now");
+        else if (type.equals("My")) {
+            lblBidCount.setText(String.valueOf(dto.getBidCount())+" bids");
+        }
+        else if(type.equals("Public")){
+            lblBidderCount.setText(String.valueOf(dto.getBidderCount())+" bidders");
         }
     }
     @FXML public void handleBidNowbutton(ActionEvent event){
@@ -62,7 +65,7 @@ public class ItemCardController {
                             UserSession.setAuctionDetail(auctionResponse);
                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
                             if(BidNowButton.getText().equals("Inspect")) {
-                                controller.setInvisible();
+
                             }
                             controller.setAuctionId(auctionId);
                         });

@@ -12,21 +12,15 @@
            fx:controller="vn.io.huangnosimp.controller.DashboardController">
     <children>
 
-        <!-- ═══════════════════════════════════════════════════════ -->
-        <!--   LAYER 1 — NỘI DUNG CHÍNH                             -->
-        <!-- ═══════════════════════════════════════════════════════ -->
         <BorderPane fx:id="mainBorderPane" styleClass="root-pane">
 
-            <!-- TOP NAVBAR -->
             <top>
                 <HBox alignment="CENTER_LEFT" spacing="0" styleClass="navbar">
-                    <!-- Logo -->
                     <HBox alignment="CENTER_LEFT" spacing="4" styleClass="logo-container">
                         <Label styleClass="logo-ofc" text="HOANGCHIM88." />
                         <Label styleClass="logo-digital" text="Digital" />
                     </HBox>
 
-                    <!-- Nav Buttons -->
                     <HBox fx:id="menuHbox" alignment="CENTER_LEFT" spacing="4" styleClass="nav-buttons" HBox.hgrow="ALWAYS">
                         <Button fx:id="btnDashboard" onAction="#handlebtnDashboard" styleClass="nav-btn, nav-btn-active" text="Dashboard" />
                         <Button fx:id="btnOpenSlots" onAction="#handlebtnOpenSlots" styleClass="nav-btn" text="Open Slots" />
@@ -34,7 +28,6 @@
                         <Button fx:id="btnFighters" styleClass="nav-btn" text=".........." />
                     </HBox>
 
-                    <!-- Right actions -->
                     <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="nav-right">
                         <Button fx:id="btnSupport" styleClass="support-btn" text="⊕  Personal Support" />
                         <Button fx:id="btnNotif" styleClass="icon-btn" text="🔔" />
@@ -47,14 +40,12 @@
                 </HBox>
             </top>
 
-            <!-- MAIN CONTENT -->
             <center>
                 <StackPane fx:id="contentArea" prefWidth="697.0">
                     <fx:include source="dashboard_home.fxml" />
                 </StackPane>
             </center>
 
-            <!-- LEFT SIDEBAR -->
             <left>
                 <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="224.0"
                             style="-fx-background-color: #171414;"
@@ -63,14 +54,12 @@
                           AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10"
                           AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
 
-                        <!-- Balance card -->
                         <VBox spacing="4" styleClass="stat-card">
                             <Label styleClass="stat-label" text="YOUR BALANCE" />
                             <Label fx:id="lblBalance" styleClass="stat-value" text="1,550" />
                             <Label styleClass="stat-link" text="+ Top Up" />
                         </VBox>
 
-                        <!-- Quick Stats -->
                         <VBox spacing="8" styleClass="side-card">
                             <Label styleClass="side-section-title" text="QUICK STATS" />
                             <GridPane hgap="8" vgap="8">
@@ -101,13 +90,11 @@
                             </GridPane>
                         </VBox>
 
-                        <!-- Expiring Soon -->
                         <VBox spacing="8" styleClass="side-card">
                             <Label styleClass="side-section-title" text="EXPIRING SOON" />
                             <VBox fx:id="expiringList" spacing="6" />
                         </VBox>
 
-                        <!-- Recent Activity -->
                         <VBox spacing="8" styleClass="side-card" VBox.vgrow="ALWAYS">
                             <Label styleClass="side-section-title" text="RECENT ACTIVITY" />
                             <VBox fx:id="activityList" spacing="8" />
@@ -119,17 +106,15 @@
 
         </BorderPane>
 
-        <!-- ═══════════════════════════════════════════════════════ -->
-        <!--   LAYER 2 — TOAST OVERLAY                              -->
-        <!--   Nổi trên toàn bộ UI, không chặn click               -->
-        <!--   Controller gọi: showToast(title, sub, type)          -->
-        <!-- ═══════════════════════════════════════════════════════ -->
         <VBox fx:id="toastContainer"
-              alignment="BOTTOM_RIGHT"
+              alignment="TOP_RIGHT"
               mouseTransparent="true"
               pickOnBounds="false"
-              StackPane.alignment="BOTTOM_RIGHT">
-            <padding><Insets bottom="20" right="20" /></padding>
+              maxWidth="400"
+              StackPane.alignment="TOP_RIGHT">
+            <padding>
+                <Insets top="80" right="20" />
+            </padding>
             <children>
 
                 <HBox fx:id="toastBox"
@@ -146,7 +131,6 @@
                     <padding><Insets bottom="12" left="14" right="16" top="12" /></padding>
                     <children>
 
-                        <!-- Icon tròn -->
                         <StackPane prefHeight="22" prefWidth="22">
                             <children>
                                 <Circle fx:id="toastIconCircle"
@@ -160,7 +144,6 @@
                             </children>
                         </StackPane>
 
-                        <!-- Text -->
                         <VBox spacing="2">
                             <children>
                                 <Label fx:id="toastTitle"

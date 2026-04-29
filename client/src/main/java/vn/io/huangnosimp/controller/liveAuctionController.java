@@ -21,18 +21,15 @@ import javafx.util.Duration;
 
 import javafx.event.ActionEvent;
 import vn.io.huangnosimp.Manager.*;
-import vn.io.huangnosimp.dto.request.AutoBidRequestDTO;
-import vn.io.huangnosimp.dto.request.BuyNowRequestDTO;
-import vn.io.huangnosimp.dto.request.CancelAuctionRequestDTO;
-import vn.io.huangnosimp.dto.request.RegisterRequestDTO;
-import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
-import vn.io.huangnosimp.dto.response.BidHistoryDTO;
-import vn.io.huangnosimp.dto.response.PricePointDTO;
+import vn.io.huangnosimp.dto.request.*;
+import vn.io.huangnosimp.dto.response.*;
 import vn.io.huangnosimp.network.IServerMessageListener;
 import vn.io.huangnosimp.network.SocketClient;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
+import vn.io.huangnosimp.protocol.ResponseStatus;
+import vn.io.huangnosimp.util.GsonParser;
 
 import java.io.IOException;
 import java.net.URL;
@@ -80,34 +77,31 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML private Separator spr1;
     @FXML ListView bidHistoryList;
 
-    @FXML private HBox toastBox;
-    @FXML private Label toastTitle, toastSub, toastIconLabel;
-    @FXML private Circle toastIconCircle;
-
-    private double minCount;
+    private double minCount = 100000;
     private Timeline holdTimer;
     private Runnable currentAction;
     private String auctionId;
 
     private void setUpliveAuction(AuctionDetailResponseDTO DTO){
-        currentPriceLabel.setText(FormatUtil.formatNumber(DTO.getCurrentPrice())+"₫");
-        startPriceLabel.setText("Khởi điểm: "+FormatUtil.formatNumber(DTO.getStartPrice())+"₫");
+        currentPriceLabel.setText(FormatUtil.formatNumber(DTO.getCurrentPrice()));
+        startPriceLabel.setText("Khởi điểm: "+FormatUtil.formatNumber(DTO.getStartPrice()));
         leadBidderLabel.setText(DTO.getLeadBidder());
-        minNextBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
-        myBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid())+"₫");
+        minNextBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid()));
+        myBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid()));
         AuctionCountdownUtil clock = new AuctionCountdownUtil(timeLabel, DTO.getStartTime(), DTO.getEndTime());
         clock.start();
         bidStepLabel.setText(caculateBidIncreament(DTO.getBidIncrement()));
+        bidIndex=DTO.getBidCount();
         bidCountLabel.setText(String.valueOf(DTO.getBidCount()));
         participantCountLabel.setText(String.valueOf(DTO.getParticipantCount()));
-        minCount = DTO.getBidIncrement();
+
         loadChartHistory(DTO.getPriceHistory());
         loadBidHistory(DTO.getBidHistory());
         productTitleLabel.setText(DTO.getProductName());
         categoryLabel.setText(String.valueOf(DTO.getCategory()));
         conditionLabel.setText(String.valueOf(DTO.getCondition()));
         descriptionLabel.setText(DTO.getDescription());
-        sidebarBuyNowPriceLabel.setText(formatNumber(DTO.getBuyNowPrice())+" đ");
+        sidebarBuyNowPriceLabel.setText(formatNumber(DTO.getBuyNowPrice()));
         startDateLabel.setText(formatEpochSecond(DTO.getStartTime()));
     }
     public void handleIncreaseButton(){
@@ -211,8 +205,22 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         btnBuyNow.setDisable(true);
         SocketManager.getClient().sendRequestAsync(request)
                 .thenAccept(response -> {
-                    btnBuyNow.setDisable(false);
+                    if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+                        changeView("dashboard_home.fxml", 1);
+                        ControllerManager.getDashboardController().showToast("SUCCESS", response.getMessage(), true);
+                    }
+                    if(ResponseStatus.FAILED.equals(response.getStatus())){
+                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                    }
+
                 });
+    }
+    @FXML
+    public void handlePlaceBid(){
+        double amount = parseNumber(myBidLabel.getText());
+        PlaceBidRequestDTO placeBidRequest = new PlaceBidRequestDTO(auctionId, amount);
+        Request request = new Request(ActionType.PLACE_BID, placeBidRequest);
+        SocketManager.getClient().sendRequest(request);
     }
     @FXML
     public void handleCancelAndAutobid(){
@@ -228,6 +236,8 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         if("SUCCESS".equals(String.valueOf(cancelResponse.getStatus()))){
                             Platform.runLater(()->{
                                 ControllerManager.getDashboardController().showToast("SUCCESS", cancelResponse.getMessage(), true);
+                                ControllerManager.getDashboardHomeController().removeFromDashBoard(this.auctionId);
+                                ViewManager.changeView("dashboard_home.fxml", 1);
                             });
                         }
                         else {
@@ -242,16 +252,33 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         this.auctionId = id;
     }
     public void onResponseReceived(Response response){
-
     }
-    public void onRequestReceived(Request notification){}
+    public void onRequestReceived(Request notification){
+        PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), PlaceBidResponseDTO.class);
+        bidIndex++;
+        bidCountLabel.setText(String.valueOf(bidIndex));
+        leadBidderLabel.setText(dto.getUsername());
+        priceSeries.getData().add(new XYChart.Data<>(bidIndex, dto.getAmount()));
+        currentPriceLabel.setText(formatNumber(dto.getAmount()));
+        minNextBidLabel.setText(formatNumber(dto.getAmount()+minCount));
+        BidHistoryDTO historyDTO = new BidHistoryDTO(dto.getUsername(), dto.getAmount(), dto.getPlaceAt());
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/bid_history_cell.fxml"));
+            Parent cell = loader.load();
+            BidHistoryCellController controller = loader.getController();
+            controller.setData(historyDTO, true);
+            bidHistoryList.getItems().add(cell);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
     public void onDisconnected(String reason){}
     @FXML
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         SocketManager.getClient().addListener(this);
         setupLineChart();
-        setUpliveAuction(UserSession.getAuctionDetail());
         holdTimer = new Timeline(new KeyFrame(Duration.millis(200), event -> {
             handleIncreaseButton(); // Gọi lại hàm tăng số bạn đã viết
         }));

@@ -131,7 +131,7 @@ public class CreateAuctionController implements Initializable{
                 .thenAccept(response -> Platform.runLater(() -> {
                     if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
                         AuctionCardDTO cardResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionCardDTO.class);
-                        ControllerManager.getDashboardHomeController().addToDashboard(cardResponse);
+                        ControllerManager.getDashboardHomeController().addToDashboard(cardResponse, "My");
                         ViewManager.changeView("dashboard_home.fxml", 1);
                     }
                     else if(ResponseStatus.FAILED.equals(response.getStatus())) {

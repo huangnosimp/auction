@@ -142,7 +142,7 @@
                         </HBox>
 
                         <!-- Nút đặt giá -->
-                        <Button fx:id="btnPlaceBid" prefHeight="38" prefWidth="100" styleClass="bidbtn" text="Đặt giá" />
+                        <Button fx:id="btnPlaceBid" onAction="#handlePlaceBid" prefHeight="38" prefWidth="100" styleClass="bidbtn" text="Đặt giá" />
 
                         <Separator fx:id="spr" orientation="VERTICAL" style="-fx-background-color: #3a3d4a;" />
 
