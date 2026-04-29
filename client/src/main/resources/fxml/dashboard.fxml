@@ -11,7 +11,7 @@
         <HBox alignment="CENTER_LEFT" spacing="0" styleClass="navbar">
             <!-- Logo -->
             <HBox alignment="CENTER_LEFT" spacing="4" styleClass="logo-container">
-                <Label styleClass="logo-ofc" text="HOANGCHIM88." />
+                <Label styleClass="logo-ofc" text="AUCTION88." />
                 <Label styleClass="logo-digital" text="Digital" />
             </HBox>
 
@@ -20,7 +20,6 @@
                 <Button fx:id="btnDashboard" onAction="#handlebtnDashboard" styleClass="nav-btn, nav-btn-active" text="Dashboard" />
                 <Button fx:id="btnOpenSlots" onAction="#handlebtnOpenSlots" styleClass="nav-btn" text="Open Slots" />
                 <Button fx:id="btnAuctions" styleClass="nav-btn" text="My Auctions" />
-                <Button fx:id="btnFighters" styleClass="nav-btn" text="Fighters" />
             </HBox>
 
             <!-- Right actions -->
