@@ -80,7 +80,7 @@ public class AuctionService implements IAuctionService {
         Auction auction = new Auction(item, seller, startPrice, startTime, endTime, minimumIncrement, buyNowPrice);
         auctionRepository.save(auction);
         scheduler.scheduleAuction(auction);
-        return new AuctionCardDTO(auction.getId(), item.getName(), auction.getCurrentPrice(), 0, auction.getStartTime(), auction.getEndTime());
+        return new AuctionCardDTO(auction.getId(), item.getName(), auction.getStartPrice(), 0, auction.getStartTime(), auction.getEndTime(), 0, 0);
     }
 
     private boolean isValidOpenAuctionInput(String sellerId, String name, String description, ItemType type,
@@ -156,7 +156,7 @@ public class AuctionService implements IAuctionService {
             bidTransactionRepository.saveBidTransaction(new BidTransaction(bidderId, auctionId, amount));
 
             if (notificationService != null) {
-                notificationService.notifyBidPlaced(auctionId, auction.getCurrentPrice(), bidderId);
+                notificationService.notifyBidPlaced(auctionId, amount, bidderId);
                 if (previousWinnerId != null && !previousWinnerId.equals(bidderId)) {
                     notificationService.notifyOutbid(auctionId, previousWinnerId, auction.getCurrentPrice());
                 }

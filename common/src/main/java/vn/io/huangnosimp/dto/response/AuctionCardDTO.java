@@ -53,8 +53,11 @@ public class AuctionCardDTO {
         return endTime;
     }
 
-    public int getBidCount(){return bidCount;}
+    public int getBidCount() {
+        return bidCount;
+    }
 
-    public int getBidderCount(){return bidderCount;}
-
+    public int getBidderCount() {
+        return bidderCount;
+    }
 }

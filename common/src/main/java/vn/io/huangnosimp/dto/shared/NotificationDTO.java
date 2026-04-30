@@ -5,13 +5,13 @@ import vn.io.huangnosimp.enums.NotificationType;
 public class NotificationDTO {
     private final NotificationType notificationType;
     private final String auctionId;
-    private final String message;
+    private final Object data;
     private final long timestamp;
 
-    public NotificationDTO(NotificationType notificationType, String auctionId, String message) {
+    public NotificationDTO(NotificationType notificationType, String auctionId, Object data) {
         this.notificationType = notificationType;
         this.auctionId = auctionId;
-        this.message = message;
+        this.data = data;
         this.timestamp = System.currentTimeMillis();
     }
 
@@ -23,8 +23,8 @@ public class NotificationDTO {
         return auctionId;
     }
 
-    public String getMessage() {
-        return message;
+    public Object getData() {
+        return data;
     }
 
     public long getTimestamp() {

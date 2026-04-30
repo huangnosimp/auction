@@ -57,20 +57,17 @@ public class AuctionHandler {
 
     public static class PlaceBidHandler implements RequestHandler {
         private final IAuctionService auctionService;
-        private final IUserService userService;
 
-        public PlaceBidHandler(IAuctionService auctionService, IUserService userService) {
+        public PlaceBidHandler(IAuctionService auctionService) {
             this.auctionService = auctionService;
-            this.userService = userService;
         }
 
         @Override
         public Response handle(Request request, ClientHandle client) {
             PlaceBidRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), PlaceBidRequestDTO.class);
             BidResult result = auctionService.placeBid(client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), false);
-            PlaceBidResponseDTO responseDTO = new PlaceBidResponseDTO(userService.getMember(client.getUserId()).getUsername(), dto.getBidAmount(), System.currentTimeMillis());
             return switch (result) {
-                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Place bid successfully", responseDTO);
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Place bid successfully");
                 case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
                 case AUCTION_ENDED -> new Response(ResponseStatus.FAILED, "Auction has already ended");
                 case INSUFFICIENT_FUNDS -> new Response(ResponseStatus.FAILED, "Insufficient funds");

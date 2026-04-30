@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.service;
 
+import vn.io.huangnosimp.dto.response.PlaceBidResponseDTO;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.ClientSessionManager;
@@ -7,14 +8,14 @@ import vn.io.huangnosimp.dto.shared.NotificationDTO;
 import vn.io.huangnosimp.protocol.Request;
 
 public class NotificationService {
-    private void sendNotification(String auctionId, NotificationType type, String messageText) {
-         NotificationDTO dto = new NotificationDTO(type, auctionId, messageText);
+    private void sendNotification(String auctionId, NotificationType type, Object data) {
+         NotificationDTO dto = new NotificationDTO(type, auctionId, data);
          Request request = new Request(ActionType.NOTIFICATION, dto);
          ClientSessionManager.getInstance().broadcastToRoom(auctionId, request);
     }
-    public void notifyBidPlaced(String auctionId, double currentPrice, String winnerUsername) {
-        String msg = String.format("A new bid of %.2f was placed! Current top bidder: %s", currentPrice, winnerUsername);
-        sendNotification(auctionId, NotificationType.NEW_BID, msg);
+    public void notifyBidPlaced(String auctionId, double amount, String winnerUsername) {
+        PlaceBidResponseDTO dto = new PlaceBidResponseDTO(winnerUsername, amount, System.currentTimeMillis());
+        sendNotification(auctionId, NotificationType.NEW_BID, dto);
     }
     public void notifyAuctionEnded(String auctionId, String winnerUsername, double finalPrice) {
         String msg = String.format("Auction ended! Winner: %s with price %.2f", winnerUsername != null ? winnerUsername : "None", finalPrice);
