@@ -6,6 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.animation.FadeTransition;
 import javafx.util.Duration;
@@ -19,8 +20,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class dashboard_homeController implements Initializable {
-    @FXML private Button btnFab1;
     @FXML private FlowPane auctionFlowPane;
+    @FXML private ScrollPane scrollJoined;
+    @FXML private ScrollPane scrollMyAuctions;
+    @FXML private Button tabJoined;
+    @FXML private Button tabMyAuctions;
 
     public void addToDashboard(AuctionCardDTO dto, String type){
         String fxmlPath = null;
@@ -66,6 +70,27 @@ public class dashboard_homeController implements Initializable {
             });
 
             ft.play();
+        }
+    }
+    @FXML
+    private void handleTabChange(ActionEvent event) {
+        tabJoined.getStyleClass().remove("tab-btn-active");
+        tabMyAuctions.getStyleClass().remove("tab-btn-active");
+
+        if (event.getSource() == tabJoined) {
+            tabJoined.getStyleClass().add("tab-btn-active");
+
+            scrollJoined.setVisible(true);
+            scrollJoined.setManaged(true);
+            scrollMyAuctions.setVisible(false);
+            scrollMyAuctions.setManaged(false);
+        } else {
+            tabMyAuctions.getStyleClass().add("tab-btn-active");
+
+            scrollJoined.setVisible(false);
+            scrollJoined.setManaged(false);
+            scrollMyAuctions.setVisible(true);
+            scrollMyAuctions.setManaged(true);
         }
     }
     public void handleCreateAuction(ActionEvent event){
