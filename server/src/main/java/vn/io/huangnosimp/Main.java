@@ -22,14 +22,14 @@ public class Main {
         IStatisticRepository statisticRepository = new StatisticRepository(dbConnection);
         IAutoBidRepository autoBidRepository = new AutoBidRepository();
         //Services
-        UserService userService = new UserService(userRepository);
+        IUserService userService = new UserService(userRepository);
         ItemService itemService = new ItemService(itemRepository);
         IStatisticService statisticService = new StatisticService(statisticRepository);
         AutoBidService autoBidService = new AutoBidService(autoBidRepository, userRepository, auctionRepository);
         AuctionService auctionService = new AuctionService(auctionRepository, userService, itemService, transactionRepository, auctionParticipantsRepository, bidTransactionRepository);
         autoBidService.setAuctionService(auctionService);
         auctionService.setAutoBidService(autoBidService);
-        AdminService adminService = new AdminService(userRepository, auctionRepository, auctionService);
+        IAdminService adminService = new AdminService(userRepository, auctionRepository, auctionService);
 
         NotificationService notificationService = new NotificationService();
         auctionService.setNotificationService(notificationService);
@@ -47,7 +47,7 @@ public class Main {
         //Auction Handler
         router.registerHandler(ActionType.CREATE_AUCTION, new AuctionHandler.CreateAuctionHandler(auctionService));
         router.registerHandler(ActionType.CANCEL_AUCTION, new AuctionHandler.CancelAuctionHandler(auctionService));
-        router.registerHandler(ActionType.PLACE_BID, new AuctionHandler.PlaceBidHandler(auctionService, userService));
+        router.registerHandler(ActionType.PLACE_BID, new AuctionHandler.PlaceBidHandler(auctionService));
         router.registerHandler(ActionType.JOIN_ROOM, new AuctionHandler.JoinRoomHandler(auctionService));
         router.registerHandler(ActionType.LEAVE_ROOM, new AuctionHandler.LeaveRoomHandler(auctionService));
         router.registerHandler(ActionType.BUY_NOW, new AuctionHandler.BuyNowHandler(auctionService));
@@ -64,6 +64,7 @@ public class Main {
         //Statistic Handler
         router.registerHandler(ActionType.GET_DASHBOARD_INFO, new StatisticHandler.GetDashboardInfoHandler(statisticService));
         router.registerHandler(ActionType.GET_AUCTION_DETAIL, new StatisticHandler.GetAuctionDetailHandler(statisticService));
+        router.registerHandler(ActionType.GET_AUCTION_CARD, new StatisticHandler.GetAuctionCardHandler(statisticService));
         //Start Server
         SocketServer server = new SocketServer(26676, router);
         Runtime.getRuntime().addShutdownHook(new Thread(AuctionScheduler::shutdown));

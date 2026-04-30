@@ -9,6 +9,8 @@ import vn.io.huangnosimp.dto.response.PricePointDTO;
 
 import java.sql.*;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class StatisticRepository implements IStatisticRepository {
     private final DatabaseConnection databaseConnection;
@@ -36,12 +38,12 @@ public class StatisticRepository implements IStatisticRepository {
                 int winningBids = rs.getInt("winning_bids");
                 int outBids = rs.getInt("out_bids");
                 int wonTotal = rs.getInt("won_total");
-                return new vn.io.huangnosimp.dto.response.DashboardResponseDTO(balance, 0, winningBids, outBids, wonTotal, java.util.Collections.emptyList());
+                return new DashboardResponseDTO(balance, 0, winningBids, outBids, wonTotal, Collections.emptyList());
             }
         } catch (SQLException e) {
             System.err.println("DB error when fetching user scalar statistics: " + e.getMessage());
         }
-        return new vn.io.huangnosimp.dto.response.DashboardResponseDTO(0.0, 0, 0, 0, 0, java.util.Collections.emptyList());
+        return new DashboardResponseDTO(0.0, 0, 0, 0, 0, Collections.emptyList());
     }
 
     @Override
@@ -50,7 +52,9 @@ public class StatisticRepository implements IStatisticRepository {
         String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "(SELECT IFNULL(MAX(bid_amount), 0) FROM bidtransactions bt WHERE bt.auction_id = a.id AND bt.bidder_id = ?) AS your_bid, " +
-                     "a.start_time AS start_time, a.end_time AS end_time " +
+                     "a.start_time AS start_time, a.end_time AS end_time, " +
+                     "(SELECT COUNT(*) FROM bidtransactions bt2 WHERE bt2.auction_id = a.id) AS bid_count, " +
+                     "(SELECT COUNT(DISTINCT bt3.bidder_id) FROM bidtransactions bt3 WHERE bt3.auction_id = a.id) AS bidder_count " +
                      "FROM auctions a " +
                      "JOIN auctionparticipants ap ON a.id = ap.auction_id " +
                      "JOIN items i ON a.item_id = i.id " +
@@ -68,7 +72,9 @@ public class StatisticRepository implements IStatisticRepository {
                 double yourBid = rs.getDouble("your_bid");
                 long startTime = rs.getTimestamp("start_time").getTime();
                 long endTime = rs.getTimestamp("end_time").getTime();
-                rooms.add(new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, startTime, endTime));
+                int bidCount = rs.getInt("bid_count");
+                int bidderCount = rs.getInt("bidder_count");
+                rooms.add(new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, startTime, endTime, bidCount, bidderCount));
             }
         } catch (SQLException e) {
             System.err.println("DB error when fetching active rooms: " + e.getMessage());
@@ -126,8 +132,8 @@ public class StatisticRepository implements IStatisticRepository {
                 double buyNowPrice = 0.0;
                 double minNextBid = currentPrice + bidIncrement;
 
-                java.util.List<BidHistoryDTO> bidHistory = new java.util.ArrayList<>();
-                java.util.List<PricePointDTO> priceHistory = new java.util.ArrayList<>();
+                List<BidHistoryDTO> bidHistory = new ArrayList<>();
+                List<PricePointDTO> priceHistory = new ArrayList<>();
 
                 priceHistory.add(new PricePointDTO(startTime, startPrice));
 
@@ -159,5 +165,37 @@ public class StatisticRepository implements IStatisticRepository {
         }
 
         return result;
+    }
+
+    @Override
+    public AuctionCardDTO getAuctionCard(String auctionId) {
+        String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
+                     "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
+                     "0 AS your_bid, " +
+                     "a.start_time AS start_time, a.end_time AS end_time, " +
+                     "(SELECT COUNT(*) FROM bidtransactions bt WHERE bt.auction_id = a.id) AS bid_count, " +
+                     "(SELECT COUNT(DISTINCT bt2.bidder_id) FROM bidtransactions bt2 WHERE bt2.auction_id = a.id) AS bidder_count " +
+                     "FROM auctions a " +
+                     "JOIN items i ON a.item_id = i.id " +
+                     "WHERE a.id = ?";
+                     
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, auctionId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                String productName = rs.getString("product_name");
+                double currentPrice = rs.getDouble("current_price");
+                double yourBid = rs.getDouble("your_bid");
+                long startTime = rs.getTimestamp("start_time").getTime();
+                long endTime = rs.getTimestamp("end_time").getTime();
+                int bidCount = rs.getInt("bid_count");
+                int bidderCount = rs.getInt("bidder_count");
+                return new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, startTime, endTime, bidCount, bidderCount);
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error when fetching auction card: " + e.getMessage());
+        }
+        return null;
     }
 }

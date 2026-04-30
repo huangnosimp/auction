@@ -11,4 +11,5 @@ public interface IStatisticRepository {
     DashboardResponseDTO getUserScalarStatistics(String userId);
     List<AuctionCardDTO> getActiveRooms(String userId);
     AuctionDetailResponseDTO getAuctionDetail(String auctionId);
+    AuctionCardDTO getAuctionCard(String auctionId);
 }
