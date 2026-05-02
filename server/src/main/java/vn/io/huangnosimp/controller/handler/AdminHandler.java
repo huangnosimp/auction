@@ -2,6 +2,8 @@ package vn.io.huangnosimp.controller.handler;
 
 import vn.io.huangnosimp.dto.request.CancelAuctionRequestDTO;
 import vn.io.huangnosimp.dto.request.TargetIdRequestDTO;
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.enums.UserType;
 import vn.io.huangnosimp.util.GsonParser;
 import vn.io.huangnosimp.protocol.Request;
@@ -33,7 +35,7 @@ public class AdminHandler {
             if (!isAdmin(client)) {
                 return new Response(ResponseStatus.UNAUTHORIZED, "Access denied: Admins only");
             }
-            List<Member> members = adminService.getAllMembers();
+            List<MemberDTO> members = adminService.getAllMembers();
             return new Response(ResponseStatus.SUCCESS, "Get all members successful", members);
         }
     }
@@ -91,7 +93,7 @@ public class AdminHandler {
         public Response handle(Request request, ClientHandle client) {
             if (!isAdmin(client)) return new Response(ResponseStatus.UNAUTHORIZED, "Access denied");
 
-            List<Auction> auctions = adminService.getAllAuctions();
+            List<AuctionCardDTO> auctions = adminService.getAllAuctions();
             return new Response(ResponseStatus.SUCCESS, "Get all auctions successful", auctions);
         }
     }

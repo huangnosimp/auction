@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="vn.io.huangnosimp.controller.AdminController"
+            stylesheets="@../css/AdminDashboard.css" prefWidth="1100" prefHeight="700">
+
+    <left>
+        <VBox spacing="15" styleClass="sidebar" prefWidth="250">
+            <padding><Insets top="30" right="20" bottom="30" left="20"/></padding>
+
+            <Label text="ADMIN PANEL" styleClass="sidebar-title" />
+            <Separator styleClass="sidebar-sep"/>
+
+            <Button text="Dashboard" styleClass="nav-btn, active" maxWidth="Infinity" />
+            <Button text="Members" styleClass="nav-btn" maxWidth="Infinity" />
+            <Button text="Auctions" styleClass="nav-btn" maxWidth="Infinity" />
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <VBox styleClass="revenue-card" spacing="10">
+                <Label text="SYSTEM REVENUE" styleClass="card-subtitle"/>
+                <Label fx:id="lblSystemRevenue" text="\$0.00" styleClass="card-value"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="25" styleClass="main-content">
+            <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+
+            <Label text="System Overview" styleClass="header-title" />
+
+            <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                <Tab text="Member Management">
+                    <TableView fx:id="tableMembers">
+                        <columns>
+                            <TableColumn fx:id="colMemberId" text="ID" prefWidth="100" />
+                            <TableColumn fx:id="colMemberName" text="Username" prefWidth="200" />
+                            <TableColumn fx:id="colMemberStatus" text="Status" prefWidth="150" />
+                            <TableColumn fx:id="colMemberAction" text="Actions" prefWidth="150" />
+                        </columns>
+                    </TableView>
+                </Tab>
+                <Tab text="Auction Management">
+                    <TableView fx:id="tableAuctions">
+                        <columns>
+                            <TableColumn fx:id="colAuctionId" text="Auction ID" prefWidth="100" />
+                            <TableColumn fx:id="colAuctionName" text="Product" prefWidth="250" />
+                            <TableColumn fx:id="colAuctionPrice" text="Current Price" prefWidth="150" />
+                            <TableColumn fx:id="colAuctionAction" text="Control" prefWidth="150" />
+                        </columns>
+                    </TableView>
+                </Tab>
+            </TabPane>
+        </VBox>
+    </center>
+</BorderPane>

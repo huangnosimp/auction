@@ -14,16 +14,19 @@ repositories {
 
 dependencies {
     implementation(project(":common"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
     implementation("com.google.code.gson:gson:2.13.2")
     implementation(project(":common"))
-    implementation("com.google.code.gson:gson:2.13.2")
 }
 
 javafx {
-    version = "25.0.2"
+    version = "21"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
