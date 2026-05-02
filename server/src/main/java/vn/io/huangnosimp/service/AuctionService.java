@@ -89,6 +89,29 @@ public class AuctionService implements IAuctionService {
                 && !description.isBlank() && type != null && attributes != null && startPrice > 0;
     }
 
+    public void startAuction(String auctionId) {
+        Object lock = getAuctionLock(auctionId);
+        synchronized (lock) {
+            Auction auction = auctionRepository.findById(auctionId);
+            if (auction != null && auction.getStatus() == AuctionStatus.OPEN) {
+                auction.setStatusRunning();
+                auctionRepository.save(auction);
+            }
+        }
+    }
+
+    public void finishAuction(String auctionId) {
+        Object lock = getAuctionLock(auctionId);
+        synchronized (lock) {
+            Auction auction = auctionRepository.findById(auctionId);
+            if (auction != null && auction.getStatus() == AuctionStatus.RUNNING) {
+                auction.setStatusFinish();
+                auctionRepository.save(auction);
+            }
+        }
+        processPayment(auctionId);
+    }
+
     public BidResult placeBid(String bidderId, String auctionId, double amount, boolean triggerAutoBid) {
         BidResult bidSuccess;
         Object lock = getAuctionLock(auctionId);

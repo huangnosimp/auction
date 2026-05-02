@@ -24,35 +24,47 @@ public class AuctionScheduler {
     }
 
     private void scheduleStart(Auction auction) {
-        auction.setStatusOPEN();
-        long delayToStart = auction.getStartTime() - System.currentTimeMillis();
+        long delayToStart = Math.max(0, auction.getStartTime() - System.currentTimeMillis());
         String auctionId = auction.getId();
+        
         ScheduledFuture<?> startTask = scheduler.schedule(() -> {
-            this.startAuctionTask(auction);
+            this.startAuctionTask(auctionId);
             this.scheduleEnd(auction);
             startTimer.remove(auctionId);
         }, delayToStart, TimeUnit.MILLISECONDS);
+        
         startTimer.put(auctionId, startTask);
+        if (startTask.isDone()) {
+            startTimer.remove(auctionId, startTask);
+        }
     }
 
     private void scheduleEnd(Auction auction) {
-        long delayToEnd = auction.getEndTime() - System.currentTimeMillis();
+        long delayToEnd = Math.max(0, auction.getEndTime() - System.currentTimeMillis());
         String auctionId = auction.getId();
+        
         ScheduledFuture<?> endTask = scheduler.schedule(() -> {
-            this.finishAuctionTask(auction);
+            this.finishAuctionTask(auctionId);
             endTimer.remove(auctionId);
         }, delayToEnd, TimeUnit.MILLISECONDS);
+        
         endTimer.put(auctionId, endTask);
+        if (endTask.isDone()) {
+            endTimer.remove(auctionId, endTask);
+        }
     }
 
     public void extendTime(Auction auction, long newEndTime) {
         String auctionId = auction.getId();
-        ScheduledFuture<?> oldTask = endTimer.remove(auctionId);
-        if (oldTask != null && !oldTask.isDone()) {
-            oldTask.cancel(false);
-        }
         auction.extendEndTime(newEndTime);
-        this.scheduleEnd(auction);
+        
+        ScheduledFuture<?> oldTask = endTimer.remove(auctionId);
+        if (oldTask != null) {
+            if (!oldTask.isDone()) {
+                oldTask.cancel(false);
+            }
+            this.scheduleEnd(auction);
+        }
     }
 
     public void cancelTimers(String auctionId) {
@@ -66,14 +78,15 @@ public class AuctionScheduler {
         }
     }
 
-    private void startAuctionTask(Auction auction) {
-        auction.setStatusRunning();
+    private void startAuctionTask(String auctionId) {
+        if (auctionService instanceof AuctionService) {
+            ((AuctionService) auctionService).startAuction(auctionId);
+        }
     }
 
-    private void finishAuctionTask(Auction auction) {
-        auction.setStatusFinish();
+    private void finishAuctionTask(String auctionId) {
         if (auctionService instanceof AuctionService) {
-            ((AuctionService) auctionService).processPayment(auction.getId());
+            ((AuctionService) auctionService).finishAuction(auctionId);
         }
     }
 

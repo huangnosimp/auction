@@ -70,10 +70,10 @@ public class StatisticHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             GetPublicAcutionCardDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetPublicAcutionCardDTO.class);
-             if (dto.getQuantity() <= 0) {
+            if (dto.getQuantity() <= 0) {
                  return new Response(ResponseStatus.FAILED, "Invalid quantity");
-             }
-             GetPublicAuctionCardResponseDTO dtoResponse = new GetPublicAuctionCardResponseDTO(statisticService.getPublicAuctionCard(dto.getQuantity()));
+            }
+            GetPublicAuctionCardResponseDTO dtoResponse = new GetPublicAuctionCardResponseDTO(statisticService.getPublicAuctionCard(dto.getQuantity()));
             return new Response(ResponseStatus.SUCCESS, dtoResponse);
         }
     }
