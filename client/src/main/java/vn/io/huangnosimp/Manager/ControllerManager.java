@@ -5,6 +5,7 @@ public class ControllerManager {
     private static DashboardController dashboardController;
     private static dashboard_homeController dashboardHomeController;
     private static liveAuctionController liveAuctionController;
+    private static OpenSlotController openSlotController;
 
     //dashBoard
     public static  DashboardController getDashboardController(){
@@ -19,11 +20,18 @@ public class ControllerManager {
     public static void setDashboardHomeController(dashboard_homeController c) {
         dashboardHomeController = c; }
     //liveAuction
-    public void setLiveAuctionController(liveAuctionController c){
+    public static void setLiveAuctionController(liveAuctionController c){
         liveAuctionController = c;
     }
     public liveAuctionController getLiveAuctionController(){
         return liveAuctionController;
+    }
+    //open slot
+    public static OpenSlotController getOpenSlotController(){
+        return openSlotController;
+    }
+    public static void setOpenSlotController(OpenSlotController o){
+        openSlotController = o;
     }
 
 }

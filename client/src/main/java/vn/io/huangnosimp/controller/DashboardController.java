@@ -15,8 +15,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import vn.io.huangnosimp.Manager.ControllerManager;
+import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.Manager.ViewManager;
+import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.protocol.ActionType;
+import vn.io.huangnosimp.protocol.Request;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -65,6 +69,16 @@ public class DashboardController implements Initializable {
 
     @FXML
     public void handlebtnOpenSlots(ActionEvent event){
+        GetPublicAcutionCardDTO getPublicAcutionCard = new GetPublicAcutionCardDTO(30);
+        Request request = new Request(ActionType.GET_PUBLIC_AUCTION_CARD, getPublicAcutionCard);
+        SocketManager.getClient().sendRequestAsync(request)
+                        .thenAccept(response -> {
+
+                        });
+
+
+
+
         changeView("open_slots.fxml", 1);
         handleMenuAction(event);
     }
