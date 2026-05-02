@@ -7,6 +7,9 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class DatabaseConnection {
+    private static final int MAX_THREAD_POOL_SIZE = 20;
+    private static final int MIN_IDLE_CONNECTIONS = 5;
+    private static final int CONNECTION_TIMEOUT_MS = 30000;
     private static volatile DatabaseConnection instance;
     private final HikariDataSource dataSource;
     private DatabaseConnection() {
@@ -23,9 +26,9 @@ public class DatabaseConnection {
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
-        config.setMaximumPoolSize(20);
-        config.setMinimumIdle(5);
-        config.setConnectionTimeout(30000);
+        config.setMaximumPoolSize(MAX_THREAD_POOL_SIZE);
+        config.setMinimumIdle(MIN_IDLE_CONNECTIONS);
+        config.setConnectionTimeout(CONNECTION_TIMEOUT_MS);
 
         this.dataSource = new HikariDataSource(config);
         System.out.println("[DatabaseConnection] HikariCP Connection Pool initialized successfully.");
