@@ -136,10 +136,10 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     }
     private String caculateBidIncreament(double value){
         if(value > 1000000000){
-            return value/1000000000+" Billions";
+            return value/1000000000+" B";
         }
         else if (value>1000000){
-            return value/1000000+" Millions";
+            return value/1000000+" M";
         }
         else {
             return String.valueOf(value);
@@ -149,7 +149,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     private void onMouseReleased(MouseEvent event) {
         holdTimer.stop();
         currentAction = null;
-    }    // Dừng lại ngay khi thả chuột
+    }
 
     public void setInvisible(){
         Hbox1.setVisible(false);
@@ -236,7 +236,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         if("SUCCESS".equals(String.valueOf(cancelResponse.getStatus()))){
                             Platform.runLater(()->{
                                 ControllerManager.getDashboardController().showToast("SUCCESS", cancelResponse.getMessage(), true);
-                                ControllerManager.getDashboardHomeController().removeFromDashBoard(this.auctionId);
+                                ControllerManager.getDashboardHomeController().removeFromDashBoard(this.auctionId, ControllerManager.getDashboardHomeController().getFlowJoined());
                                 ViewManager.changeView("dashboard_home.fxml", 1);
                             });
                         }
@@ -253,6 +253,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     }
     public void onResponseReceived(Response response){
     }
+    public void onResponseReceived(Response response, ActionType actionType){}
     public void onRequestReceived(Request notification){
         PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), PlaceBidResponseDTO.class);
         bidIndex++;

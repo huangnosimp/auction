@@ -2,33 +2,84 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <HBox spacing="16" style="-fx-background-color: #211429;" styleClass="main-content" stylesheets="@../css/dashboard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.dashboard_homeController">
 
     <VBox spacing="16" styleClass="left-panel" HBox.hgrow="ALWAYS">
 
-        <!-- AUCTIONS CARD GRID -->
+        <!-- ═══════════════ QUICK STATS BAR ═══════════════ -->
+        <HBox spacing="12" styleClass="stats-bar">
+
+            <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="ACTIVE BIDS" />
+                <Label fx:id="statActiveBids" styleClass="green-value" text="7">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
+                <Label styleClass="mini-key" text="Currently bidding" />
+            </VBox>
+
+            <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="WINNING" />
+                <Label fx:id="statWinning" styleClass="blue-value" text="3">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
+                <Label styleClass="mini-key" text="Leading auctions" />
+            </VBox>
+
+            <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="OUTBID" />
+                <Label fx:id="statOutbid" styleClass="red-value" text="2">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
+                <Label styleClass="mini-key" text="Need attention" />
+            </VBox>
+
+            <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="WON TOTAL" />
+                <Label fx:id="statWonTotal" styleClass="amber-value" text="12">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
+                <Label styleClass="mini-key" text="All time" />
+            </VBox>
+
+        </HBox>
+
+        <!-- ═══════════════ AUCTIONS ═══════════════ -->
         <VBox spacing="12" styleClass="table-section" VBox.vgrow="ALWAYS">
 
-            <!-- Header -->
             <HBox alignment="CENTER_LEFT" spacing="8">
                 <Label styleClass="section-title" text="🔥 Auctions" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Button fx:id="btnCreateAuction" mnemonicParsing="false" onAction="#handleCreateAuction" styleClass="tab-action-btn" text="+ Tạo phiên" />
+                <Button fx:id="btnCreateAuction" mnemonicParsing="false" onAction="#handleCreateAuction" styleClass="tab-action-btn" text="+ Create Session" />
             </HBox>
 
-            <!-- Tab Bar -->
             <HBox spacing="4" styleClass="tab-bar">
-                <Button fx:id="tabJoined" mnemonicParsing="false" styleClass="tab-btn tab-btn-active" text="Đang tham gia" />
-                <Button fx:id="tabMyAuctions" mnemonicParsing="false" styleClass="tab-btn" text="Phiên của tôi" />
+                <Button fx:id="tabJoined" mnemonicParsing="false" onAction="#handleTabChange" styleClass="tab-btn tab-btn-active" text="Active Bids" />
+                <Button fx:id="tabMyAuctions" mnemonicParsing="false" onAction="#handleTabChange" styleClass="tab-btn" text="My Auctions" />
             </HBox>
 
-            <!-- Content -->
-            <ScrollPane fitToWidth="true" styleClass="auction-scroll" VBox.vgrow="ALWAYS">
-                <content>
-                    <FlowPane fx:id="auctionFlowPane" hgap="12" prefWrapLength="600" styleClass="auction-flow-pane" vgap="12" />
-                </content>
-            </ScrollPane>
+            <StackPane VBox.vgrow="ALWAYS">
+
+                <!-- Pane 1: Active Bids -->
+                <ScrollPane fx:id="scrollJoined" fitToWidth="true" styleClass="auction-scroll">
+                    <content>
+                        <FlowPane fx:id="flowJoined" hgap="12" prefWrapLength="600" styleClass="auction-flow-pane" vgap="12" />
+                    </content>
+                </ScrollPane>
+
+                <!-- Pane 2: My Auctions -->
+                <ScrollPane fx:id="scrollMyAuctions" fitToWidth="true" managed="false" styleClass="auction-scroll" visible="false">
+                    <content>
+                        <FlowPane fx:id="auctionFlowPane" hgap="12" prefWrapLength="600" styleClass="auction-flow-pane" vgap="12" />
+                    </content>
+                </ScrollPane>
+
+            </StackPane>
 
         </VBox>
     </VBox>

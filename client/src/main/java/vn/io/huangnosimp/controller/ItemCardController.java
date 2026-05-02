@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.layout.VBox;
 import vn.io.huangnosimp.Manager.*;
 import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
+import vn.io.huangnosimp.dto.request.JoinRoomRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 import vn.io.huangnosimp.protocol.ActionType;
@@ -17,6 +18,8 @@ import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
 
 import java.time.Instant;
+
+import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 
 public class ItemCardController {
     @FXML private Label lblProductName;
@@ -43,7 +46,7 @@ public class ItemCardController {
         }
         AuctionCountdownUtil countdownUtil = new AuctionCountdownUtil(lblTimeRemaining, dto.getStartTime(), dto.getEndTime());
         countdownUtil.start();
-        lblCurrentBid.setText(FormatUtil.formatNumber(dto.getCurrentPrice()));
+        lblCurrentBid.setText(caculateCurrentBid(dto.getCurrentPrice()));
         this.auctionId = dto.getAuctionId();
         if(type.equals("Joining")){
             lblYourBid.setText(String.valueOf(dto.getYourBid())+" đ");
@@ -55,7 +58,51 @@ public class ItemCardController {
             lblBidderCount.setText(String.valueOf(dto.getBidderCount())+" bidders");
         }
     }
+    private String caculateCurrentBid(double value){
+        if(value >= 1000000000){
+            return formatNumber(value/1000000000)+" B";
+        }
+        else if (value>=1000000){
+            return formatNumber(value/1000000)+" M";
+        }
+        else {
+            return formatNumber(value/1000)+" K";
+        }
+    }
     @FXML public void handleBidNowbutton(ActionEvent event){
+        JoinRoomRequestDTO joinRoomRequest = new JoinRoomRequestDTO(auctionId);
+        Request request = new Request(ActionType.JOIN_ROOM, joinRoomRequest);
+        SocketManager.getClient().sendRequestAsync(request)
+                .thenAccept(response->{
+                    if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+                        GetAuctionDetailRequestDTO getDetail = new GetAuctionDetailRequestDTO(auctionId);
+                        SocketManager.getClient().sendRequestAsync(new Request(ActionType.GET_AUCTION_DETAIL, getDetail))
+                                .thenAccept(Joinresponse -> {
+                                    if(ResponseStatus.SUCCESS.equals(Joinresponse.getStatus())){
+                                        AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionDetailResponseDTO.class);
+                                        Platform.runLater(()->{
+                                            UserSession.setAuctionDetail(auctionResponse);
+                                            liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
+                                            try {
+                                                if (BidNowButton.getText().equals("Manage")) {
+                                                    controller.setInvisible();
+                                                }
+                                                controller.setAuctionId(auctionId);
+                                            }
+                                            catch (NullPointerException e){
+                                                System.out.println("Nothing happen");
+                                            }
+                                        });
+                                    }
+                                });
+                    }
+                    if(ResponseStatus.FAILED.equals(response.getStatus())){
+                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                    }
+                });
+    }
+    @FXML
+    public void handleEnterRoom(){
         GetAuctionDetailRequestDTO getDetail = new GetAuctionDetailRequestDTO(auctionId);
         SocketManager.getClient().sendRequestAsync(new Request(ActionType.GET_AUCTION_DETAIL, getDetail))
                 .thenAccept(response -> {
@@ -64,11 +111,19 @@ public class ItemCardController {
                         Platform.runLater(()->{
                             UserSession.setAuctionDetail(auctionResponse);
                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
-                            if(BidNowButton.getText().equals("Inspect")) {
-
+                            try {
+                                if (BidNowButton.getText().equals("Manage")) {
+                                    controller.setInvisible();
+                                }
+                                controller.setAuctionId(auctionId);
                             }
-                            controller.setAuctionId(auctionId);
+                            catch (NullPointerException e){
+                                System.out.println("Nothing happen");
+                            }
                         });
+                    }
+                    if(ResponseStatus.FAILED.equals(response.getStatus())){
+                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
                     }
                 });
     }

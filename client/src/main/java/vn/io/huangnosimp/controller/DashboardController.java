@@ -16,6 +16,7 @@ import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import vn.io.huangnosimp.Manager.ControllerManager;
 import vn.io.huangnosimp.Manager.ViewManager;
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -27,15 +28,10 @@ import static vn.io.huangnosimp.Manager.ViewManager.*;
 public class DashboardController implements Initializable {
     @FXML private BorderPane mainBorderPane;
     @FXML private StackPane contentArea; // Cái này nằm ở file dashboard.fxml nên giữ lại
-    @FXML private Button createButton;
     @FXML private Button btnOpenSlots;
     @FXML private HBox menuHbox;
     @FXML private VBox sideVbox;
     @FXML private Label lblBalance;
-    @FXML private Label lblActiveBids;
-    @FXML private Label lblWinning;
-    @FXML private Label lblOutbid;
-    @FXML private Label lblWonTotal;
 
     @FXML private HBox toastBox;
     @FXML private Label toastTitle, toastSub, toastIconLabel;
@@ -107,15 +103,15 @@ public class DashboardController implements Initializable {
         });
         pause.play();
     }
+    private void setupDashboard(){
+        lblBalance.setText(String.valueOf(getDashboardInfo().getBalance()));
+        ControllerManager.getDashboardHomeController().setupDashboardHome();
+    }
     @Override
     public void initialize(URL location, ResourceBundle resources){
         setMainBorderPane(mainBorderPane);
         ControllerManager.setDashboardController(this);
+        setupDashboard();
         changeView("dashboard_home.fxml", 1);
-        lblBalance.setText(String.valueOf(getDashboardInfo().getBalance()));
-        lblActiveBids.setText(String.valueOf(getDashboardInfo().getJoinedRooms()));
-        lblOutbid.setText(String.valueOf(getDashboardInfo().getOutBids()));
-        lblWinning.setText(String.valueOf(getDashboardInfo().getWinningBids()));
-        lblWonTotal.setText(String.valueOf(getDashboardInfo().getWonTotal()));
     }
 }

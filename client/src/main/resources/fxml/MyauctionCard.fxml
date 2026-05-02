@@ -4,46 +4,30 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<!--
-    Card Type 2: My Auction Card (host / seller view)
-    Displayed when the current user is the owner of this auction session.
-    Instead of "Your bid", shows the total number of bids received.
-    The "Manage" button navigates to the auction management page.
-    Controller: MyAuctionCardController
--->
-
-<VBox fx:id="rootVbox" prefWidth="200.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
+<VBox fx:id="rootVbox" prefWidth="150.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
 
     <children>
 
-        <!-- ===== Image Container ===== -->
-        <StackPane prefHeight="130.0" styleClass="image-container">
+        <StackPane prefHeight="100.0" styleClass="image-container">
             <children>
-                <ImageView fx:id="imgProduct" fitHeight="130.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="false" />
+                <ImageView fx:id="imgProduct" fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="false" />
 
-                <!-- Corner badge: indicates ownership -->
                 <Label fx:id="lblSessionStatus" styleClass="img-owner-badge" text="Mine" StackPane.alignment="TOP_RIGHT" />
             </children>
         </StackPane>
 
-        <!-- ===== Card Body ===== -->
-        <VBox prefWidth="200.0" spacing="10" style="-fx-padding: 12;">
+        <VBox prefWidth="150.0" spacing="7" style="-fx-padding: 9;">
             <children>
 
-                <!-- Card type label -->
                 <Label styleClass="ac-card-type-label" text="My Auction" />
 
-                <!-- Product name -->
                 <Label fx:id="lblProductName" styleClass="ac-product" text="Product Name" wrapText="true" />
 
-                <!-- Session status badge -->
-                <!-- styleClass options: s-live | s-scheduled | s-ended -->
                 <Label fx:id="lblAuctionStatus" styleClass="status-badge s-live" text="LIVE" />
 
-                <!-- Info grid: time remaining & highest bid -->
-                <GridPane vgap="5">
+                <GridPane vgap="4">
                     <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="90.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="70.0" />
                         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                     </columnConstraints>
                     <rowConstraints>
@@ -61,8 +45,7 @@
 
                 <Separator styleClass="ac-separator" />
 
-                <!-- Bottom row: total bids received + manage button -->
-                <HBox alignment="CENTER_LEFT" spacing="5">
+                <HBox alignment="CENTER_LEFT" spacing="4">
                     <children>
                         <VBox>
                             <children>
@@ -73,7 +56,7 @@
 
                         <Region HBox.hgrow="ALWAYS" />
 
-                        <Button fx:id="btnManage" prefHeight="28.0" prefWidth="75.0" styleClass="bid-btn-secondary" text="Manage" />
+                        <Button fx:id="btnManage" maxWidth="68.0" minWidth="55.0" onAction="#handleEnterRoom" prefHeight="28.0" prefWidth="-1" style="-fx-padding: 4 6 4 6;" styleClass="bid-btn-secondary" text="Manage" />
                     </children>
                 </HBox>
 

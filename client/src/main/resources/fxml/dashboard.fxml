@@ -51,37 +51,7 @@
                             <Label styleClass="stat-link" text="+ Top Up" />
                         </VBox>
 
-                        <VBox spacing="8" styleClass="side-card">
-                            <Label styleClass="side-section-title" text="QUICK STATS" />
-                            <GridPane hgap="8" vgap="8">
-                                <columnConstraints>
-                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
-                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                    <RowConstraints />
-                                    <RowConstraints />
-                                </rowConstraints>
-                                <VBox styleClass="mini-stat" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label fx:id="lblActiveBids" styleClass="mini-val, green-value" text="7" />
-                                    <Label styleClass="mini-key" text="Active Bids" />
-                                </VBox>
-                                <VBox styleClass="mini-stat" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <Label fx:id="lblWinning" styleClass="mini-val, blue-value" text="3" />
-                                    <Label styleClass="mini-key" text="Winning" />
-                                </VBox>
-                                <VBox styleClass="mini-stat" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                    <Label fx:id="lblOutbid" styleClass="mini-val, red-value" text="2" />
-                                    <Label styleClass="mini-key" text="Outbid" />
-                                </VBox>
-                                <VBox styleClass="mini-stat" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                    <Label fx:id="lblWonTotal" styleClass="mini-val, amber-value" text="12" />
-                                    <Label styleClass="mini-key" text="Won Total" />
-                                </VBox>
-                            </GridPane>
-                        </VBox>
-
-                        <VBox spacing="8" styleClass="side-card">
+                        <VBox prefHeight="145.0" prefWidth="194.0" spacing="8" styleClass="side-card">
                             <Label styleClass="side-section-title" text="EXPIRING SOON" />
                             <VBox fx:id="expiringList" spacing="6" />
                         </VBox>
