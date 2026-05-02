@@ -22,7 +22,7 @@ public class StatisticService implements IStatisticService {
         }
 
         DashboardResponseDTO scalars = statisticRepository.getUserScalarStatistics(userId);
-        List<AuctionCardDTO> activeRooms = statisticRepository.getActiveRooms(userId);
+        List<AuctionCardDTO> activeRooms = statisticRepository.getMyAuctionCard(userId);
         int joinedRooms = activeRooms.size();
 
         return new DashboardResponseDTO(
@@ -44,10 +44,18 @@ public class StatisticService implements IStatisticService {
     }
 
     @Override
-    public AuctionCardDTO getAuctionCard(String userId) {
-        if (userId == null || userId.isBlank()) {
+    public AuctionCardDTO getJoiningAuctionCard(String auctionId) {
+        if (auctionId == null || auctionId.isBlank()) {
             return null;
         }
-        return statisticRepository.getAuctionCard(userId);
+        return statisticRepository.getJoiningAuctionCard(auctionId);
+    }
+
+    @Override
+    public List<AuctionCardDTO> getPublicAuctionCard(int quantity) {
+        if (quantity <= 0) {
+            return Collections.emptyList();
+        }
+        return statisticRepository.getPublicAuctionCard(quantity);
     }
 }

@@ -2,7 +2,8 @@ package vn.io.huangnosimp.controller.handler;
 
 import vn.io.huangnosimp.controller.RequestHandler;
 import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
-import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.request.GetJoiningAuctionCardDTO;
+import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.protocol.Request;
@@ -44,19 +45,34 @@ public class StatisticHandler {
             return new Response(ResponseStatus.SUCCESS, statisticService.getAuctionDetail(client.getUserId(), dto.getAuctionId()));
         }
     }
-    public static class GetAuctionCardHandler implements RequestHandler {
+    public static class GetJoiningAuctionCardHandler implements RequestHandler {
         private final IStatisticService statisticService;
-        public GetAuctionCardHandler(IStatisticService statisticService) {
+        public GetJoiningAuctionCardHandler(IStatisticService statisticService) {
             this.statisticService = statisticService;
         }
 
         @Override
         public Response handle(Request request, ClientHandle client) {
-            AuctionCardDTO auctionCardDTO = statisticService.getAuctionCard(client.getUserId());
-            if (auctionCardDTO == null) {
-                return new Response(ResponseStatus.FAILED, "No active auction found");
+            GetJoiningAuctionCardDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetJoiningAuctionCardDTO.class);
+             if (dto.getAuctionId() == null || dto.getAuctionId().isBlank()) {
+                return new Response(ResponseStatus.FAILED, "Invalid auction ID");
             }
-            return new Response(ResponseStatus.SUCCESS, auctionCardDTO);
+            return new Response(ResponseStatus.SUCCESS, statisticService.getJoiningAuctionCard(dto.getAuctionId()));
+        }
+    }
+    public static class GetPublicAuctionCardHandler implements RequestHandler {
+        private final IStatisticService statisticService;
+        public GetPublicAuctionCardHandler(IStatisticService statisticService) {
+            this.statisticService = statisticService;
+        }
+
+        @Override
+        public Response handle(Request request, ClientHandle client) {
+            GetPublicAcutionCardDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetPublicAcutionCardDTO.class);
+             if (dto.getQuantity() <= 0) {
+                 return new Response(ResponseStatus.FAILED, "Invalid quantity");
+             }
+            return new Response(ResponseStatus.SUCCESS, statisticService.getPublicAuctionCard(dto.getQuantity()));
         }
     }
 }
