@@ -47,7 +47,7 @@ public class StatisticRepository implements IStatisticRepository {
     }
 
     @Override
-    public List<AuctionCardDTO> getActiveRooms(String userId) {
+    public List<AuctionCardDTO> getMyAuctionCard(String userId) {
         List<AuctionCardDTO> rooms = new java.util.ArrayList<>();
         String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
@@ -168,7 +168,7 @@ public class StatisticRepository implements IStatisticRepository {
     }
 
     @Override
-    public AuctionCardDTO getAuctionCard(String auctionId) {
+    public AuctionCardDTO getJoiningAuctionCard(String auctionId) {
         String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "0 AS your_bid, " +
@@ -197,5 +197,41 @@ public class StatisticRepository implements IStatisticRepository {
             System.err.println("DB error when fetching auction card: " + e.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public List<AuctionCardDTO> getPublicAuctionCard(int quantity) {
+        List<AuctionCardDTO> rooms = new ArrayList<>();
+        String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
+                     "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
+                     "0 AS your_bid, " +
+                     "a.start_time AS start_time, a.end_time AS end_time, " +
+                     "(SELECT COUNT(*) FROM bidtransactions bt WHERE bt.auction_id = a.id) AS bid_count, " +
+                     "(SELECT COUNT(DISTINCT bt2.bidder_id) FROM bidtransactions bt2 WHERE bt2.auction_id = a.id) AS bidder_count " +
+                     "FROM auctions a " +
+                     "JOIN items i ON a.item_id = i.id " +
+                     "WHERE a.status IN ('OPEN', 'RUNNING') " +
+                     "ORDER BY a.start_time DESC " +
+                     "LIMIT ?";
+                     
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, quantity);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                String auctionId = rs.getString("auction_id");
+                String productName = rs.getString("product_name");
+                double currentPrice = rs.getDouble("current_price");
+                double yourBid = rs.getDouble("your_bid");
+                long startTime = rs.getTimestamp("start_time").getTime();
+                long endTime = rs.getTimestamp("end_time").getTime();
+                int bidCount = rs.getInt("bid_count");
+                int bidderCount = rs.getInt("bidder_count");
+                rooms.add(new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, startTime, endTime, bidCount, bidderCount));
+            }
+        } catch (SQLException e) {
+            System.err.println("DB error when fetching public auction cards: " + e.getMessage());
+        }
+        return rooms;
     }
 }
