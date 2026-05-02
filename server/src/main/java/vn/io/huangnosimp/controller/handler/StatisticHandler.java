@@ -5,6 +5,7 @@ import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
 import vn.io.huangnosimp.dto.request.GetJoiningAuctionCardDTO;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
+import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
@@ -72,7 +73,8 @@ public class StatisticHandler {
              if (dto.getQuantity() <= 0) {
                  return new Response(ResponseStatus.FAILED, "Invalid quantity");
              }
-            return new Response(ResponseStatus.SUCCESS, statisticService.getPublicAuctionCard(dto.getQuantity()));
+             GetPublicAuctionCardResponseDTO dtoResponse = new GetPublicAuctionCardResponseDTO(statisticService.getPublicAuctionCard(dto.getQuantity()));
+            return new Response(ResponseStatus.SUCCESS, dtoResponse);
         }
     }
 }
