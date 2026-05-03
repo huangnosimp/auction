@@ -2,7 +2,13 @@ name: workflow.yml
 on:
   push:
     branches: [master]
+  pull_request:
+    branches: [master]
 jobs:
   build-docker-image:
+    if: github.event_name == 'push'
     uses: ./.github/workflows/build-and-push.yml
     secrets: inherit
+  check-build-shadowjar:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/check-build-ShadowJar.yml
