@@ -2,6 +2,7 @@ name: build client installers (reusable)
 
 on:
   workflow_dispatch:
+  workflow_call: 
   push:
     branches:
       - master
