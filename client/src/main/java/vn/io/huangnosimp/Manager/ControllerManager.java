@@ -14,7 +14,7 @@ public class ControllerManager {
         dashboardController = db;
     }
     //dashboardHome
-    public static dashboard_homeController getDashboardHomeController() {
+    public static dashboard_homeController getDashboardHomeController() {   
         return dashboardHomeController; }
     public static void setDashboardHomeController(dashboard_homeController c) {
         dashboardHomeController = c; }

@@ -20,7 +20,8 @@
                 <Button fx:id="btnDashboard" onAction="#handlebtnDashboard" styleClass="nav-btn, nav-btn-active" text="Dashboard" />
                 <Button fx:id="btnOpenSlots" onAction="#handlebtnOpenSlots" styleClass="nav-btn" text="Open Slots" />
                 <Button fx:id="btnAuctions" styleClass="nav-btn" text="My Auctions" />
-                <Button fx:id="btnFighters" styleClass="nav-btn" text=".........." />
+                <TextField fx:id="txtSearch" onAction="#onSearchEnter" promptText="Tìm kiếm phiên đấu giá..." styleClass="nav-btn" text="Search auctions" />
+            <BorderPane prefHeight="200.0" prefWidth="200.0" />
             </HBox>
 
             <!-- Right actions -->
@@ -43,10 +44,8 @@
         </StackPane>
     </center>
     <left>
-        <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="224.0"
-                    style="-fx-background-color: #171414;" BorderPane.alignment="CENTER">
-            <VBox spacing="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
-                  AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
+        <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="224.0" style="-fx-background-color: #171414;" BorderPane.alignment="CENTER">
+            <VBox spacing="10" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
 
                 <!-- Balance card (giữ nguyên) -->
                 <VBox spacing="4" styleClass="stat-card">

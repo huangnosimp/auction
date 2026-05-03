@@ -1,6 +1,8 @@
 package vn.io.huangnosimp.service;
 
 import vn.io.huangnosimp.dto.response.AuctionActionResult;
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.enums.AuctionStatus;
 import vn.io.huangnosimp.model.Admin;
 import vn.io.huangnosimp.model.Member;
@@ -8,6 +10,7 @@ import vn.io.huangnosimp.model.Auction;
 import vn.io.huangnosimp.model.User;
 import vn.io.huangnosimp.repository.IUserRepository;
 import vn.io.huangnosimp.repository.IAuctionRepository;
+import vn.io.huangnosimp.util.ModelMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,10 +36,10 @@ public class AdminService implements IAdminService {
     }
 
     @Override
-    public List<Member> getAllMembers() {
+    public List<MemberDTO> getAllMembers() {
         return userRepo.findAll().stream()
                 .filter(user -> user instanceof Member)
-                .map(user -> (Member) user)
+                .map(user -> ModelMapper.toMemberDTO((Member) user))
                 .collect(Collectors.toList());
     }
 
@@ -63,8 +66,8 @@ public class AdminService implements IAdminService {
     }
 
     @Override
-    public List<Auction> getAllAuctions() {
-        return auctionRepo.findAll();
+    public List<AuctionCardDTO> getAllAuctions() {
+        return ModelMapper.toAuctionCardDTOList(auctionRepo.findAll());
     }
 
     @Override
