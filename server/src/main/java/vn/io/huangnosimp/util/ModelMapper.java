@@ -33,7 +33,9 @@ public class ModelMapper {
                 auction.getCurrentPrice(),
                 0.0,
                 auction.getStartTime(),
-                auction.getEndTime()
+                auction.getEndTime(),
+                0,
+                0
         );
     }
 
