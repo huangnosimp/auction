@@ -1,4 +1,4 @@
-name: Build Client Installers (reusable)
+name: build client installers (reusable)
 
 on:
   workflow_dispatch:
@@ -64,7 +64,6 @@ jobs:
         with:
           tag_name: build-${{ github.run_number }}
           name: "Auto-build #${{ github.run_number }}"
-          body: "Tự động xuất xưởng file cài đặt mới nhất từ nhánh \`master\`."
           draft: false
           prerelease: false
           files: installers/*
