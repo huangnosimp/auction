@@ -1,0 +1,121 @@
+@import url("auction_theme.css");
+@import url("dashboard.css");
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #334155; /* Viền mỏng màu xám tối */
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 2;
+}
+
+.table-view .show-hide-columns-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #1e293b;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #334155 transparent;
+    -fx-size: 45; /* Chiều cao của thanh tiêu đề */
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #94a3b8; /* Chữ xám nhạt */
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #1e293b transparent; /* Kẻ vạch ngang mỏng giữa các dòng */
+    -fx-cell-size: 50; /* Chiều cao mỗi dòng (để nút bấm nhét vừa) */
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #1e293b33;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #334155;
+}
+
+.table-view .cell {
+    -fx-text-fill: #f8fafc;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #1e293b;
+    -fx-background-radius: 8 8 0 0;
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #4ade80;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #0f172a;
+}
+
+.sidebar {
+    -fx-background-color: #1e293b;
+    -fx-border-color: transparent #334155 transparent transparent;
+}
+
+/* 2. Đổi màu chữ tiêu đề "ADMIN PANEL" */
+.sidebar-title {
+    -fx-text-fill: #f8fafc; /* Chữ trắng sáng */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.sidebar-sep {
+    -fx-background-color: #334155;
+}
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #94a3b8; /* Chữ màu xám nhạt */
+    -fx-font-size: 16px;
+    -fx-alignment: CENTER_LEFT; /* Căn lề trái cho chữ */
+    -fx-padding: 10 15;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.nav-btn:hover {
+    -fx-background-color: #334155;
+    -fx-text-fill: #ffffff; /* Sáng chữ lên */
+}
+
+.card-subtitle {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 14px;
+}
+
+.card-value {
+    -fx-text-fill: #4ade80; /* Màu xanh lá nổi bật (khớp với chữ Dashboard) */
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
