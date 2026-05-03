@@ -6,6 +6,8 @@ import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 import vn.io.huangnosimp.dto.response.BidHistoryDTO;
 import vn.io.huangnosimp.dto.response.PricePointDTO;
+import vn.io.huangnosimp.enums.ItemCondition;
+import vn.io.huangnosimp.enums.ItemType;
 
 import java.sql.*;
 import java.util.List;
@@ -86,7 +88,7 @@ public class StatisticRepository implements IStatisticRepository {
     public AuctionDetailResponseDTO getAuctionDetail(String auctionId) {
         AuctionDetailResponseDTO result = null;
 
-        String auctionSql = "SELECT a.id, a.starting_price, a.final_price, a.start_time, a.end_time, a.status, " +
+        String auctionSql = "SELECT a.id, a.starting_price, a.final_price, a.start_time, a.end_time, a.status, a.minimum_increment, a.buy_now_price, " +
                 "i.name AS product_name, i.item_type, i.conditions, i.description, " +
                 "w.username AS winner_username, " +
                 "(SELECT COUNT(*) FROM auctionparticipants WHERE auction_id = a.id) AS participant_count, " +
@@ -121,15 +123,15 @@ public class StatisticRepository implements IStatisticRepository {
                 int participantCount = rsAuction.getInt("participant_count");
                 int bidCount = rsAuction.getInt("bid_count");
 
-                vn.io.huangnosimp.enums.ItemType category = null;
-                try { category = vn.io.huangnosimp.enums.ItemType.valueOf(itemTypeStr); } catch (Exception ignored) {}
+                ItemType category = null;
+                try { category = ItemType.valueOf(itemTypeStr); } catch (Exception ignored) {}
 
-                vn.io.huangnosimp.enums.ItemCondition condition = null;
-                try { condition = vn.io.huangnosimp.enums.ItemCondition.valueOf(conditionStr); } catch (Exception ignored) {}
+                ItemCondition condition = null;
+                try { condition = ItemCondition.valueOf(conditionStr); } catch (Exception ignored) {}
 
                 double currentPrice = finalPrice > 0 ? finalPrice : startPrice;
-                double bidIncrement = 0.0;
-                double buyNowPrice = 0.0;
+                double bidIncrement = rsAuction.getDouble("minimum_increment");
+                double buyNowPrice = rsAuction.getDouble("buy_now_price");
                 double minNextBid = currentPrice + bidIncrement;
 
                 List<BidHistoryDTO> bidHistory = new ArrayList<>();
