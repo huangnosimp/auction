@@ -201,16 +201,22 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML
     public void handleBuyNowButton(){
         BuyNowRequestDTO buyNowRequest = new BuyNowRequestDTO(auctionId);
-        Request request = new Request(ActionType.BUY_NOW, auctionId);
+        Request request = new Request(ActionType.BUY_NOW, buyNowRequest);
         btnBuyNow.setDisable(true);
         SocketManager.getClient().sendRequestAsync(request)
                 .thenAccept(response -> {
                     if(ResponseStatus.SUCCESS.equals(response.getStatus())){
-                        changeView("dashboard_home.fxml", 1);
-                        ControllerManager.getDashboardController().showToast("SUCCESS", response.getMessage(), true);
+                        Platform.runLater(()->{
+                            changeView("dashboard_home.fxml", 1);
+                            ControllerManager.getDashboardController().showToast("SUCCESS", response.getMessage(), true);
+                            btnBuyNow.setDisable(false);
+                        });
                     }
                     if(ResponseStatus.FAILED.equals(response.getStatus())){
-                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                        Platform.runLater(()->{
+                            ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                            btnBuyNow.setDisable(false);
+                        });
                     }
 
                 });
@@ -253,7 +259,9 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     }
     public void onResponseReceived(Response response){
     }
-    public void onResponseReceived(Response response, ActionType actionType){}
+    public void onResponseReceived(Response response, ActionType actionType){
+
+    }
     public void onRequestReceived(Request notification){
         PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), PlaceBidResponseDTO.class);
         bidIndex++;
@@ -279,6 +287,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         SocketManager.getClient().addListener(this);
+        setAuctionId(UserSession.getAuctionId());
         setupLineChart();
         holdTimer = new Timeline(new KeyFrame(Duration.millis(200), event -> {
             handleIncreaseButton(); // Gọi lại hàm tăng số bạn đã viết

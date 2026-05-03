@@ -7,6 +7,7 @@
 <VBox fx:id="openSlotsPane"
       spacing="0"
       styleClass="os-root"
+      fx:controller="vn.io.huangnosimp.controller.OpenSlotController"
       stylesheets="@../css/open_slots.css"
       xmlns="http://javafx.com/javafx/17.0.12"
       xmlns:fx="http://javafx.com/fxml/1">

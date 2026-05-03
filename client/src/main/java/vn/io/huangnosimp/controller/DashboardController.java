@@ -1,7 +1,9 @@
 package vn.io.huangnosimp.controller;
 
+import com.google.gson.reflect.TypeToken;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -16,13 +18,21 @@ import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import vn.io.huangnosimp.Manager.ControllerManager;
 import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.ResponseStatus;
+import vn.io.huangnosimp.util.GsonParser;
 
+import javax.swing.text.View;
+import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static vn.io.huangnosimp.Manager.UserSession.getDashboardInfo;
@@ -72,15 +82,19 @@ public class DashboardController implements Initializable {
         GetPublicAcutionCardDTO getPublicAcutionCard = new GetPublicAcutionCardDTO(30);
         Request request = new Request(ActionType.GET_PUBLIC_AUCTION_CARD, getPublicAcutionCard);
         SocketManager.getClient().sendRequestAsync(request)
-                        .thenAccept(response -> {
+                .thenAccept(response -> {
+                    if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
+                        Type listType = new TypeToken<List<AuctionCardDTO>>(){}.getType();
+                        List<AuctionCardDTO> list = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), listType);
 
+                        Platform.runLater(() -> {
+                            UserSession.addToList(list);
+                            ViewManager.changeView("open_slots.fxml", 1);
+                            handleMenuAction(event);
                         });
+                    }
+                });
 
-
-
-
-        changeView("open_slots.fxml", 1);
-        handleMenuAction(event);
     }
     public void showToast(String title, String sub, boolean success) {
         String borderColor = success ? "#22c55e" : "#e24b4a";

@@ -12,7 +12,7 @@
     Controller: PublicAuctionCardController
 -->
 
-<VBox fx:id="rootVbox" prefWidth="150.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
+<VBox fx:id="rootVbox" prefHeight="326.0" prefWidth="243.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
 
     <children>
 
@@ -57,7 +57,7 @@
                     <children>
                         <VBox>
                             <children>
-                                <Label styleClass="ac-bid-sub" text="Active bidders" />
+                                <Label prefHeight="16.0" prefWidth="84.0" styleClass="ac-bid-sub" text="Active bidders" />
                                 <Label fx:id="lblBidderCount" styleClass="ac-bid-val" text="5 people" />
                             </children>
                         </VBox>

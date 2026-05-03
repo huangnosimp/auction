@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.controller;
 
+import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -9,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.layout.VBox;
 import vn.io.huangnosimp.Manager.*;
 import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
+import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.request.JoinRoomRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
@@ -17,7 +19,9 @@ import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
 
+import java.lang.reflect.Type;
 import java.time.Instant;
+import java.util.List;
 
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 
@@ -71,28 +75,42 @@ public class ItemCardController {
     }
     @FXML public void handleBidNowbutton(ActionEvent event){
         JoinRoomRequestDTO joinRoomRequest = new JoinRoomRequestDTO(auctionId);
+
         Request request = new Request(ActionType.JOIN_ROOM, joinRoomRequest);
+
         SocketManager.getClient().sendRequestAsync(request)
                 .thenAccept(response->{
                     if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+
                         GetAuctionDetailRequestDTO getDetail = new GetAuctionDetailRequestDTO(auctionId);
+
                         SocketManager.getClient().sendRequestAsync(new Request(ActionType.GET_AUCTION_DETAIL, getDetail))
                                 .thenAccept(Joinresponse -> {
+
                                     if(ResponseStatus.SUCCESS.equals(Joinresponse.getStatus())){
-                                        AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionDetailResponseDTO.class);
+
+                                        AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(Joinresponse.getData()), AuctionDetailResponseDTO.class);
                                         Platform.runLater(()->{
                                             UserSession.setAuctionDetail(auctionResponse);
+                                            UserSession.setAuctionId(auctionId);
                                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
-                                            try {
-                                                if (BidNowButton.getText().equals("Manage")) {
-                                                    controller.setInvisible();
-                                                }
-                                                controller.setAuctionId(auctionId);
-                                            }
-                                            catch (NullPointerException e){
-                                                System.out.println("Nothing happen");
+                                            ControllerManager.getOpenSlotController().clearCard(auctionId);
+                                            if (BidNowButton.getText().equals("Manage")) {
+                                                controller.setInvisible();
                                             }
                                         });
+                                    }
+                                });
+                        GetPublicAcutionCardDTO getPublicCard = new GetPublicAcutionCardDTO(1);
+                        Request request2 = new Request(ActionType.GET_PUBLIC_AUCTION_CARD, getPublicCard);
+                        SocketManager.getClient().sendRequestAsync(request2)
+                                .thenAccept(response1 -> {
+                                    if (ResponseStatus.SUCCESS.equals(response1.getStatus())) {
+                                        Type listType = new TypeToken<List<AuctionCardDTO>>(){}.getType();
+                                        List<AuctionCardDTO> list = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response1.getData()), listType);
+                                        for(AuctionCardDTO dto:list){
+                                            ControllerManager.getOpenSlotController().addCard(dto, "Public");
+                                        }
                                     }
                                 });
                     }
@@ -110,15 +128,10 @@ public class ItemCardController {
                         AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionDetailResponseDTO.class);
                         Platform.runLater(()->{
                             UserSession.setAuctionDetail(auctionResponse);
+                            UserSession.setAuctionId(auctionId);
                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
-                            try {
-                                if (BidNowButton.getText().equals("Manage")) {
-                                    controller.setInvisible();
-                                }
-                                controller.setAuctionId(auctionId);
-                            }
-                            catch (NullPointerException e){
-                                System.out.println("Nothing happen");
+                            if (BidNowButton.getText().equals("Manage")) {
+                                controller.setInvisible();
                             }
                         });
                     }
