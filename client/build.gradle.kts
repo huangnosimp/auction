@@ -2,7 +2,7 @@ plugins {
     application
     id("java")
     id("org.openjfx.javafxplugin") version "0.1.0"
-    id("org.beryx.runtime") version "2.0.1"
+    id("org.beryx.jlink") version "4.0.0"
 }
 
 group = "vn.io.huangnosimp"
@@ -22,7 +22,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("com.google.code.gson:gson:2.13.2")
-    implementation(project(":common"))
 }
 
 javafx {
@@ -34,17 +33,23 @@ application {
     mainClass.set("vn.io.huangnosimp.Main")
 }
 
-runtime {
-    options.set(listOf("--strip-debug", "--compress=zip-6", "--no-header-files"))
+jlink {
+    options.set(listOf("--strip-debug", "--compress=zip-6", "--no-header-files", "--no-man-pages"))
 
     jpackage {
-        imageName = "Auction"
-        appVersion = "1.0"
+        val buildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "0"
+        imageName = "AuctionClient"
+        appVersion = "0.0.$buildNumber"
+        installerName = "Auction"
     }
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.compileJava {
+    dependsOn(":common:jar")
 }
 tasks.jar {
     manifest {

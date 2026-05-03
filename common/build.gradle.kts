@@ -2,6 +2,13 @@ plugins {
     id("java")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
+}
+
 group = "vn.io.huangnosimp"
 version = "1.0-SNAPSHOT"
 

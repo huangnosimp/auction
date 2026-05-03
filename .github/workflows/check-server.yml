@@ -1,8 +1,8 @@
-name: Check Build ShadowJar (reusable)
+name: Check server compileJava (reusable)
 on:
-    workflow_call:
+  workflow_call:
 jobs:
-  check-build-shadowjar:
+  check-compileJava:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -18,4 +18,4 @@ jobs:
       - name: Build with Gradle
         run: |
           chmod +x ./gradlew
-          ./gradlew :server:shadowJar
+          ./gradlew :server:compileJava

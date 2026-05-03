@@ -9,6 +9,13 @@ jobs:
     if: github.event_name == 'push'
     uses: ./.github/workflows/build-and-push.yml
     secrets: inherit
-  check-build-shadowjar:
+  build-installers:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/build-installers.yml
+    secrets: inherit
+  check-server:
     if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/check-build-ShadowJar.yml
+    uses: ./.github/workflows/check-server.yml
+  check-client:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/check-client.yml
