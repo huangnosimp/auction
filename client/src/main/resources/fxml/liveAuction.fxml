@@ -93,9 +93,7 @@
                 </ScrollPane>
 
                 <!-- HBox dưới: Điều chỉnh & Đặt giá -->
-                <HBox fx:id="hbox1" alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="547.0" spacing="12"
-                      style="-fx-background-color: #211429; -fx-border-color: #3a1a4a; -fx-border-width: 1 0 0 0;"
-                      VBox.vgrow="NEVER">
+                <HBox fx:id="hbox1" alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="547.0" spacing="12" style="-fx-background-color: #211429; -fx-border-color: #3a1a4a; -fx-border-width: 1 0 0 0;" VBox.vgrow="NEVER">
                     <padding><Insets bottom="10" left="14" right="14" top="10" /></padding>
                     <children>
 
@@ -131,26 +129,10 @@
                         <Separator fx:id="spr" orientation="VERTICAL" style="-fx-background-color: #3a3d4a;" />
 
                         <!-- Nút rời phòng — gọi LEAVE_ROOM, vẫn giữ bid đã đặt -->
-                        <Button fx:id="btnLeaveRoom"
-                                prefHeight="32"
-                                prefWidth="80"
-                                styleClass="quitbtn"
-                                text="Leave" />
+                        <Button fx:id="btnLeaveRoom" onAction="#handleLeaveRoom" prefHeight="32" prefWidth="80" styleClass="quitbtn" text="Leave" />
 
                         <!-- Nút về dashboard — chỉ chuyển màn hình, không rời phòng -->
-                        <Button fx:id="btnBackDashboard"
-                                onAction="#handlebtnWithdraw"
-                                prefHeight="32"
-                                prefWidth="80"
-                                style="-fx-background-color: transparent;
-                                       -fx-text-fill: #aaaaaa;
-                                       -fx-border-color: #3a3d4a;
-                                       -fx-border-width: 1;
-                                       -fx-border-radius: 6;
-                                       -fx-background-radius: 6;
-                                       -fx-font-size: 12px;
-                                       -fx-cursor: hand;"
-                                text="← Dashboard" />
+                        <Button fx:id="btnBackDashboard" onAction="#handleReturnToDashboard" prefHeight="32" prefWidth="57.0" styleClass="quitbtn" text="← " />
 
                     </children>
                 </HBox>
@@ -161,8 +143,7 @@
         <!-- ═══════════════════════════════════════════ -->
         <!--         VBOX PHẢI: Sidebar thông tin        -->
         <!-- ═══════════════════════════════════════════ -->
-        <VBox prefHeight="470.0" prefWidth="237.0" spacing="8"
-              style="-fx-background-color: #1e2029;" HBox.hgrow="NEVER">
+        <VBox prefHeight="470.0" prefWidth="237.0" spacing="8" style="-fx-background-color: #1e2029;" HBox.hgrow="NEVER">
             <padding><Insets bottom="12" left="10" right="10" top="12" /></padding>
             <children>
 
@@ -247,8 +228,7 @@
                 </VBox>
 
                 <!-- ═══ AUTO BID — có ô nhập giá tối đa ═══ -->
-                <VBox fx:id="autoBidVbox" spacing="6"
-                      style="-fx-background-color: #2d1a1a; -fx-background-radius: 8;">
+                <VBox fx:id="autoBidVbox" spacing="6" style="-fx-background-color: #2d1a1a; -fx-background-radius: 8;">
                     <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
                     <children>
 
@@ -256,9 +236,7 @@
                         <HBox alignment="CENTER_LEFT" spacing="6">
                             <children>
                                 <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Auto Bid" />
-                                <Label fx:id="autoBidStatusLabel"
-                                       style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;"
-                                       text="● Chưa kích hoạt" />
+                                <Label fx:id="autoBidStatusLabel" style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="● Chưa kích hoạt" />
                             </children>
                         </HBox>
 
@@ -266,28 +244,12 @@
                         <VBox spacing="3">
                             <children>
                                 <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Giá tối đa (₫)" />
-                                <TextField fx:id="maxBidInput"
-                                           promptText="Nhập giá tối đa..."
-                                           style="-fx-background-color: #1a1a2a;
-                                                  -fx-text-fill: #ffffff;
-                                                  -fx-border-color: #3a3d4a;
-                                                  -fx-border-width: 1;
-                                                  -fx-border-radius: 6;
-                                                  -fx-background-radius: 6;
-                                                  -fx-font-size: 12px;
-                                                  -fx-padding: 5 8 5 8;" />
+                                <TextField fx:id="maxBidInput" promptText="Nhập giá tối đa..." style="-fx-background-color: #1a1a2a;                                                   -fx-text-fill: #ffffff;                                                   -fx-border-color: #3a3d4a;                                                   -fx-border-width: 1;                                                   -fx-border-radius: 6;                                                   -fx-background-radius: 6;                                                   -fx-font-size: 12px;                                                   -fx-padding: 5 8 5 8;" />
                             </children>
                         </VBox>
 
                         <!-- Nút Auto Bid -->
-                        <Button fx:id="AutoBid"
-                                alignment="CENTER"
-                                mnemonicParsing="false"
-                                onAction="#handleCancelAndAutobid"
-                                maxWidth="Infinity"
-                                prefHeight="26.0"
-                                styleClass="bidbtn"
-                                text="Auto Bid" />
+                        <Button fx:id="AutoBid" alignment="CENTER" maxWidth="Infinity" mnemonicParsing="false" onAction="#handleCancelAndAutobid" prefHeight="26.0" styleClass="bidbtn" text="Auto Bid" />
 
                     </children>
                 </VBox>
