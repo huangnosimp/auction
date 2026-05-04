@@ -32,7 +32,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with jpackage
-        run: ./gradlew :client:jpackage
+        run: ./gradlew :client:jpackage --no-daemon
         shell: bash
 
       - name: Upload Installer Artifacts
