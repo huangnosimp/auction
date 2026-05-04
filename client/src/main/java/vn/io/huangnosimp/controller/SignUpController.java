@@ -68,8 +68,8 @@ public class SignUpController {
 
     @FXML
     private void navigateToLogin() {
-        // Code chuyển scene về Login.fxml tại đây
         System.out.println("Navigating back to Login...");
+        ViewManager.changeMainStage("login.fxml");
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {

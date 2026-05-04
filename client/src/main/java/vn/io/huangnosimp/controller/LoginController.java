@@ -65,9 +65,13 @@ public class LoginController {
                                     });
                         }
 
-                        else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){}
+                        else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){
+                            showAlert("UNAUTHORIZED", response.getMessage());
+                        }
 
-                        else if (ResponseStatus.FAILED.equals(response.getStatus())){}
+                        else if (ResponseStatus.FAILED.equals(response.getStatus())){
+                            showAlert("FAILED", response.getMessage());
+                        }
                     });
         }
 
