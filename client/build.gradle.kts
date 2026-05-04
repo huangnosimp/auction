@@ -38,9 +38,13 @@ jlink {
 
     jpackage {
         val buildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "0"
+        val currentOs = System.getProperty("os.name")
         imageName = "AuctionClient"
         appVersion = "1.0.$buildNumber"
         installerName = "Auction"
+        if (currentOs == "Windows") {
+            installerOptions.addAll(listOf("--win-console"))
+        }
     }
 }
 
