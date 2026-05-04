@@ -6,6 +6,7 @@ build/
 .kotlin
 docker/.env
 .env
+docker/server.jar
 
 ### IntelliJ IDEA ###
 .idea
