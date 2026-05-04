@@ -23,6 +23,7 @@ import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
@@ -84,11 +85,9 @@ public class DashboardController implements Initializable {
         SocketManager.getClient().sendRequestAsync(request)
                 .thenAccept(response -> {
                     if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                        Type listType = new TypeToken<List<AuctionCardDTO>>(){}.getType();
-                        List<AuctionCardDTO> list = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), listType);
-
+                        GetPublicAuctionCardResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), GetPublicAuctionCardResponseDTO.class);
                         Platform.runLater(() -> {
-                            UserSession.addToList(list);
+                            UserSession.addToList(dto.getPublicAuctionCardList());
                             ViewManager.changeView("open_slots.fxml", 1);
                             handleMenuAction(event);
                         });
