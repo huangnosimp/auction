@@ -42,7 +42,7 @@ jlink {
         imageName = "AuctionClient"
         appVersion = "1.0.$buildNumber"
         installerName = "Auction"
-        if (currentOs == "Windows") {
+        if (currentOs.startsWith("Windows")) {
             installerOptions.addAll(listOf("--win-console"))
         }
     }
