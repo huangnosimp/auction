@@ -8,8 +8,12 @@ module vn.io.huangnosimp.client {
 
     exports vn.io.huangnosimp;
     exports vn.io.huangnosimp.controller;
+    exports vn.io.huangnosimp.Manager;
+    exports vn.io.huangnosimp.network;
 
     opens vn.io.huangnosimp.controller to javafx.fxml, com.google.gson;
     opens vn.io.huangnosimp.model to com.google.gson;
     opens vn.io.huangnosimp to javafx.fxml, javafx.graphics;
+    opens vn.io.huangnosimp.Manager to javafx.fxml, com.google.gson;
+    opens vn.io.huangnosimp.network to com.google.gson;
 }
