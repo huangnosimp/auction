@@ -2,7 +2,7 @@ plugins {
     application
     id("java")
     id("org.openjfx.javafxplugin") version "0.1.0"
-    id("org.beryx.jlink") version "4.0.0"
+    id("org.beryx.runtime") version "2.0.1"
 }
 
 group = "vn.io.huangnosimp"
@@ -25,7 +25,7 @@ dependencies {
 }
 
 javafx {
-    version = "21"
+    version = "25"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
@@ -33,7 +33,7 @@ application {
     mainClass.set("vn.io.huangnosimp.Main")
 }
 
-jlink {
+runtime {
     options.set(listOf("--strip-debug", "--compress=zip-6", "--no-header-files", "--no-man-pages"))
 
     jpackage {
