@@ -18,6 +18,10 @@ public class ViewManager {
         mainBorderPane = area;
     }
 
+    public static Map<String, Parent> getCache(){
+        return cache;
+    }
+
     public static void changeView(String fxmlFile, int mode){
         try {
 

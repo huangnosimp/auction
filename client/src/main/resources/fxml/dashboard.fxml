@@ -1,103 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
-<BorderPane fx:id="mainBorderPane" styleClass="root-pane" stylesheets="@../css/dashboard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.DashboardController">
+<StackPane fx:id="rootStack" stylesheets="@../css/dashboard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.DashboardController">
+    <children>
 
+        <BorderPane fx:id="mainBorderPane" styleClass="root-pane">
 
-    <!-- TOP NAVBAR -->
-    <top>
-        <HBox alignment="CENTER_LEFT" spacing="0" styleClass="navbar">
-            <!-- Logo -->
-            <HBox alignment="CENTER_LEFT" spacing="4" styleClass="logo-container">
-                <Label styleClass="logo-ofc" text="AUCTION88." />
-                <Label styleClass="logo-digital" text="Digital" />
-            </HBox>
+            <top>
+                <HBox alignment="CENTER_LEFT" spacing="0" styleClass="navbar">
+                    <HBox alignment="CENTER_LEFT" spacing="4" styleClass="logo-container">
+                        <Label styleClass="logo-ofc" text="HOANGCHIM88." />
+                        <Label styleClass="logo-digital" text="Digital" />
+                    </HBox>
 
-            <!-- Nav Buttons -->
-            <HBox fx:id="menuHbox" alignment="CENTER_LEFT" spacing="4" styleClass="nav-buttons" HBox.hgrow="ALWAYS">
-                <Button fx:id="btnDashboard" onAction="#handlebtnDashboard" styleClass="nav-btn, nav-btn-active" text="Dashboard" />
-                <Button fx:id="btnOpenSlots" onAction="#handlebtnOpenSlots" styleClass="nav-btn" text="Open Slots" />
-                <Button fx:id="btnAuctions" styleClass="nav-btn" text="My Auctions" />
-                <TextField fx:id="txtSearch" onAction="#onSearchEnter" promptText="Tìm kiếm phiên đấu giá..." styleClass="nav-btn" text="Search auctions" />
-            <BorderPane prefHeight="200.0" prefWidth="200.0" />
-            </HBox>
+                    <HBox fx:id="menuHbox" alignment="CENTER_LEFT" spacing="4" styleClass="nav-buttons" HBox.hgrow="ALWAYS">
+                        <Button fx:id="btnDashboard" onAction="#handlebtnDashboard" styleClass="nav-btn, nav-btn-active" text="Dashboard" />
+                        <Button fx:id="btnOpenSlots" onAction="#handlebtnOpenSlots" styleClass="nav-btn" text="Open Slots" />
+                        <Button fx:id="btnFighters" styleClass="nav-btn" text=".........." />
+                    </HBox>
 
-            <!-- Right actions -->
-            <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="nav-right">
-                <Button fx:id="btnSupport" styleClass="support-btn" text="⊕  Personal Support" />
-                <Button fx:id="btnNotif" styleClass="icon-btn" text="🔔" />
-                <Button fx:id="btnAvatar" onAction="#handlebtnAvatar" styleClass="avatar-btn">
-                    <graphic>
-                        <Label styleClass="avatar-label" text="👤" />
-                    </graphic>
-                </Button>
-            </HBox>
-        </HBox>
-    </top>
+                    <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="nav-right">
+                        <Button fx:id="btnSupport" styleClass="support-btn" text="⊕  Personal Support" />
+                        <Button fx:id="btnNotif" styleClass="icon-btn" text="🔔" />
+                        <Button fx:id="btnAvatar" onAction="#handlebtnAvatar" styleClass="avatar-btn">
+                            <graphic>
+                                <Label styleClass="avatar-label" text="👤" />
+                            </graphic>
+                        </Button>
+                    </HBox>
+                </HBox>
+            </top>
 
-    <!-- MAIN CONTENT -->
-    <center>
-        <StackPane fx:id="contentArea" prefWidth="697.0">
-            <fx:include source="dashboard_home.fxml" />
-        </StackPane>
-    </center>
-    <left>
-        <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="224.0" style="-fx-background-color: #171414;" BorderPane.alignment="CENTER">
-            <VBox spacing="10" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
+            <center>
+                <StackPane fx:id="contentArea" prefWidth="697.0">
+                    <fx:include source="dashboard_home.fxml" />
+                </StackPane>
+            </center>
 
-                <!-- Balance card (giữ nguyên) -->
-                <VBox spacing="4" styleClass="stat-card">
-                    <Label styleClass="stat-label" text="YOUR BALANCE" />
-                    <Label fx:id="lblBalance" styleClass="stat-value" text="1,550" />
-                    <Label styleClass="stat-link" text="+ Top Up" />
-                </VBox>
+            <left>
+                <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="224.0" style="-fx-background-color: #171414;" BorderPane.alignment="CENTER">
+                    <VBox fx:id="sideVbox" spacing="10" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
 
-                <!-- Quick Stats -->
-                <VBox spacing="8" styleClass="side-card">
-                    <Label styleClass="side-section-title" text="QUICK STATS" />
-                    <GridPane hgap="8" vgap="8">
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
-                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
-                        </columnConstraints>
-                        <VBox styleClass="mini-stat" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <Label fx:id="lblActiveBids" styleClass="mini-val, green-value" text="7" />
-                            <Label styleClass="mini-key" text="Active Bids" />
+                        <VBox spacing="4" styleClass="stat-card">
+                            <Label styleClass="stat-label" text="YOUR BALANCE" />
+                            <Label fx:id="lblBalance" styleClass="stat-value" text="1,550" />
+                            <Label styleClass="stat-link" text="+ Top Up" />
                         </VBox>
-                        <VBox styleClass="mini-stat" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                            <Label fx:id="lblWinning" styleClass="mini-val, blue-value" text="3" />
-                            <Label styleClass="mini-key" text="Winning" />
-                        </VBox>
-                        <VBox styleClass="mini-stat" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                            <Label fx:id="lblOutbid" styleClass="mini-val, red-value" text="2" />
-                            <Label styleClass="mini-key" text="Outbid" />
-                        </VBox>
-                        <VBox styleClass="mini-stat" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                            <Label fx:id="lblWonTotal" styleClass="mini-val, amber-value" text="12" />
-                            <Label styleClass="mini-key" text="Won Total" />
-                        </VBox>
-                  <rowConstraints>
-                     <RowConstraints />
-                     <RowConstraints />
-                  </rowConstraints>
-                    </GridPane>
-                </VBox>
 
-                <!-- Expiring Soon -->
-                <VBox spacing="8" styleClass="side-card">
-                    <Label styleClass="side-section-title" text="EXPIRING SOON" />
-                    <VBox fx:id="expiringList" spacing="6" />
-                </VBox>
+                        <VBox prefHeight="145.0" prefWidth="194.0" spacing="8" styleClass="side-card">
+                            <Label styleClass="side-section-title" text="EXPIRING SOON" />
+                            <VBox fx:id="expiringList" spacing="6" />
+                        </VBox>
 
-                <!-- Recent Activity -->
-                <VBox spacing="8" styleClass="side-card" VBox.vgrow="ALWAYS">
-                    <Label styleClass="side-section-title" text="RECENT ACTIVITY" />
-                    <VBox fx:id="activityList" spacing="8" />
-                </VBox>
-            </VBox>
-        </AnchorPane>
-    </left>
+                        <VBox spacing="8" styleClass="side-card" VBox.vgrow="ALWAYS">
+                            <Label styleClass="side-section-title" text="RECENT ACTIVITY" />
+                            <VBox fx:id="activityList" spacing="8" />
+                        </VBox>
 
-</BorderPane>
+                    </VBox>
+                </AnchorPane>
+            </left>
+
+        </BorderPane>
+
+        <VBox fx:id="toastContainer" alignment="TOP_RIGHT" maxWidth="400" mouseTransparent="true" pickOnBounds="false" StackPane.alignment="TOP_RIGHT">
+            <padding>
+                <Insets right="20" top="80" />
+            </padding>
+            <children>
+
+                <HBox fx:id="toastBox" alignment="CENTER_LEFT" managed="false" spacing="10" style="-fx-background-color: #1a2e1a;                              -fx-border-color: #22c55e;                              -fx-border-width: 1;                              -fx-border-radius: 8;                              -fx-background-radius: 8;                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 10, 0, 0, 4);" visible="false">
+                    <padding><Insets bottom="12" left="14" right="16" top="12" /></padding>
+                    <children>
+
+                        <StackPane prefHeight="22" prefWidth="22">
+                            <children>
+                                <Circle fx:id="toastIconCircle" fill="#22c55e" radius="11" StackPane.alignment="CENTER" />
+                                <Label fx:id="toastIconLabel" style="-fx-text-fill: #0a2a0a; -fx-font-size: 11px; -fx-font-weight: bold;" text="✓" StackPane.alignment="CENTER" />
+                            </children>
+                        </StackPane>
+
+                        <VBox spacing="2">
+                            <children>
+                                <Label fx:id="toastTitle" style="-fx-text-fill: #4ade80; -fx-font-size: 12px; -fx-font-weight: bold;" text="Thành công!" />
+                                <Label fx:id="toastSub" style="-fx-text-fill: #86efac; -fx-font-size: 10px;" text="" />
+                            </children>
+                        </VBox>
+
+                    </children>
+                </HBox>
+
+            </children>
+        </VBox>
+
+    </children>
+</StackPane>

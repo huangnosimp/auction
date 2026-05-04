@@ -368,3 +368,27 @@
 .tab-action-btn:hover {
     -fx-background-color: #00e67622;
 }
+/* Style cơ bản cho cả 2 nút Tab */
+.tab-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #b5b5b5; /* Màu xám nhạt cho nút chưa chọn */
+    -fx-font-weight: bold;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 2 0; /* Chỉ để lại đường kẻ dưới */
+    -fx-transition: all 0.3s;
+}
+
+/* Hiệu ứng khi di chuột qua */
+.tab-btn:hover {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: rgba(217, 70, 239, 0.1); /* Hồng mờ */
+}
+
+/* STYLE KHI NÚT ĐƯỢC CHỌN (ACTIVE) */
+.tab-btn-active {
+    -fx-text-fill: #d946ef; /* Màu hồng tím sáng */
+    -fx-border-color: #d946ef; /* Gạch chân màu hồng tím */
+    -fx-background-color: rgba(217, 70, 239, 0.05);
+}
