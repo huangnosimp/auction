@@ -39,7 +39,7 @@ jlink {
     jpackage {
         val buildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "0"
         imageName = "AuctionClient"
-        appVersion = "0.0.$buildNumber"
+        appVersion = "1.0.$buildNumber"
         installerName = "Auction"
     }
 }
