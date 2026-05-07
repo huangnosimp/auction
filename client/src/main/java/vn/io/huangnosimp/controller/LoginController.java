@@ -29,6 +29,10 @@ public class LoginController {
     private UserType userType;
 
     @FXML
+    public void pressEnter(){
+
+    }
+    @FXML
     private void handleLogin(ActionEvent event) {
         String email = emailField.getText();
         String password = passwordField.getText();

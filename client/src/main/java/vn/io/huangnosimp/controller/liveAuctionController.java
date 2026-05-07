@@ -74,6 +74,8 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML private Separator spr1;
     @FXML private ListView bidHistoryList;
     @FXML private TextField maxBidInput;
+    @FXML private HBox AutobidHbox;
+    @FXML private VBox AutobidVbox;
 
     private double minCount;
     private Timeline holdTimer;
@@ -103,11 +105,13 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         sidebarBuyNowPriceLabel.setText(formatNumber(DTO.getBuyNowPrice()));//giá mua ngay
         startDateLabel.setText(formatEpochSecond(DTO.getStartTime()));//thời điểm bắt đầu
     }
+
     public void handleIncreaseButton(){
         double currentBid = parseNumber(myBidLabel.getText());
         currentBid+=minCount;
         myBidLabel.setText(formatNumber(currentBid));
     }
+
     public void handleDecreaseButton(){
         double currentBid = parseNumber(myBidLabel.getText());
         if(currentBid - minCount >= minCount){
@@ -118,6 +122,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             holdTimer.stop();
         }
     }
+
     public void handleReturnToDashboard(ActionEvent event){
         changeView("dashboard_home.fxml", 1);
     }
@@ -133,6 +138,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             holdTimer.playFromStart();
         }
     }
+
     private String caculateBidIncreament(double value){
         if(value > 1000000000){
             return value/1000000000+" B";
@@ -144,6 +150,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             return String.valueOf(value);
         }
     }
+
     @FXML
     private void onMouseReleased(MouseEvent event) {
         holdTimer.stop();
@@ -158,7 +165,10 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         btnPlaceBid.setVisible(false);
         btnBuyNow.setVisible(false);
         AutoBid.setText("Cancel Auction");
+        AutobidHbox.setVisible(false);
+        AutobidVbox.setVisible(false);
     }
+
     public void setupLineChart(){
         lineChart.setAnimated(false);
         lineChart.setCreateSymbols(false);
@@ -174,6 +184,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         priceSeries.setName("Price");
         lineChart.getData().add(priceSeries);
     }
+
     public void loadChartHistory(List<PricePointDTO> history){
         priceSeries.getData().clear();
         bidIndex = 0;
@@ -182,6 +193,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             priceSeries.getData().add(new XYChart.Data<>(bidIndex, dto.getPrice()));
         }
     }
+
     public void loadBidHistory(List<BidHistoryDTO> history){
         for(BidHistoryDTO dto : history) {
             try {
@@ -196,6 +208,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             }
         }
     }
+
     @FXML
     public void handleLeaveRoom(){
         LeaveRoomRequestDTO leaveRoomRequest = new LeaveRoomRequestDTO(auctionId);
@@ -210,6 +223,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                     }
                 });
     }
+
     @FXML
     public void handleBuyNowButton(){
         BuyNowRequestDTO buyNowRequest = new BuyNowRequestDTO(auctionId);
@@ -233,6 +247,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
 
                 });
     }
+
     @FXML
     public void handlePlaceBid(){
         double amount = parseNumber(myBidLabel.getText());
@@ -240,6 +255,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         Request request = new Request(ActionType.PLACE_BID, placeBidRequest);
         SocketManager.getClient().sendRequest(request);
     }
+
     @FXML
     public void handleCancelAndAutobid(){
         if(AutoBid.getText().equals("Auto Bid")){

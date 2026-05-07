@@ -35,7 +35,7 @@ public class ItemCardController {
     @FXML private Label lblBidCount;
     @FXML private Label lblYourBid;
 
-    @FXML private Button BidNowButton;
+    @FXML private Button btnManage;
 
     private String auctionId;
 
@@ -95,7 +95,7 @@ public class ItemCardController {
                                             UserSession.setAuctionId(auctionId);
                                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
                                             ControllerManager.getOpenSlotController().clearCard(auctionId);
-                                            if (BidNowButton.getText().equals("Manage")) {
+                                            if (btnManage.getText().equals("Manage")) {
                                                 controller.setInvisible();
                                             }
                                         });
@@ -130,7 +130,7 @@ public class ItemCardController {
                             UserSession.setAuctionDetail(auctionResponse);
                             UserSession.setAuctionId(auctionId);
                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
-                            if (BidNowButton.getText().equals("Manage")) {
+                            if (btnManage.getText().equals("Manage")) {
                                 controller.setInvisible();
                             }
                         });
