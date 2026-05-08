@@ -58,4 +58,12 @@ public class StatisticService implements IStatisticService {
         }
         return statisticRepository.getPublicAuctionCard(quantity);
     }
+
+    @Override
+    public List<AuctionCardDTO> getPostedAuctionCard(String userId) {
+        if (userId == null || userId.isBlank()) {
+            return Collections.emptyList();
+        }
+        return statisticRepository.getPostedAuctionCard(userId);
+    }
 }

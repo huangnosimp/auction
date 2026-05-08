@@ -5,6 +5,7 @@ import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
 import vn.io.huangnosimp.dto.request.GetJoiningAuctionCardDTO;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
+import vn.io.huangnosimp.dto.response.GetPostedAuctionCardResponseDTO;
 import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.protocol.Request;
@@ -24,9 +25,6 @@ public class StatisticHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             DashboardResponseDTO dashboardInfo = statisticService.getDashboardStatistics(client.getUserId());
-            if (dashboardInfo == null) {
-                return new Response(ResponseStatus.FAILED, "Failed to retrieve dashboard information");
-            }
             return new Response(ResponseStatus.SUCCESS, dashboardInfo);
         }
     }
@@ -74,6 +72,17 @@ public class StatisticHandler {
                  return new Response(ResponseStatus.FAILED, "Invalid quantity");
             }
             GetPublicAuctionCardResponseDTO dtoResponse = new GetPublicAuctionCardResponseDTO(statisticService.getPublicAuctionCard(dto.getQuantity()));
+            return new Response(ResponseStatus.SUCCESS, dtoResponse);
+        }
+    }
+    public static class GetPostedAuctionCardHandler implements RequestHandler {
+        private final IStatisticService statisticService;
+        public GetPostedAuctionCardHandler(IStatisticService statisticService) {
+            this.statisticService = statisticService;
+        }
+        @Override
+        public Response handle(Request request, ClientHandle client) {
+            GetPostedAuctionCardResponseDTO dtoResponse = new GetPostedAuctionCardResponseDTO(statisticService.getPostedAuctionCard(client.getUserId()));
             return new Response(ResponseStatus.SUCCESS, dtoResponse);
         }
     }
