@@ -13,4 +13,5 @@ public interface IStatisticRepository {
     AuctionDetailResponseDTO getAuctionDetail(String auctionId);
     AuctionCardDTO getJoiningAuctionCard(String auctionId);
     List<AuctionCardDTO> getPublicAuctionCard(int quantity);
+    List<AuctionCardDTO> getPostedAuctionCard(String userId);
 }
