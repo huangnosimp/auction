@@ -143,7 +143,7 @@
         <!-- ═══════════════════════════════════════════ -->
         <!--         VBOX PHẢI: Sidebar thông tin        -->
         <!-- ═══════════════════════════════════════════ -->
-        <VBox prefHeight="470.0" prefWidth="237.0" spacing="8" style="-fx-background-color: #1e2029;" HBox.hgrow="NEVER">
+        <VBox prefHeight="558.0" prefWidth="354.0" spacing="8" style="-fx-background-color: #1e2029;" HBox.hgrow="NEVER">
             <padding><Insets bottom="12" left="10" right="10" top="12" /></padding>
             <children>
 
@@ -223,7 +223,7 @@
                     <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
                     <children>
                         <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Lịch sử đặt giá" />
-                        <ListView fx:id="bidHistoryList" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS" />
+                        <ListView fx:id="bidHistoryList" style="-fx-background-color: #16181f; -fx-border-color: #16181f;" VBox.vgrow="ALWAYS" />
                     </children>
                 </VBox>
 

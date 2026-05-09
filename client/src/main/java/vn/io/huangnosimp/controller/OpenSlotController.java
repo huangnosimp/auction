@@ -19,9 +19,15 @@ import java.util.ResourceBundle;
 
 public class OpenSlotController implements Initializable {
     @FXML private FlowPane cardContainer;
+
     public FlowPane getCardContainer(){
         return cardContainer;
     }
+
+    public void clearContainer(){
+        getCardContainer().getChildren().clear();
+    }
+
     public void addCard(AuctionCardDTO dto, String type){
         String fxmlPath = null;
         if(type.equals("Joining")){
@@ -76,7 +82,6 @@ public class OpenSlotController implements Initializable {
     }
     public void initialize(URL location, ResourceBundle resources){
         ControllerManager.setOpenSlotController(this);
-        cardContainer.getChildren().clear();
         setupOpenSlot(UserSession.getListCard());
     }
 }

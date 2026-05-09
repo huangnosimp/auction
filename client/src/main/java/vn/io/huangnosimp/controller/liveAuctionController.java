@@ -20,6 +20,7 @@ import javafx.event.ActionEvent;
 import vn.io.huangnosimp.Manager.*;
 import vn.io.huangnosimp.dto.request.*;
 import vn.io.huangnosimp.dto.response.*;
+import vn.io.huangnosimp.dto.shared.NotificationDTO;
 import vn.io.huangnosimp.network.IServerMessageListener;
 import vn.io.huangnosimp.network.SocketClient;
 import vn.io.huangnosimp.protocol.ActionType;
@@ -68,6 +69,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML private Button AutoBid;
     @FXML private Button btnPlaceBid;
     @FXML private Button btnBuyNow;
+    @FXML private Button btnLeaveRoom;
     @FXML private HBox Hbox1;
     @FXML private VBox Vbox1;
     @FXML private Separator spr;
@@ -123,9 +125,17 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         }
     }
 
+    @FXML
     public void handleReturnToDashboard(ActionEvent event){
-        changeView("dashboard_home.fxml", 1);
+        Button ActBtn = ControllerManager.getDashboardController().getActiveMenuButton();
+        if(ActBtn.getText().equals("Dashboard")){
+            changeView("dashboard_home.fxml", 1);
+        }
+        else{
+            changeView("open_slots.fxml", 1);
+        }
     }
+
     @FXML
     private void onMousePressed(MouseEvent event) {
         if(event.getSource() == btnIncrease){
@@ -167,6 +177,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         AutoBid.setText("Cancel Auction");
         AutobidHbox.setVisible(false);
         AutobidVbox.setVisible(false);
+        btnLeaveRoom.setVisible(false);
     }
 
     public void setupLineChart(){
@@ -217,8 +228,21 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                 .thenAccept(response -> {
                     if(ResponseStatus.SUCCESS.equals(response.getStatus())){
                         Platform.runLater(()->{
-                            changeView("dashboard_home.fxml", 1);
+                            ControllerManager.getDashboardHomeController().removeFromDashBoard(auctionId, ControllerManager.getDashboardHomeController().getFlowJoined());
+                            UserSession.removeCard(UserSession.getJoiningListCard(), auctionId);
+                            Button activeBtn = ControllerManager.getDashboardController().getActiveMenuButton();
+                            if(activeBtn.getText().equals("Dashboard")){
+                                changeView("dashboard_home.fxml", 1);
+                            }
+                            else{
+                                changeView("open_slots.fxml", 1);
+                            }
                             ControllerManager.getDashboardController().showToast("SUCCESS", response.getMessage(), true);
+                        });
+                    }
+                    else{
+                        Platform.runLater(()->{
+                            ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
                         });
                     }
                 });
@@ -304,18 +328,23 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         ControllerManager.getDashboardController().showToast("SUCCESS", response.getMessage(), true);
                     }
                     else {
-                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                        ControllerManager.getDashboardController().showToast("FAILED", "you're too poor", false);
                     }
                 }
-                case REGISTER_AUTO_BID -> ControllerManager.getDashboardController().showToast("Active Auto Bid", null, true);
+                case REGISTER_AUTO_BID -> {
+                    if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+                        ControllerManager.getDashboardController().showToast("Active Auto Bid", response.getMessage(), true);
+                    }
+                    if(ResponseStatus.ERROR.equals(response.getStatus())){
+                        ControllerManager.getDashboardController().showToast("ERROR", response.getMessage(), false);
+                    }
+                }
             }
         });
     }
     public void onRequestReceived(Request notification) {
-        PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(
-                GsonParser.GSON.toJsonTree(notification.getData()),
-                PlaceBidResponseDTO.class
-        );
+        NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
+        PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
         BidHistoryDTO historyDTO = new BidHistoryDTO(
                 dto.getUsername(), dto.getAmount(), dto.getPlaceAt()
         );

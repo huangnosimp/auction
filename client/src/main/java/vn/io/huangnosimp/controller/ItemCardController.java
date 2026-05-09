@@ -41,7 +41,7 @@ public class ItemCardController {
 
     public void addInfo(AuctionCardDTO dto, String type){
         lblProductName.setText(dto.getProductName());
-        long now = Instant.now().getEpochSecond();
+        long now = Instant.now().toEpochMilli();
         if(now < dto.getStartTime()){
             statuslbl.setText("Start in: ");
         }
@@ -95,6 +95,7 @@ public class ItemCardController {
                                             UserSession.setAuctionId(auctionId);
                                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
                                             ControllerManager.getOpenSlotController().clearCard(auctionId);
+                                            ControllerManager.getDashboardHomeController().addToDashboard(UserSession.findWithId(auctionId), "Joining", ControllerManager.getDashboardHomeController().getFlowJoined());
                                             if (btnManage.getText().equals("Manage")) {
                                                 controller.setInvisible();
                                             }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
@@ -59,7 +60,11 @@
             </HBox>
 
             <HBox spacing="4" styleClass="tab-bar">
-                <Button fx:id="tabJoined" mnemonicParsing="false" onAction="#handleTabChange" styleClass="tab-btn-active" text="Active Bids" />
+                <Button fx:id="tabJoined" mnemonicParsing="false" onAction="#handleTabChange" text="Active Bids">
+               <styleClass>
+                  <String fx:value="tab-btn-active" />
+                  <String fx:value="tab-btn" />
+               </styleClass></Button>
                 <Button fx:id="tabMyAuctions" mnemonicParsing="false" onAction="#handleTabChange" styleClass="tab-btn" text="My Auctions" />
             </HBox>
 

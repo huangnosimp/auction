@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import vn.io.huangnosimp.Manager.ControllerManager;
 import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.CreateAuctionRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
@@ -132,6 +133,7 @@ public class CreateAuctionController implements Initializable{
                     if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
                         AuctionCardDTO cardResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionCardDTO.class);
                         ControllerManager.getDashboardHomeController().addToDashboard(cardResponse, "My", ControllerManager.getDashboardHomeController().getAuctionFlowPane());
+                        UserSession.addoneMyCard(cardResponse);
                         ControllerManager.getDashboardHomeController().changeTab();
                         ViewManager.changeView("dashboard_home.fxml", 1);
                     }

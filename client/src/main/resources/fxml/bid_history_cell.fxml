@@ -4,24 +4,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox fx:id="cellRoot" alignment="CENTER_LEFT" spacing="8"
-      styleClass="bid-cell"
-      stylesheets="@../css/bid_history_cell.css"
-      xmlns="http://javafx.com/javafx/17.0.12"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="vn.io.huangnosimp.controller.BidHistoryCellController">
+<HBox fx:id="cellRoot" alignment="CENTER_LEFT" prefHeight="65.0" prefWidth="139.0" spacing="8" styleClass="bid-cell" stylesheets="@../css/bid_history_cell.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.BidHistoryCellController">
     <padding><Insets bottom="6" left="8" right="8" top="6" /></padding>
 
     <!-- Avatar -->
     <Label fx:id="avatarLabel" styleClass="bid-avatar" text="07" />
 
     <!-- Tên + giờ -->
-    <VBox spacing="2" HBox.hgrow="ALWAYS">
+    <VBox prefHeight="51.0" prefWidth="114.0" spacing="2" HBox.hgrow="ALWAYS">
         <Label fx:id="bidderLabel" styleClass="bid-name" text="Khách #007" />
-        <Label fx:id="timeLabel"   styleClass="bid-time" text="14:31:07" />
-    </VBox>
 
-    <!-- Số tiền -->
-    <Label fx:id="amountLabel" styleClass="bid-amount" text="2.850.000.000 đ" />
+       <!-- Số tiền -->
+       <Label fx:id="amountLabel" styleClass="bid-amount" text="2.850.000.000 đ" />
+        <Label fx:id="timeLabel" styleClass="bid-time" text="14:31:07" />
+    </VBox>
 
 </HBox>

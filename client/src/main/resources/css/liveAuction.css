@@ -24,12 +24,18 @@ Pane {
     -fx-border-width: 15;
 }
  
-/* ── LineChart ──────────────────────────────────────── */
+
 .chart {
     -fx-padding: 10px;
     -fx-background-color: #12141f;
 }
- 
+
+.chart-title {
+    -fx-text-fill: white;
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
 .chart-plot-background {
     -fx-background-color: #12141f;
 }
@@ -38,7 +44,12 @@ Pane {
 .chart-horizontal-grid-lines {
     -fx-stroke: #2a2d3e;
 }
- 
+
+.axis-label {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
 .axis {
     -fx-tick-label-fill: #aaaaaa;
     -fx-axis-label-fill: #aaaaaa;

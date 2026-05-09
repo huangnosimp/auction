@@ -33,9 +33,9 @@ import vn.io.huangnosimp.util.GsonParser;
 import javax.swing.text.View;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
+import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 import static vn.io.huangnosimp.Manager.UserSession.getDashboardInfo;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
@@ -67,6 +67,18 @@ public class DashboardController implements Initializable {
         clickedButton.getStyleClass().add("nav-btn-active");
     }
 
+    public Button getActiveMenuButton(){
+        for(Node node : menuHbox.getChildren()){
+            if(node instanceof Button){
+                Button actButton = (Button) node;
+                if (actButton.getStyleClass().contains("nav-btn-active")){
+                    return actButton;
+                }
+            }
+        }
+        return null;
+    }
+
     @FXML
     public void handlebtnAvatar(ActionEvent event){
         changeView("AccountView.fxml", 1);
@@ -79,21 +91,93 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
-    public void handlebtnOpenSlots(ActionEvent event){
-        GetPublicAcutionCardDTO getPublicAcutionCard = new GetPublicAcutionCardDTO(30);
-        Request request = new Request(ActionType.GET_PUBLIC_AUCTION_CARD, getPublicAcutionCard);
+    public void handlebtnOpenSlots(ActionEvent event) {
+        List<AuctionCardDTO> combineList = new ArrayList<>(UserSession.getJoiningListCard());
+        combineList.addAll(UserSession.getMyListCard());
+        List<AuctionCardDTO> result = new ArrayList<>();
+        fetchUntilFull(result, combineList, 30, event, 5);
+        if(ViewManager.getCache().containsKey("open_slots.fxml")){
+            ControllerManager.getOpenSlotController().clearContainer();
+            ControllerManager.getOpenSlotController().setupOpenSlot(UserSession.getListCard());
+        }
+    }
+
+    private void fetchUntilFull(List<AuctionCardDTO> result,
+                                List<AuctionCardDTO> excludeList,
+                                int target,
+                                ActionEvent event,
+                                int maxRetry) {
+
+        // Đủ số lượng hoặc hết retry → chạy UI
+        if (result.size() >= target || maxRetry <= 0) {
+            Platform.runLater(() -> {
+                UserSession.addToList(result);
+                ViewManager.changeView("open_slots.fxml", 1);
+                handleMenuAction(event);
+            });
+            return;
+        }
+
+        int needed = target - result.size();
+
+        // Lấy gấp đôi để bù cho card bị lọc
+        GetPublicAcutionCardDTO requestDTO = new GetPublicAcutionCardDTO(needed * 2);
+        Request request = new Request(ActionType.GET_PUBLIC_AUCTION_CARD, requestDTO);
+
         SocketManager.getClient().sendRequestAsync(request)
                 .thenAccept(response -> {
-                    if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                        GetPublicAuctionCardResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), GetPublicAuctionCardResponseDTO.class);
+                    if (!ResponseStatus.SUCCESS.equals(response.getStatus())) {
+                        // Request thất bại → dừng, dùng những gì đã có
                         Platform.runLater(() -> {
-                            UserSession.addToList(dto.getPublicAuctionCardList());
+                            UserSession.addToList(result);
                             ViewManager.changeView("open_slots.fxml", 1);
                             handleMenuAction(event);
                         });
+                        return;
+                    }
+
+                    GetPublicAuctionCardResponseDTO dto = GsonParser.GSON.fromJson(
+                            GsonParser.GSON.toJsonTree(response.getData()),
+                            GetPublicAuctionCardResponseDTO.class
+                    );
+
+                    List<AuctionCardDTO> responseList = dto.getPublicAuctionCardList();
+
+                    // Server không còn card → dừng
+                    if (responseList == null || responseList.isEmpty()) {
+                        Platform.runLater(() -> {
+                            UserSession.addToList(result);
+                            ViewManager.changeView("open_slots.fxml", 1);
+                            handleMenuAction(event);
+                        });
+                        return;
+                    }
+
+                    // Tập hợp id cần loại trừ (excludeList + result đã có)
+                    Set<String> excludeIds = new HashSet<>();
+                    excludeList.forEach(c -> excludeIds.add(c.getAuctionId()));
+                    result.forEach(c -> excludeIds.add(c.getAuctionId()));
+
+                    // Lọc và thêm vào result
+                    for (AuctionCardDTO card : responseList) {
+                        if (!excludeIds.contains(card.getAuctionId())) {
+                            result.add(card);
+                            excludeIds.add(card.getAuctionId());
+                            if (result.size() >= target) break;
+                        }
+                    }
+
+                    // Đủ rồi → chạy UI, chưa đủ → gọi lại với retry - 1
+                    if (result.size() >= target) {
+                        Platform.runLater(() -> {
+                            UserSession.addToList(result);
+                            ViewManager.changeView("open_slots.fxml", 1);
+                            handleMenuAction(event);
+                        });
+                    } else {
+                        fetchUntilFull(result, excludeList, target, event, maxRetry - 1);
                     }
                 });
-
     }
     public void showToast(String title, String sub, boolean success) {
         String borderColor = success ? "#22c55e" : "#e24b4a";
@@ -131,8 +215,19 @@ public class DashboardController implements Initializable {
         pause.play();
     }
     private void setupDashboard(){
-        lblBalance.setText(String.valueOf(getDashboardInfo().getBalance()));
+        lblBalance.setText(calculateBalance(getDashboardInfo().getBalance()));
         ControllerManager.getDashboardHomeController().setupDashboardHome();
+    }
+    private String calculateBalance(double value){
+        if(value >= 1000000000){
+            return formatNumber(value/1000000000)+" B";
+        }
+        else if (value>=1000000){
+            return formatNumber(value/1000000)+" M";
+        }
+        else {
+            return formatNumber(value/1000)+" K";
+        }
     }
     @Override
     public void initialize(URL location, ResourceBundle resources){
