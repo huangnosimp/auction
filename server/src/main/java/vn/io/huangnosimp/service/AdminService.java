@@ -8,14 +8,18 @@ import vn.io.huangnosimp.model.Admin;
 import vn.io.huangnosimp.model.Member;
 import vn.io.huangnosimp.model.Auction;
 import vn.io.huangnosimp.model.User;
+import vn.io.huangnosimp.network.ClientSessionManager;
 import vn.io.huangnosimp.repository.IUserRepository;
 import vn.io.huangnosimp.repository.IAuctionRepository;
 import vn.io.huangnosimp.util.ModelMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class AdminService implements IAdminService {
+    private static final double COMMISSION_RATE = 0.05;
+
     private final IUserRepository userRepo;
     private final IAuctionRepository auctionRepo;
     private final IAuctionService auctionService;
@@ -45,11 +49,25 @@ public class AdminService implements IAdminService {
 
     @Override
     public boolean lockMember(String memberId) {
+        return lockMember(memberId, -1); // Ban vĩnh viễn
+    }
+
+    public boolean lockMember(String memberId, int durationInHours) {
         var user = userRepo.findById(memberId);
         if (user instanceof Member) {
-            Member member = (Member) user;
-            member.setBanned(true);
-            return userRepo.updateStatus(memberId, true);
+
+            LocalDateTime unbanTime = null;
+
+            if (durationInHours > 0) {
+                unbanTime = LocalDateTime.now().plusHours(durationInHours);
+            }
+
+            boolean isSuccess = userRepo.updateBanStatus(memberId, true, unbanTime);
+
+            if (isSuccess) {
+                ClientSessionManager.getInstance().banUser(memberId);
+                return true;
+            }
         }
         return false;
     }
@@ -58,9 +76,7 @@ public class AdminService implements IAdminService {
     public boolean unlockMember(String memberId) {
         var user = userRepo.findById(memberId);
         if (user instanceof Member) {
-            Member member = (Member) user;
-            member.setBanned(false);
-            return userRepo.updateStatus(memberId, false);
+            return userRepo.updateBanStatus(memberId, false, null);
         }
         return false;
     }
@@ -73,17 +89,23 @@ public class AdminService implements IAdminService {
     @Override
     public boolean forceCancelAuction(String auctionId) {
         AuctionActionResult result = auctionService.cancelAuction(auctionId);
-        return switch (result) {
+        boolean isSuccess = switch (result) {
             case SUCCESS -> true;
             case AUCTION_NOT_FOUND, UNAUTHORIZED, INVALID_STATE, ERROR -> false;
         };
+
+        if (isSuccess) {
+            ClientSessionManager.getInstance().destroyRoom(auctionId);
+        }
+
+        return isSuccess;
     }
 
     @Override
     public double getSystemTotalRevenue() {
         return auctionRepo.findAll().stream()
                 .filter(a -> a.getStatus() == AuctionStatus.PAID)
-                .mapToDouble(a -> a.getCurrentPrice() * 0.05)
+                .mapToDouble(a -> a.getCurrentPrice() * COMMISSION_RATE)
                 .sum();
     }
 }

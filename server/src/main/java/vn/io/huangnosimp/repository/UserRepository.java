@@ -5,10 +5,8 @@ import vn.io.huangnosimp.model.Admin;
 import vn.io.huangnosimp.model.Member;
 import vn.io.huangnosimp.model.User;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -137,22 +135,35 @@ public class UserRepository implements IUserRepository {
         double accountBalance = rs.getDouble("account_balance");
         double frozenBalance = rs.getDouble("frozen_balance");
         boolean isBanned = rs.getBoolean("is_banned");
+
+        Timestamp banUntilTs = rs.getTimestamp("ban_until");
+        LocalDateTime banUntil = (banUntilTs != null) ? banUntilTs.toLocalDateTime() : null;
+
         long createdAt = rs.getTimestamp("created_at").getTime();
 
         return switch (role) {
-            case "MEMBER" -> new Member(id, username, password, email, accountBalance, frozenBalance, isBanned, createdAt);
+            case "MEMBER" -> new Member(id, username, password, email, accountBalance, frozenBalance, isBanned, banUntil, createdAt);
             case "ADMIN" -> new Admin(id, username, password, email, createdAt);
             default -> null;
         };
     }
 
     @Override
-    public boolean updateStatus(String userId, boolean isBanned) {
-        String sql = "UPDATE Users SET is_banned = ? WHERE id = ?";
+    public boolean updateBanStatus(String userId, boolean isBanned, LocalDateTime banUntil) {
+        String sql = "UPDATE Users SET is_banned = ?, ban_until = ? WHERE id = ?";
+
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
+
             stmt.setBoolean(1, isBanned);
-            stmt.setString(2, userId);
+            if (banUntil != null) {
+                stmt.setTimestamp(2, Timestamp.valueOf(banUntil));
+            } else {
+                stmt.setNull(2, java.sql.Types.TIMESTAMP);
+            }
+
+            stmt.setString(3, userId);
+
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("DB error updating ban status: " + e.getMessage());
