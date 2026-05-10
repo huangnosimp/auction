@@ -2,6 +2,7 @@ package vn.io.huangnosimp.repository;
 
 import vn.io.huangnosimp.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IUserRepository {
@@ -12,6 +13,6 @@ public interface IUserRepository {
     User findById(String userId);
     boolean updateBalance(String userId, double newBalance);
     boolean updateFrozenBalance(String userId, double newFrozenBalance);
-    boolean updateStatus(String userId, boolean isBanned);
+    boolean updateBanStatus(String userId, boolean isBanned, LocalDateTime banUntil);
     List<User> findAll();
 }

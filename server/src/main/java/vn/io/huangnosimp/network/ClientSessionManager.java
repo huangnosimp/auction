@@ -1,6 +1,9 @@
 package vn.io.huangnosimp.network;
 
+import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.Response;
+import vn.io.huangnosimp.protocol.ResponseStatus;
 
 import java.util.Map;
 import java.util.Set;
@@ -87,5 +90,36 @@ public class ClientSessionManager {
                 }
             }
         }
+    }
+
+    public void banUser(String userId) {
+        if (userId == null) return;
+
+        for (ClientHandle client : activeClients) {
+            if (userId.equals(client.getUserId())) {
+                try {
+                    client.sendResponse(new Response(ResponseStatus.BANNED, "You have been banned by the administrator."));
+                    client.close();
+                    removeClient(client);
+                    System.out.println("[ClientSessionManager] Banned and disconnected user: " + userId);
+                    break;
+                } catch (Exception e) {
+                    System.err.println("[ClientSessionManager] Error while banning user " + userId + ": " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    public void destroyRoom(String auctionId) {
+        if (auctionId == null) return;
+
+        Request cancelMsg = new Request(
+                ActionType.ADMIN_FORCE_CANCEL,
+                "This auction is destroyed by Admin."
+        );
+        broadcastToRoom(auctionId, cancelMsg);
+
+        auctionRooms.remove(auctionId);
+        System.out.println("[ClientSessionManager] Destroyed room for canceled auction: " + auctionId);
     }
 }

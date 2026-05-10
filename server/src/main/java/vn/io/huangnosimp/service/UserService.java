@@ -10,6 +10,7 @@ import vn.io.huangnosimp.model.*;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.repository.IUserRepository;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,10 +70,20 @@ public class UserService implements IUserService {
             return LoginResult.INVALID_PASSWORD;
         }
 
+        // Lazy unban
         if (user instanceof Member member && member.isBanned()) {
-            client.setUserId(null);
-            client.setUserType(null);
-            return LoginResult.BANNED;
+            LocalDateTime banUntil = member.getBanUntil();
+
+            if (banUntil != null && LocalDateTime.now().isAfter(banUntil)) {
+                member.setBanned(false);
+                member.setBanUntil(null);
+
+                userRepository.updateBanStatus(member.getId(), false, null);
+            } else {
+                client.setUserId(null);
+                client.setUserType(null);
+                return LoginResult.BANNED;
+            }
         }
 
         client.setUserId(user.getId());
