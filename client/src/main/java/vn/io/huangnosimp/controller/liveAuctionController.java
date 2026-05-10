@@ -63,6 +63,8 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML private Label descriptionLabel;
     @FXML private Label sidebarBuyNowPriceLabel;
     @FXML private Label startDateLabel;
+    @FXML private Label autoBidStatusLabel;
+    @FXML private Label lastBidTimeLabel;
 
     @FXML private Button btnIncrease;
     @FXML private Button btnDecrease;
@@ -72,6 +74,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML private Button btnLeaveRoom;
     @FXML private HBox Hbox1;
     @FXML private VBox Vbox1;
+    @FXML private VBox autoBidVbox;
     @FXML private Separator spr;
     @FXML private Separator spr1;
     @FXML private ListView bidHistoryList;
@@ -88,6 +91,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         currentPriceLabel.setText(FormatUtil.formatNumber(DTO.getCurrentPrice()));//giá hiện tại
         startPriceLabel.setText("Khởi điểm: "+FormatUtil.formatNumber(DTO.getStartPrice()));//giá khởi điểm
         leadBidderLabel.setText(DTO.getLeadBidder());//người đang dẫn đầu
+        lastBidTimeLabel.setText(formatEpochSecond(DTO.getLastBidTime()));//thời gian đặt giá gần nhất
         minNextBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid()));//giá kế tiếp tối thiểu
         myBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid()));//bảng chọn giá
         AuctionCountdownUtil clock = new AuctionCountdownUtil(timeLabel, DTO.getStartTime(), DTO.getEndTime());//đồng hồ đếm ngược
@@ -122,17 +126,6 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         }
         else{
             holdTimer.stop();
-        }
-    }
-
-    @FXML
-    public void handleReturnToDashboard(ActionEvent event){
-        Button ActBtn = ControllerManager.getDashboardController().getActiveMenuButton();
-        if(ActBtn.getText().equals("Dashboard")){
-            changeView("dashboard_home.fxml", 1);
-        }
-        else{
-            changeView("open_slots.fxml", 1);
         }
     }
 
@@ -173,11 +166,12 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         spr.setVisible(false);
         spr1.setVisible(false);
         btnPlaceBid.setVisible(false);
-        btnBuyNow.setVisible(false);
-        AutoBid.setText("Cancel Auction");
-        AutobidHbox.setVisible(false);
-        AutobidVbox.setVisible(false);
         btnLeaveRoom.setVisible(false);
+        btnBuyNow.setVisible(false);
+        btnBuyNow.setManaged(false);
+        autoBidVbox.setVisible(false);
+        autoBidVbox.setManaged(false);
+        AutoBid.setText("Cancel Auction");
     }
 
     public void setupLineChart(){
@@ -219,7 +213,17 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             }
         }
     }
+    @FXML
+    public void handleReturnToDashboard(ActionEvent event){
 
+        Button ActBtn = ControllerManager.getDashboardController().getActiveMenuButton();
+        if(ActBtn.getText().equals("Dashboard")){
+            changeView("dashboard_home.fxml", 1);
+        }
+        else{
+            changeView("open_slots.fxml", 1);
+        }
+    }
     @FXML
     public void handleLeaveRoom(){
         LeaveRoomRequestDTO leaveRoomRequest = new LeaveRoomRequestDTO(auctionId);
@@ -282,17 +286,28 @@ public class liveAuctionController implements Initializable, IServerMessageListe
 
     @FXML
     public void handleCancelAndAutobid(){
-        if(AutoBid.getText().equals("Auto Bid")){
+        if(AutoBid.getText().equals("Auto Bid")) {
             double maxBid = 0;
             try {
                 maxBid = Double.parseDouble(maxBidInput.getText());
-            }
-            catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 ControllerManager.getDashboardController().showToast("FAILED", "Số tiền không hợp lệ", false);
             }
             AutoBidRequestDTO autoBidRequest = new AutoBidRequestDTO(auctionId, maxBid, minCount);
             Request request = new Request(ActionType.REGISTER_AUTO_BID, autoBidRequest);
             SocketManager.getClient().sendRequest(request);
+        }
+        else if(AutoBid.getText().equals("Cancel Auto Bid")){
+            Request stopAutobid = new Request(ActionType.UNREGISTER_AUTO_BID, null);
+            SocketManager.getClient().sendRequestAsync(stopAutobid)
+                    .thenAccept(response -> {
+                        if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+                            updateAutoBidStatus(false);
+                        }
+                        else{
+                            ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                        }
+                    });
         }
         else{
             CancelAuctionRequestDTO cancelAuctionRequest = new CancelAuctionRequestDTO(auctionId);
@@ -303,7 +318,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         if("SUCCESS".equals(String.valueOf(cancelResponse.getStatus()))){
                             Platform.runLater(()->{
                                 ControllerManager.getDashboardController().showToast("SUCCESS", cancelResponse.getMessage(), true);
-                                ControllerManager.getDashboardHomeController().removeFromDashBoard(this.auctionId, ControllerManager.getDashboardHomeController().getFlowJoined());
+                                ControllerManager.getDashboardHomeController().removeFromDashBoard(this.auctionId, ControllerManager.getDashboardHomeController().getAuctionFlowPane());
                                 ViewManager.changeView("dashboard_home.fxml", 1);
                             });
                         }
@@ -313,6 +328,26 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                             });
                         }
                     });
+        }
+    }
+    private void updateAutoBidStatus(boolean active){
+        autoBidVbox.getStyleClass().removeAll("autobid-inactive", "autobid-active");
+        autoBidStatusLabel.getStyleClass().removeAll("autobid-status-inactive", "autobid-status-active");
+        AutoBid.getStyleClass().removeAll("bidbtn", "autobid-cancel-btn");
+        if (active) {
+            autoBidVbox.getStyleClass().add("autobid-active");
+            autoBidStatusLabel.getStyleClass().add("autobid-status-active");
+            autoBidStatusLabel.setText("● Đang hoạt động");
+            AutoBid.getStyleClass().add("autobid-cancel-btn");
+            AutoBid.setText("Cancel Auto Bid");
+            maxBidInput.setDisable(true);
+        } else {
+            autoBidVbox.getStyleClass().add("autobid-inactive");
+            autoBidStatusLabel.getStyleClass().add("autobid-status-inactive");
+            autoBidStatusLabel.setText("● Chưa kích hoạt");
+            AutoBid.getStyleClass().add("bidbtn");
+            AutoBid.setText("Auto Bid");
+            maxBidInput.setDisable(false);
         }
     }
     public void setAuctionId(String id){
@@ -333,6 +368,8 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                 }
                 case REGISTER_AUTO_BID -> {
                     if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+                        AutoBid.setText("Cancel Auto Bid");
+                        updateAutoBidStatus(true);
                         ControllerManager.getDashboardController().showToast("Active Auto Bid", response.getMessage(), true);
                     }
                     if(ResponseStatus.ERROR.equals(response.getStatus())){
@@ -370,6 +407,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             }
         });
     }
+
     public void onDisconnected(String reason){}
     @FXML
     @Override

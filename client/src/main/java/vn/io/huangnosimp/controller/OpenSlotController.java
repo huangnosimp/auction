@@ -1,6 +1,7 @@
 package vn.io.huangnosimp.controller;
 
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -9,13 +10,19 @@ import javafx.scene.Parent;
 import javafx.scene.layout.FlowPane;
 import javafx.util.Duration;
 import vn.io.huangnosimp.Manager.ControllerManager;
+import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.Manager.UserSession;
+import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
+import vn.io.huangnosimp.protocol.ActionType;
+import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.ResponseStatus;
+import vn.io.huangnosimp.util.GsonParser;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class OpenSlotController implements Initializable {
     @FXML private FlowPane cardContainer;
@@ -79,6 +86,76 @@ public class OpenSlotController implements Initializable {
         for(AuctionCardDTO dto : listcard){
             addCard(dto, "Public");
         }
+    }
+    @FXML
+    public void loadMorePublicCards() {
+        // Lấy tất cả id đang có
+        Set<String> existingIds = new HashSet<>();
+        UserSession.getListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+        UserSession.getJoiningListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+        UserSession.getMyListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+
+        List<AuctionCardDTO> result = new ArrayList<>();
+        fetchMoreUntilFull(result, existingIds, 30, 5);
+    }
+
+    private void fetchMoreUntilFull(List<AuctionCardDTO> result,
+                                    Set<String> existingIds,
+                                    int target,
+                                    int maxRetry) {
+
+        if (result.size() >= target || maxRetry <= 0) {
+            applyResult(result);
+            return;
+        }
+
+        int needed = target - result.size();
+        GetPublicAcutionCardDTO requestDTO = new GetPublicAcutionCardDTO(needed * 2);
+        Request request = new Request(ActionType.GET_PUBLIC_AUCTION_CARD, requestDTO);
+
+        SocketManager.getClient().sendRequestAsync(request)
+                .thenAccept(response -> {
+                    if (!ResponseStatus.SUCCESS.equals(response.getStatus())) {
+                        applyResult(result);
+                        return;
+                    }
+
+                    GetPublicAuctionCardResponseDTO dto = GsonParser.GSON.fromJson(
+                            GsonParser.GSON.toJsonTree(response.getData()),
+                            GetPublicAuctionCardResponseDTO.class
+                    );
+
+                    List<AuctionCardDTO> responseList = dto.getPublicAuctionCardList();
+
+                    if (responseList == null || responseList.isEmpty()) {
+                        applyResult(result);
+                        return;
+                    }
+
+                    for (AuctionCardDTO card : responseList) {
+                        if (!existingIds.contains(card.getAuctionId())) {
+                            result.add(card);
+                            existingIds.add(card.getAuctionId());
+                            if (result.size() >= target) break;
+                        }
+                    }
+
+                    if (result.size() >= target) {
+                        applyResult(result);
+                    } else {
+                        fetchMoreUntilFull(result, existingIds, target, maxRetry - 1);
+                    }
+                });
+    }
+
+    // Tách riêng để tránh lặp code Platform.runLater
+    private void applyResult(List<AuctionCardDTO> result) {
+        Platform.runLater(() -> {
+            UserSession.getListCard().addAll(result); // thêm vào session, không xóa
+            for (AuctionCardDTO card : result) {
+                addCard(card, "Public"); // gọi trực tiếp trong controller
+            }
+        });
     }
     public void initialize(URL location, ResourceBundle resources){
         ControllerManager.setOpenSlotController(this);

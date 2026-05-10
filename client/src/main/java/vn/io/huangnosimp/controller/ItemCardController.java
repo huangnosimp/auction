@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.controller;
 
+import client.info.User;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -91,6 +92,7 @@ public class ItemCardController {
 
                                         AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(Joinresponse.getData()), AuctionDetailResponseDTO.class);
                                         Platform.runLater(()->{
+                                            UserSession.addonejoiningCard(UserSession.findWithId(auctionId));
                                             UserSession.setAuctionDetail(auctionResponse);
                                             UserSession.setAuctionId(auctionId);
                                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");

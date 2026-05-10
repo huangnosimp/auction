@@ -13,6 +13,7 @@ import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
 import vn.io.huangnosimp.dto.request.LoginRequestDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
+import vn.io.huangnosimp.dto.response.GetPostedAuctionCardResponseDTO;
 import vn.io.huangnosimp.enums.UserType;
 import vn.io.huangnosimp.network.IServerMessageListener;
 import vn.io.huangnosimp.network.SocketClient;
@@ -68,7 +69,12 @@ public class LoginController {
                     .thenAccept(response -> {
 
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-
+                            Request getMineRequest = new Request(ActionType.GET_POSTED_AUCTION_CARD, null);
+                            SocketManager.getClient().sendRequestAsync(getMineRequest)
+                                    .thenAccept(getPostedResponse -> {
+                                        GetPostedAuctionCardResponseDTO dto =  GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(getPostedResponse.getData()), GetPostedAuctionCardResponseDTO.class);
+                                        UserSession.addMyCard(dto.getAuctionCards());
+                                    });
                             Request dashboardRequest = new Request(ActionType.GET_DASHBOARD_INFO, null);
                             SocketManager.getClient().sendRequestAsync(dashboardRequest)
                                     .thenAccept(dashboardResponse->{

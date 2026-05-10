@@ -187,7 +187,12 @@
                     <children>
                         <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Người trả cao nhất" />
                         <Label fx:id="leadBidderLabel" style="-fx-text-fill: #ffffff; -fx-font-size: 12px; -fx-font-weight: bold;" text="Khách #007" />
-                        <Label fx:id="lastBidTimeLabel" style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Lần đặt: 14:31:07" />
+                  <HBox>
+                     <children>
+                              <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Lần đặt: " />
+                        <Label fx:id="lastBidTimeLabel" style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="14:31:07" />
+                     </children>
+                  </HBox>
                     </children>
                 </VBox>
 
@@ -228,31 +233,24 @@
                 </VBox>
 
                 <!-- ═══ AUTO BID — có ô nhập giá tối đa ═══ -->
-                <VBox fx:id="autoBidVbox" spacing="6" style="-fx-background-color: #2d1a1a; -fx-background-radius: 8;">
+                <VBox fx:id="autoBidVbox" spacing="6" styleClass="autobid-inactive">
                     <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
                     <children>
-
-                        <!-- Label tiêu đề -->
                         <HBox fx:id="AutobidHbox" alignment="CENTER_LEFT" spacing="6">
                             <children>
                                 <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Auto Bid" />
-                                <Label fx:id="autoBidStatusLabel" style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="● Chưa kích hoạt" />
+                                <Label fx:id="autoBidStatusLabel" styleClass="autobid-status-inactive" text="● Chưa kích hoạt" />
                             </children>
                         </HBox>
-
-                        <!-- Ô nhập giá tối đa -->
                         <VBox fx:id="AutobidVbox" spacing="3">
                             <children>
                                 <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Giá tối đa (₫)" />
-                                <TextField fx:id="maxBidInput" promptText="Nhập giá tối đa..." style="-fx-background-color: #1a1a2a;                                                   -fx-text-fill: #ffffff;                                                   -fx-border-color: #3a3d4a;                                                   -fx-border-width: 1;                                                   -fx-border-radius: 6;                                                   -fx-background-radius: 6;                                                   -fx-font-size: 12px;                                                   -fx-padding: 5 8 5 8;" />
+                                <TextField fx:id="maxBidInput" promptText="Nhập giá tối đa..." styleClass="autobid-input" />
                             </children>
                         </VBox>
-
-                        <!-- Nút Auto Bid -->
-                        <Button fx:id="AutoBid" alignment="CENTER" maxWidth="Infinity" mnemonicParsing="false" onAction="#handleCancelAndAutobid" prefHeight="26.0" styleClass="bidbtn" text="Auto Bid" />
-
                     </children>
                 </VBox>
+                  <Button fx:id="AutoBid" alignment="CENTER" maxWidth="Infinity" mnemonicParsing="false" onAction="#handleCancelAndAutobid" prefHeight="27.0" prefWidth="200.0" styleClass="bidbtn" text="Auto Bid" />
 
             </children>
         </VBox>
