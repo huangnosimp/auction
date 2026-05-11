@@ -100,6 +100,29 @@ public class LoginController {
                         }
                     });
         }
+        else{
+            LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserType.ADMIN, email, password);
+            Request request = new Request(ActionType.LOGIN, loginRequestDTO);
+            SocketManager.getClient().sendRequestAsync(request)
+                    .thenAccept(response -> {
+
+                        if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
+                            changeMainStage("AdminDashboarđ.fxml");
+                        }
+
+                        else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){
+                            Platform.runLater(()->{
+                                showAlert("UNAUTHORIZED", response.getMessage());
+                            });
+                        }
+
+                        else if (ResponseStatus.FAILED.equals(response.getStatus())){
+                            Platform.runLater(()->{
+                                showAlert("FAILED", response.getMessage());
+                            });
+                        }
+                    });
+        }
     }
 
     @FXML
