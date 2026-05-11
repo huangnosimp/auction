@@ -26,7 +26,7 @@ public class AuctionHandler {
                     client.getUserId(), dto.getItemName(), dto.getDescription(),
                     dto.getItemType(), dto.getAttributes(), dto.getStartPrice(),
                     dto.getStartTime(), dto.getEndTime(), dto.getCondition(),
-                    dto.getMinimumIncrement(), dto.getBuyNowPrice());
+                    dto.getMinimumIncrement(), dto.getBuyNowPrice(), dto.getImageUrl());
             if (auctionCardDTO == null) {
                 return new Response(ResponseStatus.FAILED, "Create auction failed");
             }

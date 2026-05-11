@@ -8,7 +8,7 @@ import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 import java.util.List;
 
 public interface IItemService {
-    Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes, ItemCondition condition);
+    Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes, ItemCondition condition, String imageUrl);
     Item getItemById(String id);
     boolean transferOwnership(Item item, String newOwnerId);
 }
