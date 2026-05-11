@@ -1,16 +1,29 @@
 package vn.io.huangnosimp.model;
 
+import java.time.LocalDateTime;
+
 public class Member extends User {
     protected double accountBalance;
     protected double frozenBalance;
     protected boolean isBanned;
+    protected LocalDateTime banUntil;
 
-    public Member(String id, String username, String password, String email, double accountBalance, double frozenBalance, boolean isBanned, long createdAt) {
+    public Member(String id, String username, String password, String email, double accountBalance, double frozenBalance, boolean isBanned, LocalDateTime banUntil, long createdAt) {
         super(id, username, password, email, createdAt);
         this.accountBalance = accountBalance;
         this.frozenBalance = frozenBalance;
         this.isBanned = isBanned;
+        this.banUntil = banUntil;
     }
+
+    public LocalDateTime getBanUntil() {
+        return banUntil;
+    }
+
+    public void setBanUntil(LocalDateTime banUntil) {
+        this.banUntil = banUntil;
+    }
+
     public synchronized double getAccountBalance() {
         return accountBalance;
     }
