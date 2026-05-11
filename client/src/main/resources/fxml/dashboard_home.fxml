@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox spacing="16" style="-fx-background-color: #211429;" styleClass="main-content" stylesheets="@../css/dashboard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.dashboard_homeController">
+<HBox spacing="16" style="-fx-background-color: #1F1B1F;" styleClass="main-content" stylesheets="@../css/dashboard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.dashboard_homeController">
 
     <VBox spacing="16" styleClass="left-panel" HBox.hgrow="ALWAYS">
 
@@ -59,7 +60,11 @@
             </HBox>
 
             <HBox spacing="4" styleClass="tab-bar">
-                <Button fx:id="tabJoined" mnemonicParsing="false" onAction="#handleTabChange" styleClass="tab-btn-active" text="Active Bids" />
+                <Button fx:id="tabJoined" mnemonicParsing="false" onAction="#handleTabChange" text="Active Bids">
+               <styleClass>
+                  <String fx:value="tab-btn-active" />
+                  <String fx:value="tab-btn" />
+               </styleClass></Button>
                 <Button fx:id="tabMyAuctions" mnemonicParsing="false" onAction="#handleTabChange" styleClass="tab-btn" text="My Auctions" />
             </HBox>
 

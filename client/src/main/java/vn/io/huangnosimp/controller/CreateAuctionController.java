@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import vn.io.huangnosimp.Manager.ControllerManager;
 import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.CreateAuctionRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
@@ -132,6 +133,7 @@ public class CreateAuctionController implements Initializable{
                     if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
                         AuctionCardDTO cardResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionCardDTO.class);
                         ControllerManager.getDashboardHomeController().addToDashboard(cardResponse, "My", ControllerManager.getDashboardHomeController().getAuctionFlowPane());
+                        UserSession.addoneMyCard(cardResponse);
                         ControllerManager.getDashboardHomeController().changeTab();
                         ViewManager.changeView("dashboard_home.fxml", 1);
                     }
@@ -221,23 +223,23 @@ public class CreateAuctionController implements Initializable{
         int hour = parts.length > 0 ? Integer.parseInt(parts[0].trim()) : 0;
         int min  = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 0;
         return LocalDateTime.of(date, LocalTime.of(hour, min))
-                .toInstant(ZoneOffset.of("+07:00")) // ← đổi thành GMT+7
-                .getEpochSecond();
+                .toInstant(ZoneOffset.of("+07:00"))
+                .toEpochMilli();
     }
 
     private long calculateEndTime(long startTime) {
         long duration = switch (durationCombo.getValue()) {
-            case "15 minutes" -> 900L;
-            case "30 minutes" -> 1_800L;
-            case "45 minutes" -> 2_700L;
-            case "1 hour"   -> 3_600L;
-            case "3 hours"  -> 10_800L;
-            case "6 hours"  -> 21_600L;
-            case "12 hours" -> 43_200L;
-            case "1 day"    -> 86_400L;
-            case "3 days"   -> 259_200L;
-            case "7 days"   -> 604_800L;
-            default         -> 86_400L;
+            case "15 minutes" -> 900_000L;
+            case "30 minutes" -> 1_800_000L;
+            case "45 minutes" -> 2_700_000L;
+            case "1 hour"     -> 3_600_000L;
+            case "3 hours"    -> 10_800_000L;
+            case "6 hours"    -> 21_600_000L;
+            case "12 hours"   -> 43_200_000L;
+            case "1 day"      -> 86_400_000L;
+            case "3 days"     -> 259_200_000L;
+            case "7 days"     -> 604_800_000L;
+            default           -> 86_400_000L;
         };
         return startTime + duration;
     }

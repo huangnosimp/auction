@@ -80,11 +80,15 @@ public class SocketClient {
 
     public void sendRequest(Request request) {
         if (out != null && socket != null && !socket.isClosed()) {
+            pendingRequests.put(
+                    request.getRequestId(),
+                    new PendingEntry(new CompletableFuture<>(), request.getAction())
+            );
             String jsonStr = GsonParser.GSON.toJson(request);
             synchronized (out) {
                 out.println(jsonStr);
             }
-            System.out.println("[SocketClient] Sent (Fire & Forget): " + jsonStr);
+            System.out.println("[SocketClient] Sent (Fire & Forget with Tracking): " + jsonStr);
         } else {
             System.err.println("[SocketClient] Cannot send message, not connected to server.");
         }

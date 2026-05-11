@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.controller;
 
+import client.info.User;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -35,13 +36,13 @@ public class ItemCardController {
     @FXML private Label lblBidCount;
     @FXML private Label lblYourBid;
 
-    @FXML private Button BidNowButton;
+    @FXML private Button btnManage;
 
     private String auctionId;
 
     public void addInfo(AuctionCardDTO dto, String type){
         lblProductName.setText(dto.getProductName());
-        long now = Instant.now().getEpochSecond();
+        long now = Instant.now().toEpochMilli();
         if(now < dto.getStartTime()){
             statuslbl.setText("Start in: ");
         }
@@ -91,11 +92,13 @@ public class ItemCardController {
 
                                         AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(Joinresponse.getData()), AuctionDetailResponseDTO.class);
                                         Platform.runLater(()->{
+                                            UserSession.addonejoiningCard(UserSession.findWithId(auctionId));
                                             UserSession.setAuctionDetail(auctionResponse);
                                             UserSession.setAuctionId(auctionId);
                                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
                                             ControllerManager.getOpenSlotController().clearCard(auctionId);
-                                            if (BidNowButton.getText().equals("Manage")) {
+                                            ControllerManager.getDashboardHomeController().addToDashboard(UserSession.findWithId(auctionId), "Joining", ControllerManager.getDashboardHomeController().getFlowJoined());
+                                            if (btnManage.getText().equals("Manage")) {
                                                 controller.setInvisible();
                                             }
                                         });
@@ -130,7 +133,7 @@ public class ItemCardController {
                             UserSession.setAuctionDetail(auctionResponse);
                             UserSession.setAuctionId(auctionId);
                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
-                            if (BidNowButton.getText().equals("Manage")) {
+                            if (btnManage.getText().equals("Manage")) {
                                 controller.setInvisible();
                             }
                         });

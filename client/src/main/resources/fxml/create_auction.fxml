@@ -184,11 +184,11 @@
                         <Label styleClass="toggle-title" text="Buy Now" />
                         <Label styleClass="toggle-hint" text="Allow buyers to purchase immediately at a fixed price without waiting for the auction to end" />
                     </VBox>
-                    <CheckBox fx:id="buyNowCheck" selected="false" styleClass="form-toggle" onAction="#handleBuyNowToggle" />
+                    <CheckBox fx:id="buyNowCheck" onAction="#handleBuyNowToggle" selected="false" styleClass="form-toggle" />
                 </HBox>
 
                 <!-- Buy Now price - ẩn khi chưa bật toggle -->
-                <VBox fx:id="buyNowBox" managed="false" visible="false" spacing="6">
+                <VBox fx:id="buyNowBox" managed="false" spacing="6" visible="false">
                     <Label styleClass="field-label" text="Buy Now price" />
                     <HBox spacing="6">
                         <TextField fx:id="buyNowPriceField" promptText="e.g. 10" styleClass="form-input" HBox.hgrow="ALWAYS" />
@@ -239,14 +239,6 @@
                             </items>
                         </ComboBox>
                     </VBox>
-                </HBox>
-
-                <HBox alignment="CENTER_LEFT" spacing="0" styleClass="toggle-row">
-                    <VBox spacing="2" HBox.hgrow="ALWAYS">
-                        <Label styleClass="toggle-title" text="Auto-extend" />
-                        <Label styleClass="toggle-hint" text="Adds 3 min if someone bids in the final moments (prevents sniping)" />
-                    </VBox>
-                    <CheckBox fx:id="autoExtendCheck" selected="true" styleClass="form-toggle" />
                 </HBox>
             </VBox>
 

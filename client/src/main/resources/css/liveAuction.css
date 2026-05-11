@@ -10,7 +10,7 @@
      text muted  : #aaaaaa
      text white  : #f0f0f0
 ══════════════════════════════════════════════════════════ */
- 
+
 Pane {
     -fx-background-color: #1a1d2e;
     -fx-background-radius: 15;
@@ -18,46 +18,57 @@ Pane {
     -fx-border-width: 7;
     -fx-border-radius: 15;
 }
- 
+
 #mainHbox {
     -fx-border-color: #1a1d2e;
     -fx-border-width: 15;
 }
- 
-/* ── LineChart ──────────────────────────────────────── */
+
+
 .chart {
     -fx-padding: 10px;
     -fx-background-color: #12141f;
 }
- 
+
+.chart-title {
+    -fx-text-fill: white;
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
 .chart-plot-background {
     -fx-background-color: #12141f;
 }
- 
+
 .chart-vertical-grid-lines,
 .chart-horizontal-grid-lines {
     -fx-stroke: #2a2d3e;
 }
- 
+
+.axis-label {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
 .axis {
     -fx-tick-label-fill: #aaaaaa;
     -fx-axis-label-fill: #aaaaaa;
     -fx-text-fill: #aaaaaa;
 }
- 
+
 .axis-axis-label {
     -fx-text-fill: #aaaaaa;
 }
- 
+
 .default-color0.chart-series-line {
     -fx-stroke: #f0a500;
     -fx-stroke-width: 2px;
 }
- 
+
 .default-color0.chart-line-symbol {
     -fx-background-color: #f0a500, #270830;
 }
- 
+
 /* ── ScrollPane (product info) ──────────────────────── */
 .product-scroll {
     -fx-background-color: transparent;
@@ -65,35 +76,35 @@ Pane {
     -fx-border-color: transparent;
     -fx-padding: 0;
 }
- 
+
 .product-scroll > .viewport {
     -fx-background-color: #1a1d2e;
 }
- 
+
 .product-scroll .scroll-bar:vertical .track {
     -fx-background-color: #22263a;
     -fx-background-radius: 4;
 }
- 
+
 .product-scroll .scroll-bar:vertical .thumb {
     -fx-background-color: #4a2a6a;
     -fx-background-radius: 4;
 }
- 
+
 .product-scroll .scroll-bar:vertical .thumb:hover {
     -fx-background-color: #6a3a8a;
 }
- 
+
 .product-scroll .scroll-bar:vertical .increment-button,
 .product-scroll .scroll-bar:vertical .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 0;
 }
- 
+
 .product-info-container {
     -fx-background-color: #1a1d2e;
 }
- 
+
 /* ── Typography ─────────────────────────────────────── */
 .section-title {
     -fx-text-fill: #c084f5;
@@ -101,47 +112,47 @@ Pane {
     -fx-font-weight: bold;
     -fx-padding: 4 0 2 0;
 }
- 
+
 /* ── Cards ──────────────────────────────────────────── */
 .info-card {
     -fx-background-color: #12141f;
     -fx-background-radius: 8;
 }
- 
+
 .info-card-label {
     -fx-text-fill: #888888;
     -fx-font-size: 9px;
 }
- 
+
 .info-card-value-white {
     -fx-text-fill: #f0f0f0;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
- 
+
 .info-card-value-muted {
     -fx-text-fill: #aaaaaa;
     -fx-font-size: 11px;
 }
- 
+
 .info-card-value-green {
     -fx-text-fill: #4fc97e;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
- 
+
 .info-card-value-orange {
     -fx-text-fill: #f0a500;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
- 
+
 .info-card-value-purple {
     -fx-text-fill: #c084f5;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
- 
+
 .info-card-badge-new {
     -fx-text-fill: #4fc97e;
     -fx-background-color: #0d2e1c;
@@ -150,7 +161,7 @@ Pane {
     -fx-font-weight: bold;
     -fx-padding: 2 6 2 6;
 }
- 
+
 /* ── Badges ─────────────────────────────────────────── */
 .badge-optional {
     -fx-text-fill: #888888;
@@ -159,7 +170,7 @@ Pane {
     -fx-font-size: 9px;
     -fx-padding: 1 5 1 5;
 }
- 
+
 .badge-secret {
     -fx-text-fill: #f0a500;
     -fx-background-color: #2e2200;
@@ -167,7 +178,7 @@ Pane {
     -fx-font-size: 9px;
     -fx-padding: 1 5 1 5;
 }
- 
+
 /* ── Image placeholder ──────────────────────────────── */
 .image-placeholder {
     -fx-background-color: #1e2235;
@@ -176,12 +187,12 @@ Pane {
     -fx-border-radius: 6;
     -fx-border-style: dashed;
 }
- 
+
 .image-placeholder-text {
     -fx-text-fill: #4a4d6a;
     -fx-font-size: 10px;
 }
- 
+
 /* ── Auto extend chip ───────────────────────────────── */
 .auto-extend-chip {
     -fx-background-color: #0d2212;
@@ -189,18 +200,18 @@ Pane {
     -fx-border-color: #1a4a2a;
     -fx-border-radius: 8;
 }
- 
+
 .auto-extend-title {
     -fx-text-fill: #4fc97e;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
- 
+
 .auto-extend-desc {
     -fx-text-fill: #888888;
     -fx-font-size: 9px;
 }
- 
+
 /* ── Buttons ─────────────────────────────────────────── */
 .allbtn {
     -fx-background-color: #22263a;
@@ -211,13 +222,13 @@ Pane {
     -fx-font-size: 16px;
     -fx-cursor: hand;
 }
- 
+
 .allbtn:hover {
     -fx-background-color: #2e3450;
     -fx-text-fill: #f0f2f8;
     -fx-border-color: #5a4a7a;
 }
- 
+
 .bidbtn {
     -fx-background-color: #1CC953;
     -fx-text-fill: #0a2a18;
@@ -226,12 +237,12 @@ Pane {
     -fx-background-radius: 8;
     -fx-border-radius: 8;
 }
- 
+
 .bidbtn:hover {
     -fx-background-color: #4fc97e;
     -fx-cursor: hand;
 }
- 
+
 .quitbtn {
     -fx-background-color: transparent;
     -fx-text-fill: #c084f5;
@@ -241,8 +252,64 @@ Pane {
     -fx-font-size: 11px;
     -fx-cursor: hand;
 }
- 
+
 .quitbtn:hover {
     -fx-border-color: #5a4a7a;
     -fx-text-fill: #e8e6f0;
+}
+/* ── Auto Bid Status ─────────────────────────────────── */
+
+/* Trạng thái chưa kích hoạt (mặc định) */
+.autobid-inactive {
+    -fx-background-color: #2d1a1a;
+    -fx-background-radius: 8;
+}
+
+.autobid-status-inactive {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 10px;
+}
+
+/* Trạng thái đã kích hoạt */
+.autobid-active {
+    -fx-background-color: #1a2d1a;
+    -fx-background-radius: 8;
+    -fx-border-color: #00e676;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.autobid-status-active {
+    -fx-text-fill: #00e676;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+/* TextField giá tối đa */
+.autobid-input {
+    -fx-background-color: #1a1a2a;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #3a3d4a;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+    -fx-padding: 5 8 5 8;
+}
+
+/* Nút Cancel khi đang active */
+.autobid-cancel-btn {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-max-width: Infinity;
+    -fx-pref-height: 26;
+}
+
+.autobid-cancel-btn:hover {
+    -fx-background-color: #c0392b;
 }
