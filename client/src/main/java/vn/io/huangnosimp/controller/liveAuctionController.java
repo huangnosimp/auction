@@ -298,7 +298,14 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             SocketManager.getClient().sendRequest(request);
         }
         else if(AutoBid.getText().equals("Cancel Auto Bid")){
-            Request stopAutobid = new Request(ActionType.UNREGISTER_AUTO_BID, null);
+            double maxBid = 0;
+            try {
+                maxBid = Double.parseDouble(maxBidInput.getText());
+            } catch (NumberFormatException e) {
+                ControllerManager.getDashboardController().showToast("FAILED", "Số tiền không hợp lệ", false);
+            }
+            AutoBidRequestDTO cancelAutoBidRequest = new AutoBidRequestDTO(auctionId, maxBid, minCount);
+            Request stopAutobid = new Request(ActionType.UNREGISTER_AUTO_BID, cancelAutoBidRequest);
             SocketManager.getClient().sendRequestAsync(stopAutobid)
                     .thenAccept(response -> {
                         if(ResponseStatus.SUCCESS.equals(response.getStatus())){
