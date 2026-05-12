@@ -1,7 +1,7 @@
 package vn.io.huangnosimp.controller.handler;
 
+import vn.io.huangnosimp.dto.request.BanMemberRequestDTO;
 import vn.io.huangnosimp.dto.request.CancelAuctionRequestDTO;
-import vn.io.huangnosimp.dto.request.TargetIdRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.enums.UserType;
@@ -51,9 +51,8 @@ public class AdminHandler {
         public Response handle(Request request, ClientHandle client) {
             if (!isAdmin(client)) return new Response(ResponseStatus.UNAUTHORIZED, "Access denied");
 
-            TargetIdRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), TargetIdRequestDTO.class);
-            boolean success = adminService.lockMember(dto.getTargetId());
-
+            BanMemberRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), BanMemberRequestDTO.class);
+            boolean success = adminService.lockMember(dto.getTargetId(), dto.getDurationMinutes());
             if (success) {
                 return new Response(ResponseStatus.SUCCESS, "Member locked successfully");
             }
@@ -72,7 +71,7 @@ public class AdminHandler {
         public Response handle(Request request, ClientHandle client) {
             if (!isAdmin(client)) return new Response(ResponseStatus.UNAUTHORIZED, "Access denied");
 
-            TargetIdRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), TargetIdRequestDTO.class);
+            BanMemberRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), BanMemberRequestDTO.class);
             boolean success = adminService.unlockMember(dto.getTargetId());
 
             if (success) {

@@ -6,7 +6,6 @@ import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.enums.AuctionStatus;
 import vn.io.huangnosimp.model.Admin;
 import vn.io.huangnosimp.model.Member;
-import vn.io.huangnosimp.model.Auction;
 import vn.io.huangnosimp.model.User;
 import vn.io.huangnosimp.network.ClientSessionManager;
 import vn.io.huangnosimp.repository.IUserRepository;
@@ -48,18 +47,14 @@ public class AdminService implements IAdminService {
     }
 
     @Override
-    public boolean lockMember(String memberId) {
-        return lockMember(memberId, -1); // Ban vĩnh viễn
-    }
+    public boolean lockMember(String memberId, int durationInMinutes) {
 
-    public boolean lockMember(String memberId, int durationInHours) {
         var user = userRepo.findById(memberId);
         if (user instanceof Member) {
-
             LocalDateTime unbanTime = null;
 
-            if (durationInHours > 0) {
-                unbanTime = LocalDateTime.now().plusHours(durationInHours);
+            if (durationInMinutes > 0) {
+                unbanTime = LocalDateTime.now().plusMinutes(durationInMinutes);
             }
 
             boolean isSuccess = userRepo.updateBanStatus(memberId, true, unbanTime);
@@ -69,6 +64,7 @@ public class AdminService implements IAdminService {
                 return true;
             }
         }
+
         return false;
     }
 

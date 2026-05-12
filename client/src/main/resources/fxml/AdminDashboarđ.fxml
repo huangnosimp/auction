@@ -1,59 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.Insets?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="vn.io.huangnosimp.controller.AdminController"
-            stylesheets="@../css/AdminDashboard.css" prefWidth="1100" prefHeight="700">
+<BorderPane prefHeight="700" prefWidth="1100" stylesheets="@../css/AdminDashboard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.AdminController">
 
     <left>
-        <VBox spacing="15" styleClass="sidebar" prefWidth="250">
-            <padding><Insets top="30" right="20" bottom="30" left="20"/></padding>
+        <VBox prefWidth="250" spacing="15" styleClass="sidebar">
+            <padding><Insets bottom="30" left="20" right="20" top="30" /></padding>
 
-            <Label text="ADMIN PANEL" styleClass="sidebar-title" />
-            <Separator styleClass="sidebar-sep"/>
+            <Label styleClass="sidebar-title" text="ADMIN PANEL" />
+            <Separator styleClass="sidebar-sep" />
 
-            <Button text="Dashboard" styleClass="nav-btn, active" maxWidth="Infinity" />
-            <Button text="Members" styleClass="nav-btn" maxWidth="Infinity" />
-            <Button text="Auctions" styleClass="nav-btn" maxWidth="Infinity" />
+            <Button maxWidth="Infinity" styleClass="nav-btn, active" text="Dashboard" />
+            <Button maxWidth="Infinity" styleClass="nav-btn" text="Members" />
+            <Button maxWidth="Infinity" styleClass="nav-btn" text="Auctions" />
 
             <Region VBox.vgrow="ALWAYS" />
 
-            <VBox styleClass="revenue-card" spacing="10">
-                <Label text="SYSTEM REVENUE" styleClass="card-subtitle"/>
-                <Label fx:id="lblSystemRevenue" text="\$0.00" styleClass="card-value"/>
+            <VBox spacing="10" styleClass="revenue-card">
+                <Label styleClass="card-subtitle" text="SYSTEM REVENUE" />
+                <Label fx:id="lblSystemRevenue" styleClass="card-value" text="\$0.00" />
             </VBox>
         </VBox>
     </left>
 
     <center>
         <VBox spacing="25" styleClass="main-content">
-            <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+            <padding><Insets bottom="30" left="30" right="30" top="30" /></padding>
 
-            <Label text="System Overview" styleClass="header-title" />
+            <Label styleClass="header-title" text="System Overview" />
 
             <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                 <Tab text="Member Management">
-                    <TableView fx:id="tableMembers">
-                        <columns>
-                            <TableColumn fx:id="colMemberId" text="ID" prefWidth="100" />
-                            <TableColumn fx:id="colMemberName" text="Username" prefWidth="200" />
-                            <TableColumn fx:id="colMemberStatus" text="Status" prefWidth="150" />
-                            <TableColumn fx:id="colMemberAction" text="Actions" prefWidth="150" />
-                        </columns>
-                    </TableView>
+                    <VBox spacing="10">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10"/>
+                        </padding>
+
+                        <TableView fx:id="tableMembers" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colMemberId" prefWidth="100" text="ID" />
+                                <TableColumn fx:id="colMemberName" prefWidth="200" text="Username" />
+                                <TableColumn fx:id="colMemberStatus" prefWidth="150" text="Status" />
+                                <TableColumn fx:id="colMemberAction" prefWidth="150" text="Actions" />
+                            </columns>
+                        </TableView>
+
+                        <HBox alignment="CENTER_LEFT" spacing="15">
+                            <Label style="-fx-font-weight: bold;" text="Thời gian khóa (phút):" />
+                            <TextField fx:id="txtBanDuration" prefWidth="170" promptText="Để trống = Vĩnh viễn..." />
+
+                            <Region HBox.hgrow="ALWAYS" />
+
+                            <Button onAction="#handleBanMember" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;" text="Khóa (Ban)" />
+                            <Button onAction="#handleUnbanMember" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;" text="Mở khóa (Unban)" />
+                        </HBox>
+                    </VBox>
                 </Tab>
                 <Tab text="Auction Management">
-                    <TableView fx:id="tableAuctions">
-                        <columns>
-                            <TableColumn fx:id="colAuctionId" text="Auction ID" prefWidth="100" />
-                            <TableColumn fx:id="colAuctionName" text="Product" prefWidth="250" />
-                            <TableColumn fx:id="colAuctionPrice" text="Current Price" prefWidth="150" />
-                            <TableColumn fx:id="colAuctionAction" text="Control" prefWidth="150" />
-                        </columns>
-                    </TableView>
+                    <VBox spacing="10">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10"/>
+                        </padding>
+
+                        <TableView fx:id="tableAuctions" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colAuctionId" prefWidth="100" text="Auction ID" />
+                                <TableColumn fx:id="colAuctionName" prefWidth="250" text="Product" />
+                                <TableColumn fx:id="colAuctionPrice" prefWidth="150" text="Current Price" />
+                                <TableColumn fx:id="colAuctionAction" prefWidth="150" text="Control" />
+                            </columns>
+                        </TableView>
+
+                        <HBox alignment="CENTER_RIGHT" spacing="15">
+                            <Button onAction="#handleForceCancelAuction"
+                                    style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"
+                                    text="Hủy phiên đấu giá (Force Cancel)" />
+                        </HBox>
+                    </VBox>
                 </Tab>
             </TabPane>
         </VBox>
