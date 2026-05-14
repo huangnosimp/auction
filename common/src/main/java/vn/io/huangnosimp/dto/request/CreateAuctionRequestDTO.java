@@ -26,8 +26,7 @@ public class CreateAuctionRequestDTO {
                                    long endTime,
                                    ItemCondition condition,
                                    double minimumIncrement,
-                                   double buyNowPrice,
-                                   String imageUrl) {
+                                   double buyNowPrice) {
         this.itemName = itemName;
         this.description = description;
         this.itemType = itemType;
@@ -38,7 +37,7 @@ public class CreateAuctionRequestDTO {
         this.condition = condition;
         this.minimumIncrement = minimumIncrement;
         this.buyNowPrice = buyNowPrice;
-        this.imageUrl = imageUrl;
+        this.imageUrl = "imageUrl will be set later";
     }
 
     public String getItemName() {
