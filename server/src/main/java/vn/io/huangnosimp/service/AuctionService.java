@@ -179,7 +179,7 @@ public class AuctionService implements IAuctionService {
 
             auction.setUpdatedAt(System.currentTimeMillis());
             auctionRepository.save(auction);
-            bidTransactionRepository.saveBidTransaction(new BidTransaction(bidderId, auctionId, amount));
+            bidTransactionRepository.saveBidTransaction(new BidTransaction(auctionId, bidderId, amount));
 
             if (notificationService != null) {
                 notificationService.notifyBidPlaced(auctionId, amount, bidderId);
