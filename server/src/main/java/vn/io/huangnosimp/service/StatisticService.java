@@ -18,7 +18,7 @@ public class StatisticService implements IStatisticService {
     @Override
     public DashboardResponseDTO getDashboardStatistics(String userId) {
         if (userId == null || userId.isBlank()) {
-            return new DashboardResponseDTO(0.0, 0, 0, 0, 0, Collections.emptyList());
+            return new DashboardResponseDTO(0.0, 0, 0, 0, 0, Collections.emptyList(), null);
         }
 
         DashboardResponseDTO scalars = statisticRepository.getUserScalarStatistics(userId);
@@ -31,7 +31,8 @@ public class StatisticService implements IStatisticService {
                 scalars.getWinningBids(),
                 scalars.getOutBids(),
                 scalars.getWonTotal(),
-                activeRooms
+                activeRooms,
+                scalars.getUsername()
         );
     }
 
