@@ -1,6 +1,6 @@
 package vn.io.huangnosimp.repository;
 
-import vn.io.huangnosimp.database.DatabaseConnection;
+import vn.io.huangnosimp.connection.DatabaseConnection;
 import vn.io.huangnosimp.model.Auction;
 import vn.io.huangnosimp.enums.AuctionStatus;
 import vn.io.huangnosimp.model.Item;

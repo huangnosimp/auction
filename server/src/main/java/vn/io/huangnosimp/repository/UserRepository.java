@@ -1,6 +1,6 @@
 package vn.io.huangnosimp.repository;
 
-import vn.io.huangnosimp.database.DatabaseConnection;
+import vn.io.huangnosimp.connection.DatabaseConnection;
 import vn.io.huangnosimp.model.Admin;
 import vn.io.huangnosimp.model.Member;
 import vn.io.huangnosimp.model.User;
