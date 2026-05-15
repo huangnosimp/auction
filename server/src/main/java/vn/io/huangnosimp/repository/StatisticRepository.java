@@ -1,6 +1,6 @@
 package vn.io.huangnosimp.repository;
 
-import vn.io.huangnosimp.database.DatabaseConnection;
+import vn.io.huangnosimp.connection.DatabaseConnection;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;

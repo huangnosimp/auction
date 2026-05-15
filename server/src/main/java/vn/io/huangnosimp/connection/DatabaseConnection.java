@@ -1,4 +1,4 @@
-package vn.io.huangnosimp.database;
+package vn.io.huangnosimp.connection;
 
 import java.sql.Connection;
 import java.sql.SQLException;

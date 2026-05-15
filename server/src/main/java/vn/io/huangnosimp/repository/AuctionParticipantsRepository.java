@@ -1,6 +1,6 @@
 package vn.io.huangnosimp.repository;
 
-import vn.io.huangnosimp.database.DatabaseConnection;
+import vn.io.huangnosimp.connection.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
