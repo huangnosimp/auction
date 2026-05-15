@@ -20,9 +20,9 @@ public class ItemRepository implements IItemRepository {
         if (item == null || item.getId() == null)
             return;
         String sql = "INSERT INTO Items (id, created_at, owner_id, name, description, item_type, " +
-                "artist, creation_year, brand, warranty_period, engine_type, mileage, conditions) "
+                "artist, creation_year, brand, warranty_period, engine_type, mileage, conditions, imageurl) "
                 +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -44,6 +44,7 @@ public class ItemRepository implements IItemRepository {
             stmt.setNull(12, Types.INTEGER);
 
             stmt.setString(13, item.getCondition().name());
+            stmt.setString(14, item.getImageUrl());
 
             switch (item) {
                 case Art art -> {
@@ -117,20 +118,21 @@ public class ItemRepository implements IItemRepository {
         String description = rs.getString("description");
         String itemType = rs.getString("item_type");
         ItemCondition conditions = ItemCondition.valueOf(rs.getString("conditions"));
+        String imageUrl = rs.getString("image_url");
 
         Item item = null;
         if ("ART".equals(itemType)) {
             String artist = rs.getString("artist");
             int creationYear = rs.getInt("creation_year");
-            item = new Art(ownerId, name, description, artist, creationYear, conditions);
+            item = new Art(ownerId, name, description, artist, creationYear, conditions, imageUrl);
         } else if ("ELECTRONICS".equals(itemType)) {
             String brand = rs.getString("brand");
             int warrantyPeriod = rs.getInt("warranty_period");
-            item = new Electronics(ownerId, name, description, brand, warrantyPeriod, conditions);
+            item = new Electronics(ownerId, name, description, brand, warrantyPeriod, conditions, imageUrl);
         } else if ("VEHICLE".equals(itemType)) {
             String engineType = rs.getString("engine_type");
             int mileage = rs.getInt("mileage");
-            item = new Vehicle(ownerId, name, description, engineType, mileage, conditions);
+            item = new Vehicle(ownerId, name, description, engineType, mileage, conditions, imageUrl);
         }
 
 

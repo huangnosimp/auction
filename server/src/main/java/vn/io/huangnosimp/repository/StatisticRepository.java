@@ -24,7 +24,7 @@ public class StatisticRepository implements IStatisticRepository {
     @Override
     public DashboardResponseDTO getUserScalarStatistics(String userId) {
         String sql = "SELECT " +
-                "u.account_balance, " +
+                "u.username, u.account_balance, " +
                 "(SELECT COUNT(*) FROM auctions a WHERE a.winner_id = u.id AND a.status = 'RUNNING') AS winning_bids, " +
                 "(SELECT COUNT(DISTINCT a.id) FROM auctions a JOIN bidtransactions bt ON a.id = bt.auction_id WHERE bt.bidder_id = u.id AND a.winner_id != u.id AND a.status = 'RUNNING') AS out_bids, " +
                 "(SELECT COUNT(*) FROM auctions a WHERE a.winner_id = u.id AND a.status = 'PAID') AS won_total " +
@@ -36,16 +36,17 @@ public class StatisticRepository implements IStatisticRepository {
             statement.setString(1, userId);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
+                String username = rs.getString("username");
                 double balance = rs.getDouble("account_balance");
                 int winningBids = rs.getInt("winning_bids");
                 int outBids = rs.getInt("out_bids");
                 int wonTotal = rs.getInt("won_total");
-                return new DashboardResponseDTO(balance, 0, winningBids, outBids, wonTotal, Collections.emptyList());
+                return new DashboardResponseDTO(balance, 0, winningBids, outBids, wonTotal, Collections.emptyList(), username);
             }
         } catch (SQLException e) {
             System.err.println("DB error when fetching user scalar statistics: " + e.getMessage());
         }
-        return new DashboardResponseDTO(0.0, 0, 0, 0, 0, Collections.emptyList());
+        return new DashboardResponseDTO(0.0, 0, 0, 0, 0, Collections.emptyList(), null);
     }
 
     @Override

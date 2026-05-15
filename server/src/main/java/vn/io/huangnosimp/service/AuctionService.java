@@ -65,9 +65,11 @@ public class AuctionService implements IAuctionService {
         }
     }
 
+    @Override
     public AuctionCardDTO createAuction(String sellerId, String itemName, String description, ItemType itemType,
                                             ItemAttributesDTO attributes, double startPrice, long startTime,
-                                            long endTime, ItemCondition condition, double minimumIncrement, double buyNowPrice) {
+                                            long endTime, ItemCondition condition, double minimumIncrement,
+                                            double buyNowPrice, String imageUrl) {
         if (!isValidOpenAuctionInput(sellerId, itemName, description, itemType, attributes, startPrice)
                 || endTime <= startTime || startTime > System.currentTimeMillis()) {
             return null;
@@ -76,7 +78,7 @@ public class AuctionService implements IAuctionService {
         if (seller == null) {
             return null;
         }
-        Item item = itemService.createItem(sellerId, itemName, description, itemType, attributes, condition);
+        Item item = itemService.createItem(sellerId, itemName, description, itemType, attributes, condition, imageUrl);
         Auction auction = new Auction(item, seller, startPrice, startTime, endTime, minimumIncrement, buyNowPrice);
         auctionRepository.save(auction);
         scheduler.scheduleAuction(auction);
@@ -112,6 +114,7 @@ public class AuctionService implements IAuctionService {
         processPayment(auctionId);
     }
 
+    @Override
     public BidResult placeBid(String bidderId, String auctionId, double amount, boolean triggerAutoBid) {
         BidResult bidSuccess;
         Object lock = getAuctionLock(auctionId);
@@ -176,7 +179,7 @@ public class AuctionService implements IAuctionService {
 
             auction.setUpdatedAt(System.currentTimeMillis());
             auctionRepository.save(auction);
-            bidTransactionRepository.saveBidTransaction(new BidTransaction(bidderId, auctionId, amount));
+            bidTransactionRepository.saveBidTransaction(new BidTransaction(auctionId, bidderId, amount));
 
             if (notificationService != null) {
                 notificationService.notifyBidPlaced(auctionId, amount, bidderId);
