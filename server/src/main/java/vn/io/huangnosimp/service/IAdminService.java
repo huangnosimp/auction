@@ -11,7 +11,7 @@ import java.util.List;
 public interface IAdminService {
     Admin getAdmin(String adminId);
     List<MemberDTO> getAllMembers();
-    boolean lockMember(String memberId);
+    boolean lockMember(String memberId, int durationInMinutes);
     boolean unlockMember(String memberId);
     List<AuctionCardDTO> getAllAuctions();
     boolean forceCancelAuction(String auctionId);

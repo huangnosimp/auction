@@ -1,9 +1,9 @@
 package vn.io.huangnosimp.network.service;
 
+import vn.io.huangnosimp.dto.request.BanMemberRequestDTO;
 import vn.io.huangnosimp.network.SocketClient;
 import com.google.gson.reflect.TypeToken;
 import vn.io.huangnosimp.dto.request.CancelAuctionRequestDTO;
-import vn.io.huangnosimp.dto.request.TargetIdRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.protocol.ActionType;
@@ -29,7 +29,6 @@ public class AdminNetworkService {
 
         return socketClient.sendRequestAsync(request).thenApply(response -> {
             if (response.getStatus() == ResponseStatus.SUCCESS) {
-                // Parse dữ liệu "data" từ Response về List<Member>
                 Type listType = new TypeToken<List<MemberDTO>>(){}.getType();
                 return GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), listType);
             }
@@ -38,8 +37,8 @@ public class AdminNetworkService {
     }
 
     // 2. Khóa tài khoản
-    public CompletableFuture<Boolean> lockMemberAsync(String memberId) {
-        TargetIdRequestDTO dto = new TargetIdRequestDTO(memberId);
+    public CompletableFuture<Boolean> lockMemberAsync(String memberId, int durationMinutes) {
+        BanMemberRequestDTO dto = new BanMemberRequestDTO(memberId, durationMinutes);
         Request request = new Request(ActionType.ADMIN_LOCK_MEMBER, dto);
 
         return socketClient.sendRequestAsync(request).thenApply(response ->
@@ -49,7 +48,7 @@ public class AdminNetworkService {
 
     // 3. Mở khóa tài khoản
     public CompletableFuture<Boolean> unlockMemberAsync(String memberId) {
-        TargetIdRequestDTO dto = new TargetIdRequestDTO(memberId);
+        BanMemberRequestDTO dto = new BanMemberRequestDTO(memberId, 0); // duration không cần thiết khi mở khóa
         Request request = new Request(ActionType.ADMIN_UNLOCK_MEMBER, dto);
 
         return socketClient.sendRequestAsync(request).thenApply(response ->

@@ -3,7 +3,7 @@
 
 .table-view {
     -fx-background-color: transparent;
-    -fx-border-color: #334155; /* Viền mỏng màu xám tối */
+    -fx-border-color: #334155;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
     -fx-padding: 2;
@@ -22,11 +22,11 @@
 .table-view .column-header, .table-view .filler {
     -fx-background-color: transparent;
     -fx-border-color: transparent transparent #334155 transparent;
-    -fx-size: 45; /* Chiều cao của thanh tiêu đề */
+    -fx-size: 45;
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #94a3b8; /* Chữ xám nhạt */
+    -fx-text-fill: #94a3b8;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-alignment: CENTER_LEFT;
@@ -34,8 +34,8 @@
 
 .table-row-cell {
     -fx-background-color: transparent;
-    -fx-border-color: transparent transparent #1e293b transparent; /* Kẻ vạch ngang mỏng giữa các dòng */
-    -fx-cell-size: 50; /* Chiều cao mỗi dòng (để nút bấm nhét vừa) */
+    -fx-border-color: transparent transparent #1e293b transparent;
+    -fx-cell-size: 50;
 }
 
 .table-row-cell:odd {
@@ -115,7 +115,37 @@
 }
 
 .card-value {
-    -fx-text-fill: #4ade80; /* Màu xanh lá nổi bật (khớp với chữ Dashboard) */
+    -fx-text-fill: #4ade80;
     -fx-font-size: 24px;
     -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell .table-cell {
+    -fx-text-fill: white;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #3498db;
+    -fx-background-insets: 0;
+}
+
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #ccf3fc;
+}
+.table-view .table-row-cell:hover .table-cell {
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell:selected:hover {
+    -fx-background-color: #2980b9;
+}
+
+.table-view {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
