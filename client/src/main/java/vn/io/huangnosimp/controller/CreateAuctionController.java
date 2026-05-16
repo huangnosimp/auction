@@ -163,7 +163,7 @@ public class CreateAuctionController implements Initializable{
 
     private void renderPreviews(List<File> files) {
         Platform.runLater(() -> {
-            flowPaneThumbnails.getChildren().clear(); // Xóa các preview cũ
+            flowPaneThumbnails.getChildren().clear();
             for (File file : files) {
                 ImageView iv = new ImageView(new Image(file.toURI().toString()));
                 iv.setFitWidth(100);

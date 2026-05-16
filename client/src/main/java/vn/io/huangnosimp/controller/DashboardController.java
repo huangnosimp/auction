@@ -77,11 +77,21 @@ public class DashboardController implements Initializable {
     @FXML
     public void handlebtnAvatar(ActionEvent event) {
         changeView("AccountView.fxml", 1);
+        for (Node node : menuHbox.getChildren()) {
+            if (node instanceof Button btn) {
+                btn.getStyleClass().remove("nav-btn-active");
+            }
+        }
     }
 
     @FXML
     public void handlebtnDashboard(ActionEvent event) {
         changeView("dashboard_home.fxml", 1);
+        handleMenuAction(event);
+    }
+    @FXML
+    public void handlebtnInventory(ActionEvent event){
+        changeView("Inventory.fxml", 1);
         handleMenuAction(event);
     }
 

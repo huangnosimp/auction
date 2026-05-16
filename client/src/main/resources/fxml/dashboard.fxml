@@ -20,7 +20,7 @@
                     <HBox fx:id="menuHbox" alignment="CENTER_LEFT" spacing="4" styleClass="nav-buttons" HBox.hgrow="ALWAYS">
                         <Button fx:id="btnDashboard" onAction="#handlebtnDashboard" styleClass="nav-btn, nav-btn-active" text="Dashboard" />
                         <Button fx:id="btnOpenSlots" onAction="#handlebtnOpenSlots" styleClass="nav-btn" text="Open Slots" />
-                        <Button fx:id="btnFighters" styleClass="nav-btn" text=".........." />
+                        <Button fx:id="btnInventory" onAction="#handlebtnInventory" styleClass="nav-btn" text="Inventory" />
                     </HBox>
 
                     <HBox alignment="CENTER_RIGHT" spacing="12" styleClass="nav-right">
