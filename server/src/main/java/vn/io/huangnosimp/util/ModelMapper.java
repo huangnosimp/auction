@@ -4,17 +4,28 @@ import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.model.Auction;
 import vn.io.huangnosimp.model.Member;
 import vn.io.huangnosimp.dto.response.MemberDTO;
+
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ModelMapper {
+
     public static MemberDTO toMemberDTO(Member member) {
         if (member == null) return null;
+
+        String banUntilString = null;
+        if (member.getBanUntil() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            banUntilString = member.getBanUntil().format(formatter);
+        }
+
         return new MemberDTO(
                 member.getId(),
                 member.getUsername(),
                 member.getEmail(),
-                member.isBanned()
+                member.isBanned(),
+                banUntilString
         );
     }
 

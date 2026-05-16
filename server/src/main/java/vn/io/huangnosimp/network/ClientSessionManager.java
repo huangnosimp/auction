@@ -122,4 +122,14 @@ public class ClientSessionManager {
         auctionRooms.remove(auctionId);
         System.out.println("[ClientSessionManager] Destroyed room for canceled auction: " + auctionId);
     }
+
+    public boolean isUserOnline(String userId) {
+        if (userId == null) return false;
+        for (ClientHandle client : activeClients) {
+            if (userId.equals(client.getUserId())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
