@@ -65,5 +65,8 @@ public class AuctionCardDTO {
     public int getBidderCount() {
         return bidderCount;
     }
-    public List<String> getImageUrl(){ return imageUrl; }
+
+    public List<String> getImageUrl() {
+        return imageUrl;
+    }
 }

@@ -16,6 +16,8 @@ import vn.io.huangnosimp.repository.IAuctionParticipantsRepository;
 import vn.io.huangnosimp.repository.IAuctionRepository;
 import vn.io.huangnosimp.repository.IBidTransactionRepository;
 import vn.io.huangnosimp.repository.ITransactionRepository;
+
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AuctionService implements IAuctionService {
@@ -69,7 +71,7 @@ public class AuctionService implements IAuctionService {
     public AuctionCardDTO createAuction(String sellerId, String itemName, String description, ItemType itemType,
                                             ItemAttributesDTO attributes, double startPrice, long startTime,
                                             long endTime, ItemCondition condition, double minimumIncrement,
-                                            double buyNowPrice, String imageUrl) {
+                                            double buyNowPrice, List<String> imageUrl) {
         if (!isValidOpenAuctionInput(sellerId, itemName, description, itemType, attributes, startPrice)
                 || endTime <= startTime || startTime > System.currentTimeMillis()) {
             return null;
@@ -82,7 +84,7 @@ public class AuctionService implements IAuctionService {
         Auction auction = new Auction(item, seller, startPrice, startTime, endTime, minimumIncrement, buyNowPrice);
         auctionRepository.save(auction);
         scheduler.scheduleAuction(auction);
-        return new AuctionCardDTO(auction.getId(), item.getName(), auction.getStartPrice(), 0, auction.getStartTime(), auction.getEndTime(), 0, 0);
+        return new AuctionCardDTO(auction.getId(), item.getName(), auction.getStartPrice(), 0, auction.getStartTime(), auction.getEndTime(), 0, 0, imageUrl);
     }
 
     private boolean isValidOpenAuctionInput(String sellerId, String name, String description, ItemType type,
