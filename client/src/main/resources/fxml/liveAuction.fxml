@@ -33,6 +33,7 @@
                     <content>
                         <VBox spacing="10" styleClass="product-info-container">
                             <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
+                     <Label fx:id="statusLabel" styleClass="info-card-badge-new" text="WINNING" />
 
                             <Label styleClass="section-title" text="Thông tin sản phẩm đấu giá" />
 
@@ -114,7 +115,7 @@
                                         <Label style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="Giá đặt của bạn" />
                                         <HBox>
                                             <children>
-                                                <Label fx:id="myBidLabel" style="-fx-text-fill: #ffffff; -fx-font-size: 15px; -fx-font-weight: bold;" text="2.900.000.000 " />
+                                    <TextField fx:id="myBidLabel" promptText="2.900.000.000 " />
                                                 <Label style="-fx-text-fill: white;" text="đ" />
                                             </children>
                                         </HBox>
@@ -167,7 +168,7 @@
                 </VBox>
 
                 <!-- Mua ngay -->
-                <VBox spacing="6" style="-fx-background-color: #16181f; -fx-background-radius: 8;">
+                <VBox fx:id="buyNowDisplay" spacing="6" style="-fx-background-color: #16181f; -fx-background-radius: 8;">
                     <padding><Insets bottom="8" left="10" right="10" top="8" /></padding>
                     <children>
                         <HBox alignment="CENTER_LEFT" spacing="6">

@@ -105,10 +105,9 @@ public class LoginController {
             Request request = new Request(ActionType.LOGIN, loginRequestDTO);
             SocketManager.getClient().sendRequestAsync(request)
                     .thenAccept(response -> {
+
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                            Platform.runLater(() -> {
-                                changeMainStage("AdminDashboarđ.fxml");
-                            });
+                            changeMainStage("AdminDashboarđ.fxml");
                         }
 
                         else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){

@@ -8,6 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import javafx.event.ActionEvent;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import vn.io.huangnosimp.Manager.*;
 import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
@@ -38,9 +40,14 @@ public class ItemCardController {
 
     @FXML private Button btnManage;
 
+    @FXML private ImageView imgProduct;
+
     private String auctionId;
+    private List<String> displayImg;
 
     public void addInfo(AuctionCardDTO dto, String type){
+        displayImg = dto.getImageUrl();
+        imgProduct.setImage(new Image(displayImg.get(0), 0, 0, true, true));
         lblProductName.setText(dto.getProductName());
         long now = Instant.now().toEpochMilli();
         if(now < dto.getStartTime()){
@@ -96,7 +103,6 @@ public class ItemCardController {
                                             UserSession.setAuctionDetail(auctionResponse);
                                             UserSession.setAuctionId(auctionId);
                                             liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
-                                            ControllerManager.getOpenSlotController().clearCard(auctionId);
                                             ControllerManager.getDashboardHomeController().addToDashboard(UserSession.findWithId(auctionId), "Joining", ControllerManager.getDashboardHomeController().getFlowJoined());
                                             if (btnManage.getText().equals("Manage")) {
                                                 controller.setInvisible();

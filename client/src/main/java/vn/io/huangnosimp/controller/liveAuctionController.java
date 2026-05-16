@@ -48,7 +48,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     private XYChart.Series<Number, Number> priceSeries = new XYChart.Series<>();
     private int bidIndex = 0;
 
-    @FXML private Label myBidLabel;
+    @FXML private TextField myBidLabel;
     @FXML private Label timeLabel;
     @FXML private Label currentPriceLabel;
     @FXML private Label startPriceLabel;
@@ -65,6 +65,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML private Label startDateLabel;
     @FXML private Label autoBidStatusLabel;
     @FXML private Label lastBidTimeLabel;
+    @FXML private Label statusLabel;
 
     @FXML private Button btnIncrease;
     @FXML private Button btnDecrease;
@@ -75,6 +76,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML private HBox Hbox1;
     @FXML private VBox Vbox1;
     @FXML private VBox autoBidVbox;
+    @FXML private VBox buyNowDisplay;
     @FXML private Separator spr;
     @FXML private Separator spr1;
     @FXML private ListView bidHistoryList;
@@ -86,6 +88,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     private Timeline holdTimer;
     private Runnable currentAction;
     private String auctionId;
+    private boolean isBuyNowDp;
 
     private void setUpliveAuction(AuctionDetailResponseDTO DTO){
         currentPriceLabel.setText(FormatUtil.formatNumber(DTO.getCurrentPrice()));//giá hiện tại
@@ -110,8 +113,18 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         descriptionLabel.setText(DTO.getDescription());//mô tả
         sidebarBuyNowPriceLabel.setText(formatNumber(DTO.getBuyNowPrice()));//giá mua ngay
         startDateLabel.setText(formatEpochSecond(DTO.getStartTime()));//thời điểm bắt đầu
+        if(DTO.getBuyNowPrice() == 0){
+            buyNowDisplay.setVisible(false);
+            buyNowDisplay.setManaged(false);
+        }
+        if(DTO.getLeadBidder().equals(UserSession.getUsername())){//chặn người đứng đầu đặt bid
+            btnPlaceBid.setDisable(true);
+            statusLabel.setText("WINNING");
+        }
+        else{
+            statusLabel.setText("OUTBID");
+        }
     }
-
     public void handleIncreaseButton(){
         double currentBid = parseNumber(myBidLabel.getText());
         currentBid+=minCount;
@@ -222,6 +235,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         }
         else{
             changeView("open_slots.fxml", 1);
+            ControllerManager.getOpenSlotController().clearCard(auctionId);
         }
     }
     @FXML
@@ -394,6 +408,14 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         );
 
         Platform.runLater(() -> {
+            if(dto.getUsername().equals(UserSession.getUsername())){
+                btnPlaceBid.setDisable(true);
+                statusLabel.setText("WINNING");
+            }
+            else{
+                btnPlaceBid.setDisable(false);
+                statusLabel.setText("OUTBID");
+            }
             bidIndex++;
             bidCountLabel.setText(String.valueOf(bidIndex));
             leadBidderLabel.setText(dto.getUsername());

@@ -14,6 +14,7 @@ public class UserSession {
     private static List<AuctionCardDTO> joiningListCard = new ArrayList<>();
     private static List<AuctionCardDTO> myListCard = new ArrayList<>();
     private static String auctionId;
+    private static String username;
     //dashboard
     public static void setDashboardInfo(DashboardResponseDTO info) {
         dashboardInfo = info;
@@ -73,5 +74,12 @@ public class UserSession {
     }
     public static String getAuctionId(){
         return auctionId;
+    }
+    //username
+    public static void setUsername(String name){
+        username = name;
+    }
+    public static String getUsername(){
+        return username;
     }
 }

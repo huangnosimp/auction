@@ -313,3 +313,9 @@ Pane {
 .autobid-cancel-btn:hover {
     -fx-background-color: #c0392b;
 }
+#myBidLabel{
+    -fx-background-color:  #211429;
+    -fx-font-size:  15px;
+    -fx-font-weight:  bold;
+    -fx-text-fill: white;
+}

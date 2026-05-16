@@ -2,11 +2,19 @@ package vn.io.huangnosimp.Manager;
 import vn.io.huangnosimp.controller.*;
 
 public class ControllerManager {
+    private static LoginController loginController;
     private static DashboardController dashboardController;
     private static dashboard_homeController dashboardHomeController;
     private static liveAuctionController liveAuctionController;
     private static OpenSlotController openSlotController;
 
+    //login
+    public static LoginController getLoginController(){
+        return loginController;
+    }
+    public static void setLoginController(LoginController lg){
+        loginController = lg;
+    }
     //dashBoard
     public static  DashboardController getDashboardController(){
         return dashboardController;

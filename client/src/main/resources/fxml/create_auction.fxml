@@ -119,17 +119,27 @@
 
                 </VBox>
 
+                <!-- Tìm đến phần Upload Images trong file của bạn và thay thế bằng đoạn này -->
                 <VBox spacing="8">
                     <HBox alignment="CENTER_LEFT" spacing="6">
                         <Label styleClass="field-label" text="Images" />
                         <Label styleClass="tag-optional" text="up to 3" />
                     </HBox>
-                    <VBox alignment="CENTER" prefHeight="90" spacing="4" styleClass="upload-box">
-                        <Label styleClass="upload-icon-label" text="+" />
+
+                    <VBox alignment="CENTER" minHeight="120" spacing="10" styleClass="upload-box">
+                        <padding>
+                            <Insets bottom="15" left="15" right="15" top="15" />
+                        </padding>
+
+                        <!-- FlowPane dùng để chứa các ảnh preview khi chọn -->
+                        <FlowPane fx:id="flowPaneThumbnails" alignment="CENTER" disable="true" hgap="10" vgap="10" />
+
+                        <!-- Nút bấm dấu cộng -->
+                        <Button fx:id="btnUpload" mnemonicParsing="false" onAction="#handleUploadImage" styleClass="upload-icon-label" text="+" />
+
                         <Label styleClass="upload-main-text" text="Click to upload or drag &amp; drop" />
                         <Label styleClass="upload-hint" text="PNG, JPG – max 5MB each" />
                     </VBox>
-                    <HBox fx:id="imagePreviewRow" spacing="8" />
                 </VBox>
             </VBox>
 
@@ -184,7 +194,7 @@
                         <Label styleClass="toggle-title" text="Buy Now" />
                         <Label styleClass="toggle-hint" text="Allow buyers to purchase immediately at a fixed price without waiting for the auction to end" />
                     </VBox>
-                    <CheckBox fx:id="buyNowCheck" onAction="#handleBuyNowToggle" selected="false" styleClass="form-toggle" />
+                    <CheckBox fx:id="buyNowCheck" onAction="#handleBuyNowToggle" styleClass="form-toggle" />
                 </HBox>
 
                 <!-- Buy Now price - ẩn khi chưa bật toggle -->
