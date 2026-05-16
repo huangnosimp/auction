@@ -4,6 +4,8 @@ import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 
+import java.util.List;
+
 public class CreateAuctionRequestDTO {
     private final String itemName;
     private final String description;
@@ -15,7 +17,7 @@ public class CreateAuctionRequestDTO {
     private final ItemCondition condition;
     private final double minimumIncrement;
     private final double buyNowPrice;
-    private final String imageUrl;
+    private final List<String> imageUrl;
 
     public CreateAuctionRequestDTO(String itemName,
                                    String description,
@@ -41,7 +43,7 @@ public class CreateAuctionRequestDTO {
                                    ItemCondition condition,
                                    double minimumIncrement,
                                    double buyNowPrice,
-                                   String imageUrl) {
+                                   List<String> imageUrl) {
         this.itemName = itemName;
         this.description = description;
         this.itemType = itemType;
@@ -95,7 +97,7 @@ public class CreateAuctionRequestDTO {
         return buyNowPrice;
     }
 
-    public String getImageUrl() {
+    public List<String> getImageUrl() {
         return imageUrl;
     }
 }

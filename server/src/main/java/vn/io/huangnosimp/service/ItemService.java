@@ -17,7 +17,7 @@ public class ItemService implements IItemService {
     }
 
     @Override
-    public Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes, ItemCondition condition, String imageUrl) {
+    public Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes, ItemCondition condition, List<String> imageUrl) {
         Item item = ItemFactory.createItem(ownerId, name, description, type, attributes, condition, imageUrl);
         itemRepository.save(item);
         return item;

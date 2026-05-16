@@ -52,7 +52,7 @@ public class StatisticRepository implements IStatisticRepository {
     @Override
     public List<AuctionCardDTO> getMyAuctionCard(String userId) {
         List<AuctionCardDTO> rooms = new java.util.ArrayList<>();
-        String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "(SELECT IFNULL(MAX(bid_amount), 0) FROM bidtransactions bt WHERE bt.auction_id = a.id AND bt.bidder_id = ?) AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -69,15 +69,7 @@ public class StatisticRepository implements IStatisticRepository {
             statement.setString(2, userId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
-                String auctionId = rs.getString("auction_id");
-                String productName = rs.getString("product_name");
-                double currentPrice = rs.getDouble("current_price");
-                double yourBid = rs.getDouble("your_bid");
-                long startTime = rs.getTimestamp("start_time").getTime();
-                long endTime = rs.getTimestamp("end_time").getTime();
-                int bidCount = rs.getInt("bid_count");
-                int bidderCount = rs.getInt("bidder_count");
-                rooms.add(new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, startTime, endTime, bidCount, bidderCount));
+                rooms.add(mapRowToAuctionCard(connection, rs));
             }
         } catch (SQLException e) {
             System.err.println("DB error when fetching active rooms: " + e.getMessage());
@@ -172,7 +164,7 @@ public class StatisticRepository implements IStatisticRepository {
 
     @Override
     public AuctionCardDTO getJoiningAuctionCard(String auctionId) {
-        String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "0 AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -187,14 +179,7 @@ public class StatisticRepository implements IStatisticRepository {
             statement.setString(1, auctionId);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
-                String productName = rs.getString("product_name");
-                double currentPrice = rs.getDouble("current_price");
-                double yourBid = rs.getDouble("your_bid");
-                long startTime = rs.getTimestamp("start_time").getTime();
-                long endTime = rs.getTimestamp("end_time").getTime();
-                int bidCount = rs.getInt("bid_count");
-                int bidderCount = rs.getInt("bidder_count");
-                return new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, startTime, endTime, bidCount, bidderCount);
+                return mapRowToAuctionCard(connection, rs);
             }
         } catch (SQLException e) {
             System.err.println("DB error when fetching auction card: " + e.getMessage());
@@ -205,7 +190,7 @@ public class StatisticRepository implements IStatisticRepository {
     @Override
     public List<AuctionCardDTO> getPublicAuctionCard(int quantity) {
         List<AuctionCardDTO> rooms = new ArrayList<>();
-        String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "0 AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -222,15 +207,7 @@ public class StatisticRepository implements IStatisticRepository {
             statement.setInt(1, quantity);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
-                String auctionId = rs.getString("auction_id");
-                String productName = rs.getString("product_name");
-                double currentPrice = rs.getDouble("current_price");
-                double yourBid = rs.getDouble("your_bid");
-                long startTime = rs.getTimestamp("start_time").getTime();
-                long endTime = rs.getTimestamp("end_time").getTime();
-                int bidCount = rs.getInt("bid_count");
-                int bidderCount = rs.getInt("bidder_count");
-                rooms.add(new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, startTime, endTime, bidCount, bidderCount));
+                rooms.add(mapRowToAuctionCard(connection, rs));
             }
         } catch (SQLException e) {
             System.err.println("DB error when fetching public auction cards: " + e.getMessage());
@@ -241,7 +218,7 @@ public class StatisticRepository implements IStatisticRepository {
     @Override
     public List<AuctionCardDTO> getPostedAuctionCard(String userId) {
         List<AuctionCardDTO> rooms = new ArrayList<>();
-        String sql = "SELECT a.id AS auction_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "0 AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -256,19 +233,52 @@ public class StatisticRepository implements IStatisticRepository {
             statement.setString(1, userId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
-                String auctionId = rs.getString("auction_id");
-                String productName = rs.getString("product_name");
-                double currentPrice = rs.getDouble("current_price");
-                double yourBid = rs.getDouble("your_bid");
-                long startTime = rs.getTimestamp("start_time").getTime();
-                long endTime = rs.getTimestamp("end_time").getTime();
-                int bidCount = rs.getInt("bid_count");
-                int bidderCount = rs.getInt("bidder_count");
-                rooms.add(new AuctionCardDTO(auctionId, productName, currentPrice, yourBid, startTime, endTime, bidCount, bidderCount));
+                rooms.add(mapRowToAuctionCard(connection, rs));
             }
         } catch (SQLException e) {
             System.err.println("DB error when fetching posted auction cards: " + e.getMessage());
         }
         return rooms;
+    }
+
+    private AuctionCardDTO mapRowToAuctionCard(Connection connection, ResultSet rs) throws SQLException {
+        String auctionId = rs.getString("auction_id");
+        String itemId = rs.getString("item_id");
+        String productName = rs.getString("product_name");
+        double currentPrice = rs.getDouble("current_price");
+        double yourBid = rs.getDouble("your_bid");
+        long startTime = rs.getTimestamp("start_time").getTime();
+        long endTime = rs.getTimestamp("end_time").getTime();
+        int bidCount = rs.getInt("bid_count");
+        int bidderCount = rs.getInt("bidder_count");
+        List<String> imageUrl = findImageUrlsByItemId(connection, itemId);
+
+        return new AuctionCardDTO(
+                auctionId,
+                productName,
+                currentPrice,
+                yourBid,
+                startTime,
+                endTime,
+                bidCount,
+                bidderCount,
+                imageUrl
+        );
+    }
+
+    private List<String> findImageUrlsByItemId(Connection connection, String itemId) throws SQLException {
+        List<String> imageUrls = new ArrayList<>();
+        String sql = "SELECT image_url FROM ItemImages WHERE item_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, itemId);
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    imageUrls.add(rs.getString("image_url"));
+                }
+            }
+        }
+
+        return imageUrls;
     }
 }
