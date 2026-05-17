@@ -54,7 +54,6 @@
     <!-- Action button -->
     <HBox prefWidth="80" alignment="CENTER_RIGHT">
         <Button fx:id="btnAction"
-                onAction="#handleAction"
                 styleClass="inv-btn-manage"
                 text="Manage"/>
     </HBox>

@@ -126,7 +126,7 @@
                         <Label styleClass="tag-optional" text="up to 3" />
                     </HBox>
 
-                    <VBox alignment="CENTER" minHeight="120" spacing="10" styleClass="upload-box">
+                    <VBox alignment="CENTER" minHeight="120" onMouseClicked="#handleUploadImage" spacing="10" styleClass="upload-box">
                         <padding>
                             <Insets bottom="15" left="15" right="15" top="15" />
                         </padding>
@@ -135,7 +135,7 @@
                         <FlowPane fx:id="flowPaneThumbnails" alignment="CENTER" disable="true" hgap="10" vgap="10" />
 
                         <!-- Nút bấm dấu cộng -->
-                        <Button fx:id="btnUpload" mnemonicParsing="false" onAction="#handleUploadImage" styleClass="upload-icon-label" text="+" />
+                        <Button fx:id="btnUpload" mnemonicParsing="false" onAction="#handleUploadImage" onMouseClicked="#handleUploadImage" style="-fx-cursor: hand;" styleClass="upload-icon-label" text="+" />
 
                         <Label styleClass="upload-main-text" text="Click to upload or drag &amp; drop" />
                         <Label styleClass="upload-hint" text="PNG, JPG – max 5MB each" />

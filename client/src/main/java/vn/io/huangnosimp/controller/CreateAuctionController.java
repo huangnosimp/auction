@@ -20,7 +20,6 @@ import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.CreateAuctionRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.CloudinaryUploadSignatureResponseDTO;
-import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
@@ -48,65 +47,78 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
-public class CreateAuctionController implements Initializable{
+public class CreateAuctionController implements Initializable {
+
+    // ── Form fields ───────────────────────────────────────
     @FXML private TextField itemNameField;
     @FXML private ComboBox<String> categoryCombo;
     @FXML private ChoiceBox<String> conditionChoice;
     @FXML private TextArea descriptionArea;
 
-    // Art
+    // Art attributes
     @FXML private VBox artAttributes;
     @FXML private TextField artistField;
     @FXML private TextField creationYearField;
 
-    // Electronics
+    // Electronics attributes
     @FXML private VBox electronicsAttributes;
     @FXML private TextField brandField;
     @FXML private Spinner<Integer> warrantySpinner;
 
-    // Vehicle
+    // Vehicle attributes
     @FXML private VBox vehicleAttributes;
     @FXML private ComboBox<String> engineTypeCombo;
     @FXML private TextField mileageField;
 
     // Pricing
     @FXML private TextField startPriceField;
+    @FXML private ComboBox<String> startPriceUnitCombo;
     @FXML private VBox buyNowBox;
     @FXML private CheckBox buyNowCheck;
     @FXML private TextField buyNowPriceField;
     @FXML private ComboBox<String> buyNowUnitCombo;
     @FXML private Label buyNowEquivalentLabel;
     @FXML private TextField bidIncrementField;
+    @FXML private ComboBox<String> bidIncrementUnitCombo;
 
     // Schedule
     @FXML private DatePicker startDatePicker;
     @FXML private TextField startTimeField;
     @FXML private ComboBox<String> durationCombo;
 
-    @FXML private ComboBox<String> startPriceUnitCombo;
-    @FXML private ComboBox<String> bidIncrementUnitCombo;
-
+    // Image upload
     @FXML private Button btnUpload;
     @FXML private FlowPane flowPaneThumbnails;
 
-    private List<File> selectedFiles = new ArrayList<>();
+    // ── Upload state ──────────────────────────────────────
+    private List<File> selectedFiles  = new ArrayList<>();
     private List<String> uploadedUrls = Collections.synchronizedList(new ArrayList<>());
-    private int totalFilesToUpload = 0;
+    private int totalFilesToUpload    = 0;
+
+    // ── Initialize ────────────────────────────────────────
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {}
+
+    // ── Category change ───────────────────────────────────
 
     @FXML
     private void handleCategoryChange() {
         String selected = categoryCombo.getValue();
 
-        artAttributes.setVisible(false);         artAttributes.setManaged(false);
+        artAttributes.setVisible(false);          artAttributes.setManaged(false);
         electronicsAttributes.setVisible(false);  electronicsAttributes.setManaged(false);
         vehicleAttributes.setVisible(false);      vehicleAttributes.setManaged(false);
 
         switch (selected) {
-            case "Art"         -> { artAttributes.setVisible(true);         artAttributes.setManaged(true); }
-            case "Electronics" -> { electronicsAttributes.setVisible(true);  electronicsAttributes.setManaged(true); }
-            case "Vehicle"     -> { vehicleAttributes.setVisible(true);      vehicleAttributes.setManaged(true); }
+            case "Art"         -> { artAttributes.setVisible(true);        artAttributes.setManaged(true); }
+            case "Electronics" -> { electronicsAttributes.setVisible(true); electronicsAttributes.setManaged(true); }
+            case "Vehicle"     -> { vehicleAttributes.setVisible(true);     vehicleAttributes.setManaged(true); }
         }
     }
+
+    // ── Buy now toggle ────────────────────────────────────
+
     @FXML
     private void handleBuyNowToggle() {
         boolean enabled = buyNowCheck.isSelected();
@@ -114,6 +126,7 @@ public class CreateAuctionController implements Initializable{
         buyNowBox.setManaged(enabled);
     }
 
+    // ── Image upload ──────────────────────────────────────
 
     @FXML
     public void handleUploadImage() {
@@ -122,43 +135,21 @@ public class CreateAuctionController implements Initializable{
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
         );
+
         List<File> files = fileChooser.showOpenMultipleDialog(btnUpload.getScene().getWindow());
         if (files == null || files.isEmpty()) return;
+
+        // Kiểm tra kích thước từng file
         for (File file : files) {
             if (file.length() > 5 * 1024 * 1024) {
-                ControllerManager.getDashboardController().showToast("FAILED", "File " + file.getName() + " vượt quá 5MB!", false);
+                ControllerManager.getDashboardController()
+                        .showToast("FAILED", "File " + file.getName() + " vượt quá 5MB!", false);
                 return;
             }
         }
+
         this.selectedFiles = files;
         renderPreviews(files);
-    }
-
-    private void getSignature() {
-        Request request = new Request(ActionType.GET_CLOUDINARY_UPLOAD_SIGNATURE, null);
-        SocketManager.getClient().sendRequestAsync(request)
-                .thenAccept(response -> {
-                    if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                        CloudinaryUploadSignatureResponseDTO sig = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), CloudinaryUploadSignatureResponseDTO.class);
-
-                        uploadedUrls.clear();
-                        for (File file : selectedFiles) {
-                            uploadToCloudinary(file, sig, totalFilesToUpload);
-                        }
-
-                        Platform.runLater(() ->
-                                ControllerManager.getDashboardController().showToast("SUCCESS", "Đang bắt đầu tải " + selectedFiles.size() + " ảnh lên...", true)
-                        );
-                    } else {
-                        Platform.runLater(() ->
-                                ControllerManager.getDashboardController().showToast("FAILED", "Không lấy được signature bảo mật", false)
-                        );
-                    }
-                })
-                .exceptionally(ex -> {
-                    ex.printStackTrace();
-                    return null;
-                });
     }
 
     private void renderPreviews(List<File> files) {
@@ -173,77 +164,8 @@ public class CreateAuctionController implements Initializable{
             }
         });
     }
-    private void uploadToCloudinary(File file, CloudinaryUploadSignatureResponseDTO sig, int totalFiles) {
-        this.totalFilesToUpload = totalFiles;
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                String uploadUrl = "https://api.cloudinary.com/v1_1/" + sig.getCloudName() + "/image/upload";
-                HttpClient httpClient = HttpClient.newHttpClient();
-                String boundary = "----Boundary" + System.currentTimeMillis();
-
-                // Chuẩn bị dữ liệu Body
-                ByteArrayOutputStream body = new ByteArrayOutputStream();
-                byte[] fileBytes = Files.readAllBytes(file.toPath());
-
-                // Ghi file vào multipart body
-                body.write(("--" + boundary + "\r\n").getBytes());
-                body.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"\r\n").getBytes());
-                body.write(("Content-Type: application/octet-stream\r\n\r\n").getBytes());
-                body.write(fileBytes);
-                body.write("\r\n".getBytes());
-
-                // Ghi các field bảo mật (API Key, Signature...)
-                writeField(body, boundary, "api_key", sig.getApiKey());
-                writeField(body, boundary, "timestamp", String.valueOf(sig.getTimestamp()));
-                writeField(body, boundary, "signature", sig.getSignature());
-                writeField(body, boundary, "folder", sig.getFolder());
-                body.write(("--" + boundary + "--\r\n").getBytes());
-
-                // Tạo Request
-                HttpRequest httpRequest = HttpRequest.newBuilder()
-                        .uri(URI.create(uploadUrl))
-                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                        .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
-                        .build();
-
-                // Gửi và nhận phản hồi
-                HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-                if (httpResponse.statusCode() == 200) {
-                    JsonObject json = JsonParser.parseString(httpResponse.body()).getAsJsonObject();
-                    String secureUrl = json.get("secure_url").getAsString();
-
-                    // Lưu URL vào danh sách dùng chung
-                    uploadedUrls.add(secureUrl);
-
-                    // KIỂM TRA: Nếu số lượng URL thu được bằng đúng số lượng file ban đầu
-                    if (uploadedUrls.size() == totalFilesToUpload) {
-                        Platform.runLater(() -> {
-                            ControllerManager.getDashboardController().showToast("SUCCESS", "Đã tải lên toàn bộ " + totalFilesToUpload + " ảnh thành công!", true);
-                            // Bạn có thể gọi logic tiếp theo ở đây, ví dụ: lưu dữ liệu vào DB
-                        });
-                    }
-                } else {
-                    throw new Exception("Lỗi từ Cloudinary: " + httpResponse.body());
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Platform.runLater(() ->
-                        ControllerManager.getDashboardController().showToast("FAILED", "Lỗi khi tải file " + file.getName() + ": " + e.getMessage(), false)
-                );
-            }
-        });
-    }
-
-    // Helper ghi field vào multipart body
-    private void writeField(ByteArrayOutputStream body, String boundary,
-                            String name, String value) throws IOException {
-        body.write(("--" + boundary + "\r\n").getBytes());
-        body.write(("Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n").getBytes());
-        body.write((value + "\r\n").getBytes());
-    }
+    // ── Launch button ─────────────────────────────────────
 
     @FXML
     private void handleLaunchButton() {
@@ -253,25 +175,154 @@ public class CreateAuctionController implements Initializable{
         if (attributes == null) return;
 
         ItemCondition condition = getItemCondition();
-        if(condition==null) return;
+        if (condition == null) return;
 
-        long startTime = calculateStartTime();
-        long endTime   = calculateEndTime(startTime);
-
-        double startPrice = calculateRealPrice(startPriceField, startPriceUnitCombo);
+        long   startTime    = calculateStartTime();
+        long   endTime      = calculateEndTime(startTime);
+        double startPrice   = calculateRealPrice(startPriceField, startPriceUnitCombo);
         double bidIncrement = calculateRealPrice(bidIncrementField, bidIncrementUnitCombo);
-        double buyNowPrice;
-        if(buyNowPriceField.getText().equals("0")){
-            showAlert("wrong number","buy now price cannot be 0");
-        }
-        if(buyNowPriceField.getText().isBlank()){
-            buyNowPrice=0;
-        }
-        else{
-            buyNowPrice = calculateRealPrice(buyNowPriceField, buyNowUnitCombo);
-        }
-        getSignature();
+        double buyNowPrice  = buyNowPriceField.getText().isBlank() ? 0
+                : calculateRealPrice(buyNowPriceField, buyNowUnitCombo);
 
+        // Không có ảnh → gửi luôn
+        if (selectedFiles.isEmpty()) {
+            sendCreateAuction(attributes, condition,
+                    startTime, endTime,
+                    startPrice, bidIncrement,
+                    buyNowPrice, List.of());
+            return;
+        }
+
+        // Có ảnh → xin signature → upload → gửi CREATE_AUCTION trong callback
+        totalFilesToUpload = selectedFiles.size();
+        uploadedUrls.clear();
+
+        Request request = new Request(ActionType.GET_CLOUDINARY_UPLOAD_SIGNATURE, null);
+        SocketManager.getClient().sendRequestAsync(request)
+                .thenAccept(response -> {
+                    if (!ResponseStatus.SUCCESS.equals(response.getStatus())) {
+                        Platform.runLater(() ->
+                                ControllerManager.getDashboardController()
+                                        .showToast("FAILED", "Không lấy được signature bảo mật", false)
+                        );
+                        return;
+                    }
+
+                    CloudinaryUploadSignatureResponseDTO sig = GsonParser.GSON.fromJson(
+                            GsonParser.GSON.toJsonTree(response.getData()),
+                            CloudinaryUploadSignatureResponseDTO.class
+                    );
+
+                    Platform.runLater(() ->
+                            ControllerManager.getDashboardController()
+                                    .showToast("SUCCESS", "Đang tải " + selectedFiles.size() + " ảnh lên...", true)
+                    );
+
+                    // Upload từng file, callback chỉ chạy khi TẤT CẢ đã xong
+                    for (File file : selectedFiles) {
+                        uploadToCloudinary(file, sig, totalFilesToUpload,
+                                () -> sendCreateAuction(
+                                        attributes, condition,
+                                        startTime, endTime,
+                                        startPrice, bidIncrement,
+                                        buyNowPrice,
+                                        new ArrayList<>(uploadedUrls) // snapshot tại thời điểm đủ ảnh
+                                )
+                        );
+                    }
+                })
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    Platform.runLater(() ->
+                            ControllerManager.getDashboardController()
+                                    .showToast("FAILED", "Lỗi kết nối khi xin signature", false)
+                    );
+                    return null;
+                });
+    }
+
+    // ── Upload to Cloudinary ──────────────────────────────
+
+    /**
+     * Upload 1 file lên Cloudinary bất đồng bộ.
+     * Khi tất cả file đã upload xong (uploadedUrls.size() == totalFiles),
+     * callback onAllDone sẽ được gọi để tiếp tục gửi CREATE_AUCTION.
+     */
+    private void uploadToCloudinary(File file,
+                                    CloudinaryUploadSignatureResponseDTO sig,
+                                    int totalFiles,
+                                    Runnable onAllDone) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                String uploadUrl  = sig.getUploadUrl();
+                HttpClient client = HttpClient.newHttpClient();
+                String boundary   = "----Boundary" + System.currentTimeMillis();
+
+                // Build multipart body
+                ByteArrayOutputStream body = new ByteArrayOutputStream();
+                byte[] fileBytes = Files.readAllBytes(file.toPath());
+
+                body.write(("--" + boundary + "\r\n").getBytes());
+                body.write(("Content-Disposition: form-data; name=\"file\"; filename=\""
+                        + file.getName() + "\"\r\n").getBytes());
+                body.write(("Content-Type: application/octet-stream\r\n\r\n").getBytes());
+                body.write(fileBytes);
+                body.write("\r\n".getBytes());
+
+                writeField(body, boundary, "api_key",   sig.getApiKey());
+                writeField(body, boundary, "timestamp", String.valueOf(sig.getTimestamp()));
+                writeField(body, boundary, "signature", sig.getSignature());
+                writeField(body, boundary, "folder",    sig.getFolder());
+                body.write(("--" + boundary + "--\r\n").getBytes());
+
+                HttpRequest httpRequest = HttpRequest.newBuilder()
+                        .uri(URI.create(uploadUrl))
+                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
+                        .build();
+
+                HttpResponse<String> httpResponse = client.send(
+                        httpRequest, HttpResponse.BodyHandlers.ofString()
+                );
+
+                if (httpResponse.statusCode() == 200) {
+                    JsonObject json = JsonParser.parseString(httpResponse.body()).getAsJsonObject();
+                    String secureUrl = json.get("secure_url").getAsString();
+                    uploadedUrls.add(secureUrl);
+
+                    // Tất cả file đã upload xong → gọi callback
+                    if (uploadedUrls.size() == totalFiles) {
+                        Platform.runLater(() ->
+                                ControllerManager.getDashboardController()
+                                        .showToast("SUCCESS", "Đã tải lên " + totalFiles + " ảnh!", true)
+                        );
+                        onAllDone.run(); // ← gọi sendCreateAuction()
+                    }
+                } else {
+                    throw new Exception("Cloudinary error: " + httpResponse.body());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() ->
+                        ControllerManager.getDashboardController()
+                                .showToast("FAILED", "Lỗi khi tải file " + file.getName(), false)
+                );
+            }
+        });
+    }
+
+    // ── Send CREATE_AUCTION ───────────────────────────────
+
+    /**
+     * Gửi request tạo phiên đấu giá sau khi đã có đầy đủ imageUrls.
+     * Hàm này chỉ được gọi từ callback của uploadToCloudinary().
+     */
+    private void sendCreateAuction(ItemAttributesDTO attributes,
+                                   ItemCondition condition,
+                                   long startTime, long endTime,
+                                   double startPrice, double bidIncrement,
+                                   double buyNowPrice, List<String> imageUrls) {
         CreateAuctionRequestDTO dto = new CreateAuctionRequestDTO(
                 itemNameField.getText().trim(),
                 descriptionArea.getText().trim(),
@@ -283,19 +334,23 @@ public class CreateAuctionController implements Initializable{
                 condition,
                 bidIncrement,
                 buyNowPrice,
-                uploadedUrls
+                imageUrls // ← đầy đủ URL từ Cloudinary
         );
 
         SocketManager.getClient().sendRequestAsync(new Request(ActionType.CREATE_AUCTION, dto))
                 .thenAccept(response -> Platform.runLater(() -> {
                     if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                        AuctionCardDTO cardResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionCardDTO.class);
-                        ControllerManager.getDashboardHomeController().addToDashboard(cardResponse, "My", ControllerManager.getDashboardHomeController().getAuctionFlowPane());
-                        UserSession.addoneMyCard(cardResponse);
+                        AuctionCardDTO card = GsonParser.GSON.fromJson(
+                                GsonParser.GSON.toJsonTree(response.getData()),
+                                AuctionCardDTO.class
+                        );
+                        ControllerManager.getDashboardHomeController()
+                                .addToDashboard(card, "My",
+                                        ControllerManager.getDashboardHomeController().getAuctionFlowPane());
+                        UserSession.addoneMyCard(card);
                         ControllerManager.getDashboardHomeController().changeTab();
                         ViewManager.changeView("dashboard_home.fxml", 1);
-                    }
-                    else if(ResponseStatus.FAILED.equals(response.getStatus())) {
+                    } else {
                         showError(response.getMessage());
                     }
                 }))
@@ -303,6 +358,15 @@ public class CreateAuctionController implements Initializable{
                     Platform.runLater(() -> showError("Không thể kết nối đến máy chủ."));
                     return null;
                 });
+    }
+
+    // ── Helpers ───────────────────────────────────────────
+
+    private void writeField(ByteArrayOutputStream body, String boundary,
+                            String name, String value) throws IOException {
+        body.write(("--" + boundary + "\r\n").getBytes());
+        body.write(("Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n").getBytes());
+        body.write((value + "\r\n").getBytes());
     }
 
     private boolean validate() {
@@ -321,16 +385,22 @@ public class CreateAuctionController implements Initializable{
         if (startTimeField.getText().isBlank()) {
             showAlert("ERROR", "Vui lòng nhập giờ bắt đầu."); return false;
         }
+        if (!buyNowPriceField.getText().isBlank()
+                && buyNowPriceField.getText().equals("0")) {
+            showAlert("ERROR", "Buy now price không được bằng 0."); return false;
+        }
         return true;
     }
-    private ItemCondition getItemCondition(){
-        return switch (conditionChoice.getValue()){
-            case "New" ->{yield ItemCondition.NEW;}
-            case "Like New"->{yield ItemCondition.LIKE_NEW;}
-            case "Used" ->{yield ItemCondition.USED;}
-            default -> null;
+
+    private ItemCondition getItemCondition() {
+        return switch (conditionChoice.getValue()) {
+            case "New"      -> ItemCondition.NEW;
+            case "Like New" -> ItemCondition.LIKE_NEW;
+            case "Used"     -> ItemCondition.USED;
+            default         -> null;
         };
     }
+
     private ItemAttributesDTO buildAttributes() {
         return switch (categoryCombo.getValue()) {
             case "Art" -> {
@@ -363,21 +433,20 @@ public class CreateAuctionController implements Initializable{
             default -> null;
         };
     }
-    private double calculateRealPrice(TextField value, ComboBox<String> Case){
-        if(Case.getValue().equals("Thousand")){
-            return Double.parseDouble(value.getText().trim())*1000;
-        }
-        if(Case.getValue().equals("Million")){
-            return Double.parseDouble(value.getText().trim())*1000000;
-        }
-        if(Case.getValue().equals("Billion")){
-            return Double.parseDouble(value.getText().trim())*1000000000;
-        }
-        return 0;
+
+    private double calculateRealPrice(TextField field, ComboBox<String> unitCombo) {
+        double value = Double.parseDouble(field.getText().trim());
+        return switch (unitCombo.getValue()) {
+            case "Thousand" -> value * 1_000;
+            case "Million"  -> value * 1_000_000;
+            case "Billion"  -> value * 1_000_000_000;
+            default         -> value;
+        };
     }
+
     private long calculateStartTime() {
-        LocalDate date = startDatePicker.getValue();
-        String[] parts = startTimeField.getText().split(":");
+        LocalDate date   = startDatePicker.getValue();
+        String[] parts   = startTimeField.getText().split(":");
         int hour = parts.length > 0 ? Integer.parseInt(parts[0].trim()) : 0;
         int min  = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 0;
         return LocalDateTime.of(date, LocalTime.of(hour, min))
@@ -403,12 +472,7 @@ public class CreateAuctionController implements Initializable{
     }
 
     private void showError(String msg) {
-        System.err.println("[CreateAuction] " + msg);
-    }
-
-    @FXML
-    public void handleCancelButton(ActionEvent event){
-        ViewManager.changeView("dashboard_home.fxml", 1);
+        Platform.runLater(() -> showAlert("ERROR", msg));
     }
 
     private void showAlert(String title, String content) {
@@ -419,7 +483,8 @@ public class CreateAuctionController implements Initializable{
         alert.showAndWait();
     }
 
-    public void initialize(URL location, ResourceBundle resources){
-
+    @FXML
+    public void handleCancelButton(ActionEvent event) {
+        ViewManager.changeView("dashboard_home.fxml", 1);
     }
 }

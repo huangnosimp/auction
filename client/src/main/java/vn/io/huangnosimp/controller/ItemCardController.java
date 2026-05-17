@@ -1,6 +1,5 @@
 package vn.io.huangnosimp.controller;
 
-import client.info.User;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -10,7 +9,6 @@ import javafx.scene.control.Label;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import vn.io.huangnosimp.Manager.*;
 import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
@@ -27,6 +25,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
+import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 public class ItemCardController {
     @FXML private Label lblProductName;
@@ -81,7 +80,8 @@ public class ItemCardController {
             return formatNumber(value/1000)+" K";
         }
     }
-    @FXML public void handleBidNowbutton(ActionEvent event){
+    @FXML
+    public void handleBidNowbutton(ActionEvent event){
         JoinRoomRequestDTO joinRoomRequest = new JoinRoomRequestDTO(auctionId);
 
         Request request = new Request(ActionType.JOIN_ROOM, joinRoomRequest);
@@ -102,11 +102,9 @@ public class ItemCardController {
                                             UserSession.addonejoiningCard(UserSession.findWithId(auctionId));
                                             UserSession.setAuctionDetail(auctionResponse);
                                             UserSession.setAuctionId(auctionId);
-                                            liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
+                                            liveAuctionController controller = changeViewWithController("liveAuction.fxml");
+                                            controller.setUpPreviewImg(displayImg);
                                             ControllerManager.getDashboardHomeController().addToDashboard(UserSession.findWithId(auctionId), "Joining", ControllerManager.getDashboardHomeController().getFlowJoined());
-                                            if (btnManage.getText().equals("Manage")) {
-                                                controller.setInvisible();
-                                            }
                                         });
                                     }
                                 });
@@ -138,7 +136,8 @@ public class ItemCardController {
                         Platform.runLater(()->{
                             UserSession.setAuctionDetail(auctionResponse);
                             UserSession.setAuctionId(auctionId);
-                            liveAuctionController controller = ViewManager.changeViewWithController("liveAuction.fxml");
+                            liveAuctionController controller = changeViewWithController("liveAuction.fxml");
+                            controller.setUpPreviewImg(displayImg);
                             if (btnManage.getText().equals("Manage")) {
                                 controller.setInvisible();
                             }
