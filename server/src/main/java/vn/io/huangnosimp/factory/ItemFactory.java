@@ -5,8 +5,10 @@ import vn.io.huangnosimp.enums.ItemType;
 import vn.io.huangnosimp.model.*;
 import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 
+import java.util.List;
+
 public class ItemFactory {
-    public static Item createItem(String ownerID, String name, String description, ItemType type, ItemAttributesDTO attributes, ItemCondition condition, String imageUrl) {
+    public static Item createItem(String ownerID, String name, String description, ItemType type, ItemAttributesDTO attributes, ItemCondition condition, List<String> imageUrl) {
         switch (type) {
             case ART:
                 String artist = attributes.getArtist();

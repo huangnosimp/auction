@@ -2,15 +2,17 @@ package vn.io.huangnosimp.model;
 
 import vn.io.huangnosimp.enums.ItemCondition;
 
+import java.util.List;
+
 public abstract class Item extends Entity {
 
     private String name;
     private String ownerId;
     private String description;
     private ItemCondition condition;
-    private String imageUrl;
+    private List<String> imageUrl;
 
-    public Item(String id, long createdAt, String name, String ownerId, String description, ItemCondition condition, String  imageUrl) {
+    public Item(String id, long createdAt, String name, String ownerId, String description, ItemCondition condition, List<String> imageUrl) {
         super(id, createdAt);
         this.name = name;
         this.ownerId = ownerId;
@@ -19,7 +21,7 @@ public abstract class Item extends Entity {
         this.imageUrl = imageUrl;
     }
 
-    protected Item(String ownerId, String name, String description, ItemCondition condition, String imageUrl) {
+    protected Item(String ownerId, String name, String description, ItemCondition condition, List<String> imageUrl) {
         super();
         this.ownerId = ownerId;
         this.name = name;
@@ -60,7 +62,7 @@ public abstract class Item extends Entity {
         this.condition = condition;
     }
 
-    public String getImageUrl() {
+    public List<String> getImageUrl() {
         return imageUrl;
     }
 }
