@@ -36,15 +36,14 @@
                 <Tab text="Member Management">
                     <VBox spacing="10">
                         <padding>
-                            <Insets top="10" right="10" bottom="10" left="10"/>
+                            <Insets bottom="10" left="10" right="10" top="10" />
                         </padding>
 
                         <TableView fx:id="tableMembers" VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="colMemberId" prefWidth="100" text="ID" />
-                                <TableColumn fx:id="colMemberName" prefWidth="200" text="Username" />
-                                <TableColumn fx:id="colMemberStatus" prefWidth="150" text="Status" />
-                                <TableColumn fx:id="colMemberAction" prefWidth="150" text="Actions" />
+                                <TableColumn fx:id="colMemberId" prefWidth="241.80000162124634" text="ID" />
+                                <TableColumn fx:id="colMemberName" prefWidth="188.60003662109375" text="Username" />
+                                <TableColumn fx:id="colMemberStatus" prefWidth="358.39984130859375" text="Status" />
                             </columns>
                         </TableView>
 
@@ -62,22 +61,19 @@
                 <Tab text="Auction Management">
                     <VBox spacing="10">
                         <padding>
-                            <Insets top="10" right="10" bottom="10" left="10"/>
+                            <Insets bottom="10" left="10" right="10" top="10" />
                         </padding>
 
                         <TableView fx:id="tableAuctions" VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="colAuctionId" prefWidth="100" text="Auction ID" />
-                                <TableColumn fx:id="colAuctionName" prefWidth="250" text="Product" />
-                                <TableColumn fx:id="colAuctionPrice" prefWidth="150" text="Current Price" />
-                                <TableColumn fx:id="colAuctionAction" prefWidth="150" text="Control" />
+                                <TableColumn fx:id="colAuctionId" prefWidth="241.80000162124634" text="Auction ID" />
+                                <TableColumn fx:id="colAuctionName" prefWidth="188.60003662109375" text="Product" />
+                                <TableColumn fx:id="colAuctionPrice" prefWidth="358.39984130859375" text="Current Price" />
                             </columns>
                         </TableView>
 
                         <HBox alignment="CENTER_RIGHT" spacing="15">
-                            <Button onAction="#handleForceCancelAuction"
-                                    style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"
-                                    text="Hủy phiên đấu giá (Force Cancel)" />
+                            <Button onAction="#handleForceCancelAuction" style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Hủy phiên đấu giá (Force Cancel)" />
                         </HBox>
                     </VBox>
                 </Tab>

@@ -68,15 +68,33 @@ public class AdminController implements Initializable {
     }
 
     private void setupTableColumns() {
-        // --- BẢNG THÀNH VIÊN ---
+        // BẢNG THÀNH VIÊN
         colMemberId.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getId()));
         colMemberName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUsername()));
-        colMemberStatus.setCellValueFactory(cellData -> {
-            boolean isBanned = cellData.getValue().isBanned();
-            return new SimpleStringProperty(isBanned ? "Bị Khóa" : "Hoạt động");
+
+        colMemberStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
+
+        colMemberStatus.setCellFactory(column -> new TableCell<MemberDTO, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+
+                    if (item.contains("Online")) {
+                        setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;"); // Xanh lá
+                    } else if (item.contains("Bị Ban")) {
+                        setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;"); // Đỏ
+                    } else {
+                        setStyle("-fx-text-fill: #7f8c8d;"); // Xám
+                    }
+                }
+            }
         });
 
-        // --- BẢNG ĐẤU GIÁ ---
         colAuctionId.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAuctionId()));
         colAuctionName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProductName()));
         colAuctionPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getCurrentPrice()).asObject());

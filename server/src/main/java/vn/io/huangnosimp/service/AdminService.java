@@ -13,6 +13,7 @@ import vn.io.huangnosimp.repository.IAuctionRepository;
 import vn.io.huangnosimp.util.ModelMapper;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,11 +39,42 @@ public class AdminService implements IAdminService {
         return null;
     }
 
+
     @Override
     public List<MemberDTO> getAllMembers() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
         return userRepo.findAll().stream()
                 .filter(user -> user instanceof Member)
-                .map(user -> ModelMapper.toMemberDTO((Member) user))
+                .map(user -> {
+                    Member member = (Member) user;
+
+                    MemberDTO dto = ModelMapper.toMemberDTO(member);
+
+                    boolean isCurrentlyBanned = member.isBanned();
+                    if (member.getBanUntil() != null) {
+                        if (member.getBanUntil().isAfter(now)) {
+                            isCurrentlyBanned = true;
+                        } else {
+                            isCurrentlyBanned = false;
+                        }
+                    }
+
+                    if (isCurrentlyBanned) {
+                        if (member.getBanUntil() != null) {
+                            dto.setStatus("Bị Ban (đến " + dto.getBanUntil() + ")");
+                        } else {
+                            dto.setStatus("Bị Ban vĩnh viễn");
+                        }
+                    } else if (ClientSessionManager.getInstance().isUserOnline(member.getId())) {
+                        dto.setStatus("Online");
+                    } else {
+                        dto.setStatus("Offline");
+                    }
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
