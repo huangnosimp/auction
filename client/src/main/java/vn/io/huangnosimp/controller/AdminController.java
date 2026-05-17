@@ -98,6 +98,9 @@ public class AdminController implements Initializable {
         colAuctionId.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAuctionId()));
         colAuctionName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProductName()));
         colAuctionPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getCurrentPrice()).asObject());
+
+        tableMembers.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableAuctions.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
     private void loadAllData() {
