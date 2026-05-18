@@ -19,9 +19,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
             SceneManager.setStage(primaryStage);
-            URL fxmlLocation = getClass().getResource("/fxml/LoginView.fxml");
+            URL fxmlLocation = getClass().getResource("/fxml/login.fxml");
             if (fxmlLocation == null) {
-                throw new Exception("Không tìm thấy file LoginView.fxml!");
+                throw new Exception("Không tìm thấy file login.fxml!");
             }
 
             Parent root = FXMLLoader.load(fxmlLocation);

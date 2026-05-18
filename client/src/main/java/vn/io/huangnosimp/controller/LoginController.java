@@ -3,28 +3,18 @@ package vn.io.huangnosimp.controller;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
-import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
 import vn.io.huangnosimp.dto.request.LoginRequestDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.response.GetPostedAuctionCardResponseDTO;
 import vn.io.huangnosimp.enums.UserType;
-import vn.io.huangnosimp.network.IServerMessageListener;
-import vn.io.huangnosimp.network.SocketClient;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
-import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
-
-import java.net.URL;
-import java.util.ResourceBundle;
 
 import static vn.io.huangnosimp.Manager.ViewManager.changeMainStage;
 
@@ -38,13 +28,14 @@ public class LoginController {
     @FXML private Button loginButton;
     private UserType userType;
 
+    /**
+     * Khi ấn Enter tại ô Email, tiêu điểm (focus) sẽ tự động chuyển sang ô Password
+     */
     @FXML
-    public void handlePasswordKeyPress(KeyEvent event) {
-        System.out.println("Key pressed: " + event.getCode()); // ← thêm dòng này
-        if (event.getCode() == KeyCode.ENTER) {
-            handleLogin();
-        }
+    public void handleEmailEnter(ActionEvent event) {
+        passwordField.requestFocus();
     }
+
     @FXML
     private void handleLogin() {
         String email = emailField.getText();
@@ -62,12 +53,12 @@ public class LoginController {
             showAlert("Error", "Please enter all credentials!");
             return;
         }
+
         if(userType.equals(UserType.MEMBER)) {
             LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserType.MEMBER, email, password);
             Request request = new Request(ActionType.LOGIN, loginRequestDTO);
             SocketManager.getClient().sendRequestAsync(request)
                     .thenAccept(response -> {
-
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
                             Request getMineRequest = new Request(ActionType.GET_POSTED_AUCTION_CARD, null);
                             SocketManager.getClient().sendRequestAsync(getMineRequest)
@@ -81,45 +72,33 @@ public class LoginController {
                                         DashboardResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(dashboardResponse.getData()), DashboardResponseDTO.class);
                                         Platform.runLater(() -> {
                                             UserSession.setDashboardInfo(dto);
+                                            UserSession.setUsername(dto.getUsername());
                                             UserSession.addJoiningCard(dto.getAuctionCardInfo());
                                             changeMainStage("dashboard.fxml");
                                         });
                                     });
                         }
-
                         else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){
-                            Platform.runLater(()->{
-                                showAlert("UNAUTHORIZED", response.getMessage());
-                            });
+                            Platform.runLater(()-> showAlert("UNAUTHORIZED", response.getMessage()));
                         }
-
                         else if (ResponseStatus.FAILED.equals(response.getStatus())){
-                            Platform.runLater(()->{
-                                showAlert("FAILED", response.getMessage());
-                            });
+                            Platform.runLater(()-> showAlert("FAILED", response.getMessage()));
                         }
                     });
         }
-        else{
+        else {
             LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserType.ADMIN, email, password);
             Request request = new Request(ActionType.LOGIN, loginRequestDTO);
             SocketManager.getClient().sendRequestAsync(request)
                     .thenAccept(response -> {
-
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                            changeMainStage("AdminDashboarđ.fxml");
+                            Platform.runLater(()-> changeMainStage("AdminDashboarđ.fxml")); // Lưu ý chữ 'đ' cuối giống code cũ của bạn
                         }
-
                         else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){
-                            Platform.runLater(()->{
-                                showAlert("UNAUTHORIZED", response.getMessage());
-                            });
+                            Platform.runLater(()-> showAlert("UNAUTHORIZED", response.getMessage()));
                         }
-
                         else if (ResponseStatus.FAILED.equals(response.getStatus())){
-                            Platform.runLater(()->{
-                                showAlert("FAILED", response.getMessage());
-                            });
+                            Platform.runLater(()-> showAlert("FAILED", response.getMessage()));
                         }
                     });
         }
@@ -137,5 +116,4 @@ public class LoginController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
 }

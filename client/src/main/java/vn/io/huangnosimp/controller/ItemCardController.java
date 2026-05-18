@@ -15,8 +15,12 @@ import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.request.JoinRoomRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+import vn.io.huangnosimp.dto.shared.NotificationDTO;
+import vn.io.huangnosimp.enums.NotificationType;
+import vn.io.huangnosimp.network.IServerMessageListener;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
 
@@ -27,7 +31,7 @@ import java.util.List;
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
-public class ItemCardController {
+public class ItemCardController implements IServerMessageListener {
     @FXML private Label lblProductName;
     @FXML private Label lblTimeRemaining;
     @FXML private Label lblCurrentBid;
@@ -46,7 +50,11 @@ public class ItemCardController {
 
     public void addInfo(AuctionCardDTO dto, String type){
         displayImg = dto.getImageUrl();
-        imgProduct.setImage(new Image(displayImg.get(0), 0, 0, true, true));
+        if (displayImg != null && !displayImg.isEmpty()) {
+            imgProduct.setImage(new Image(displayImg.get(0), 0, 0, true, true));
+        } else {
+            imgProduct.setImage(null);
+        }
         lblProductName.setText(dto.getProductName());
         long now = Instant.now().toEpochMilli();
         if(now < dto.getStartTime()){
@@ -60,7 +68,7 @@ public class ItemCardController {
         lblCurrentBid.setText(caculateCurrentBid(dto.getCurrentPrice()));
         this.auctionId = dto.getAuctionId();
         if(type.equals("Joining")){
-            lblYourBid.setText(String.valueOf(dto.getYourBid())+" đ");
+            lblYourBid.setText(caculateCurrentBid(dto.getYourBid()));
         }
         else if (type.equals("My")) {
             lblBidCount.setText(String.valueOf(dto.getBidCount())+" bids");
@@ -148,4 +156,13 @@ public class ItemCardController {
                     }
                 });
     }
+    public void onResponseReceived(Response response){}
+    public void onResponseReceived(Response response, ActionType actionType){}
+    public void onRequestReceived(Request notification){
+        NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
+        if(NotificationType.NEW_BID.equals(notificationDTO.getNotificationType())){
+
+        }
+    }
+    public void onDisconnected(String reason){}
 }

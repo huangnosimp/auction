@@ -34,7 +34,10 @@
 
                 <VBox spacing="15.0">
                     <children>
-                        <TextField fx:id="emailField" onAction="#handleLogin" promptText="Email or Username" styleClass="input-field" />
+                        <!-- Khi nhấn Enter ở đây, hàm handleEmailEnter sẽ được gọi để nhảy sang ô tiếp theo -->
+                        <TextField fx:id="emailField" onAction="#handleEmailEnter" promptText="Email or Username" styleClass="input-field" />
+
+                        <!-- Khi nhấn Enter ở đây, hàm handleLogin sẽ thực hiện đăng nhập -->
                         <PasswordField fx:id="passwordField" onAction="#handleLogin" promptText="Password" styleClass="input-field" />
                     </children>
                 </VBox>

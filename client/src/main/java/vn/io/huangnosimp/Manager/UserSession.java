@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.Manager;
 
+import vn.io.huangnosimp.controller.AccountViewController;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
@@ -15,6 +16,22 @@ public class UserSession {
     private static List<AuctionCardDTO> myListCard = new ArrayList<>();
     private static String auctionId;
     private static String username;
+
+    public static void clearAllSession(){
+        dashboardInfo = null;
+        auctionDetail = null;
+        auctionId = null;
+        username = null;
+        if (listCard != null) {
+            listCard.clear();
+        }
+        if (joiningListCard != null) {
+            joiningListCard.clear();
+        }
+        if (myListCard != null) {
+            myListCard.clear();
+        }
+    }
     //dashboard
     public static void setDashboardInfo(DashboardResponseDTO info) {
         dashboardInfo = info;

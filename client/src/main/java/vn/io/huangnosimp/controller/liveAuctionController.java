@@ -26,6 +26,7 @@ import vn.io.huangnosimp.Manager.*;
 import vn.io.huangnosimp.dto.request.*;
 import vn.io.huangnosimp.dto.response.*;
 import vn.io.huangnosimp.dto.shared.NotificationDTO;
+import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.IServerMessageListener;
 import vn.io.huangnosimp.network.SocketClient;
 import vn.io.huangnosimp.protocol.ActionType;
@@ -466,40 +467,41 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     }
     public void onRequestReceived(Request notification) {
         NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
-        PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
-        BidHistoryDTO historyDTO = new BidHistoryDTO(
-                dto.getUsername(), dto.getAmount(), dto.getPlaceAt()
-        );
+        if(NotificationType.NEW_BID.equals(notificationDTO.getNotificationType())) {
+            PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
+            BidHistoryDTO historyDTO = new BidHistoryDTO(
+                    dto.getUsername(), dto.getAmount(), dto.getPlaceAt()
+            );
 
-        Platform.runLater(() -> {
-            if(dto.getUsername().equals(UserSession.getUsername())){
-                btnPlaceBid.setDisable(true);
-                statusLabel.setText("WINNING");
-            }
-            else{
-                btnPlaceBid.setDisable(false);
-                statusLabel.setText("OUTBID");
-            }
-            bidIndex++;
-            bidCountLabel.setText(String.valueOf(bidIndex));
-            leadBidderLabel.setText(dto.getUsername());
-            priceSeries.getData().add(new XYChart.Data<>(bidIndex, dto.getAmount()));
-            currentPriceLabel.setText(formatNumber(dto.getAmount()));
-            minNextBidLabel.setText(formatNumber(dto.getAmount() + minCount));
-            lastBidTimeLabel.setText(formatEpochSecond(dto.getPlaceAt()));
+            Platform.runLater(() -> {
+                if (dto.getUsername().equals(UserSession.getUsername())) {
+                    btnPlaceBid.setDisable(true);
+                    statusLabel.setText("WINNING");
+                } else {
+                    btnPlaceBid.setDisable(false);
+                    statusLabel.setText("OUTBID");
+                }
+                bidIndex++;
+                bidCountLabel.setText(String.valueOf(bidIndex));
+                leadBidderLabel.setText(dto.getUsername());
+                priceSeries.getData().add(new XYChart.Data<>(bidIndex, dto.getAmount()));
+                currentPriceLabel.setText(formatNumber(dto.getAmount()));
+                minNextBidLabel.setText(formatNumber(dto.getAmount() + minCount));
+                lastBidTimeLabel.setText(formatEpochSecond(dto.getPlaceAt()));
 
-            try {
-                FXMLLoader loader = new FXMLLoader(
-                        getClass().getResource("/fxml/bid_history_cell.fxml")
-                );
-                Parent cell = loader.load();
-                BidHistoryCellController controller = loader.getController();
-                controller.setData(historyDTO, true);
-                bidHistoryList.getItems().add(cell);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+                try {
+                    FXMLLoader loader = new FXMLLoader(
+                            getClass().getResource("/fxml/bid_history_cell.fxml")
+                    );
+                    Parent cell = loader.load();
+                    BidHistoryCellController controller = loader.getController();
+                    controller.setData(historyDTO, true);
+                    bidHistoryList.getItems().add(cell);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     public void onDisconnected(String reason){}
