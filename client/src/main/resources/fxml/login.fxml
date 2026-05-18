@@ -12,7 +12,7 @@
                 <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
             </padding>
             <children>
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-text" text="AUCTION88." />
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-text" text="HOANGCHIM88" />
 
                 <VBox spacing="10.0">
                     <children>
@@ -23,18 +23,21 @@
 
                 <HBox alignment="CENTER" styleClass="toggle-container">
                     <children>
-                        <ToggleButton fx:id="userToggle"  mnemonicParsing="false" selected="true" styleClass="toggle-left" text="Customer">
+                        <ToggleButton fx:id="userToggle" mnemonicParsing="false" selected="true" styleClass="toggle-left" text="Customer">
                             <toggleGroup>
                                 <ToggleGroup fx:id="roleGroup" />
                             </toggleGroup>
                         </ToggleButton>
-                        <ToggleButton fx:id="adminToggle"  mnemonicParsing="false" styleClass="toggle-right" text="Admin" toggleGroup="$roleGroup" />
+                        <ToggleButton fx:id="adminToggle" mnemonicParsing="false" styleClass="toggle-right" text="Admin" toggleGroup="$roleGroup" />
                     </children>
                 </HBox>
 
                 <VBox spacing="15.0">
                     <children>
-                        <TextField fx:id="emailField" onAction="#handleLogin" promptText="Email or Username" styleClass="input-field" />
+                        <!-- Khi nhấn Enter ở đây, hàm handleEmailEnter sẽ được gọi để nhảy sang ô tiếp theo -->
+                        <TextField fx:id="emailField" onAction="#handleEmailEnter" promptText="Email or Username" styleClass="input-field" />
+
+                        <!-- Khi nhấn Enter ở đây, hàm handleLogin sẽ thực hiện đăng nhập -->
                         <PasswordField fx:id="passwordField" onAction="#handleLogin" promptText="Password" styleClass="input-field" />
                     </children>
                 </VBox>
