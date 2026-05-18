@@ -2,6 +2,7 @@ plugins {
     application
     id("java")
     id("org.openjfx.javafxplugin") version "0.1.0"
+    id("com.gradleup.shadow") version "9.4.1"
 }
 
 group = "vn.io.huangnosimp"
@@ -29,7 +30,7 @@ javafx {
 }
 
 application {
-    mainClass.set("vn.io.huangnosimp.Main")
+    mainClass.set("vn.io.huangnosimp.Launcher")
 }
 
 tasks.test {
@@ -41,6 +42,11 @@ tasks.compileJava {
 }
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "vn.io.huangnosimp.Main"
+        attributes["Main-Class"] = "vn.io.huangnosimp.Launcher"
+    }
+}
+tasks.shadowJar {
+    manifest {
+        attributes["Main-Class"] = "vn.io.huangnosimp.Launcher"
     }
 }
