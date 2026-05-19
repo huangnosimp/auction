@@ -48,7 +48,8 @@ public class ModelMapper {
                 auction.getStartTime(),
                 auction.getEndTime(),
                 0,
-                0
+                0,
+                null
         );
     }
 
