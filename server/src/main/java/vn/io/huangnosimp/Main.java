@@ -26,7 +26,7 @@ public class Main {
         IAuctionParticipantsRepository auctionParticipantsRepository = new AuctionParticipantsRepository(dbConnection);
         IBidTransactionRepository bidTransactionRepository = new BidTransactionRepository(dbConnection);
         IStatisticRepository statisticRepository = new StatisticRepository(dbConnection);
-        IAutoBidRepository autoBidRepository = new AutoBidRepository();
+        IAutoBidRepository autoBidRepository = new AutoBidRepository(userRepository, auctionRepository, dbConnection);
         //Services
         IUserService userService = new UserService(userRepository);
         ItemService itemService = new ItemService(itemRepository);

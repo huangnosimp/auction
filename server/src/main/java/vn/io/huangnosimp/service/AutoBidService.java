@@ -1,6 +1,7 @@
 package vn.io.huangnosimp.service;
 
 import vn.io.huangnosimp.dto.response.BidResult;
+import vn.io.huangnosimp.enums.AuctionStatus;
 import vn.io.huangnosimp.model.AutoBidConfig;
 import vn.io.huangnosimp.model.Auction;
 import vn.io.huangnosimp.model.Member;
@@ -34,48 +35,85 @@ public class AutoBidService implements IAutoBidService {
     @Override
     public boolean registerAutoBid(String bidderId, String auctionId, double maxBid, double increment) {
         User user = userRepository.findById(bidderId);
-        if (!(user instanceof Member bidder)) return false;
+        if (!(user instanceof Member bidder)) {
+            throw new IllegalArgumentException("User is not a valid member.");
+        }
 
         Auction auction = auctionRepository.findById(auctionId);
+        if (auction == null) {
+            throw new IllegalArgumentException("Auction not found.");
+        }
 
-        if (bidder == null || auction == null) return false;
-        if (increment <= 0) return false;
+        if (auction.getStatus() != AuctionStatus.RUNNING) {
+            throw new IllegalStateException("Auction is not currently running.");
+        }
 
-        if (maxBid <= auction.getCurrentPrice()) return false;
+        if (increment <= 0) {
+            throw new IllegalArgumentException("Increment must be greater than 0.");
+        }
 
-        AutoBidConfig config = new AutoBidConfig(bidder, auction, maxBid, increment, LocalDateTime.now());
-        autoBidRepository.save(config);
+        if (auction.getMinimumIncrement() > 0 && increment < auction.getMinimumIncrement()) {
+            throw new IllegalArgumentException("Increment must be at least " + auction.getMinimumIncrement());
+        }
 
-        System.out.println("[AutoBid] User " + bidder.getUsername() + " set AutoBid for Auction " + auctionId);
+        if (maxBid <= auction.getCurrentPrice()) {
+            throw new IllegalArgumentException("Maximum bid must be higher than the current price.");
+        }
+
+        if (bidder.getAccountBalance() < maxBid) {
+            throw new IllegalArgumentException("Insufficient available balance to set this Auto-Bid limit.");
+        }
+
+        AutoBidConfig existingConfig = autoBidRepository.findByMemberAndAuction(bidderId, auctionId);
+        if (existingConfig != null) {
+            existingConfig.setMaxBid(maxBid);
+            existingConfig.setIncrement(increment);
+            existingConfig.setRegisteredAt(LocalDateTime.now());
+            autoBidRepository.save(existingConfig);
+            System.out.println("[AutoBid] User " + bidder.getUsername() + " UPDATED AutoBid for Auction " + auctionId);
+        } else {
+            AutoBidConfig config = new AutoBidConfig(bidder, auction, maxBid, increment, LocalDateTime.now());
+            autoBidRepository.save(config);
+            System.out.println("[AutoBid] User " + bidder.getUsername() + " CREATED AutoBid for Auction " + auctionId);
+        }
+
+        processAutoBids(auctionId);
+
         return true;
     }
 
     @Override
-    public void processAutoBids(String auctionId) {
-        List<AutoBidConfig> configs = autoBidRepository.findByAuctionId(auctionId);
-        if (configs == null || configs.isEmpty()) return;
+    public synchronized void processAutoBids(String auctionId) {
+        synchronized (auctionId.intern()) {
+            boolean keepBidding = true;
 
-        configs.sort(Comparator.comparing(AutoBidConfig::getRegisteredAt));
+            while (keepBidding) {
+                keepBidding = false;
 
-        Auction auction = auctionRepository.findById(auctionId);
-        if (auction == null) return;
+                List<AutoBidConfig> configs = autoBidRepository.findByAuctionId(auctionId);
+                if (configs == null || configs.isEmpty()) return;
+                configs.sort(Comparator.comparing(AutoBidConfig::getRegisteredAt));
 
-        double currentPrice = auction.getCurrentPrice();
-        String currentWinnerId = auction.getCurrentWinnerId();
+                Auction auction = auctionRepository.findById(auctionId);
+                if (auction == null || !"RUNNING".equalsIgnoreCase(String.valueOf(auction.getStatus()))) return;
 
-        for (AutoBidConfig config : configs) {
-            if (config.getBidder().getId().equals(currentWinnerId)) continue;
+                double currentPrice = auction.getCurrentPrice();
+                String currentWinnerId = auction.getCurrentWinnerId();
 
-            double nextBid = currentPrice + config.getIncrement();
+                for (AutoBidConfig config : configs) {
+                    if (config.getBidder().getId().equals(currentWinnerId)) continue;
 
-            if (nextBid <= config.getMaxBid()) {
-                BidResult result = auctionService.placeBid(config.getBidder().getId(), auctionId, nextBid, false);
+                    double nextBid = currentPrice + config.getIncrement();
 
-                if (result == BidResult.SUCCESS) {
-                    System.out.println("[AutoBid] Success for " + config.getBidder().getUsername());
-                    break;
-                } else {
-                    System.out.println("[AutoBid] Failed for " + config.getBidder().getUsername() + " (e.g., Not enough money)");
+                    if (nextBid <= config.getMaxBid()) {
+                        BidResult result = auctionService.placeBid(config.getBidder().getId(), auctionId, nextBid, false);
+
+                        if (result == BidResult.SUCCESS) {
+                            System.out.println("[AutoBid] " + config.getBidder().getUsername() + " auto-bidded $" + nextBid);
+                            keepBidding = true;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -85,9 +123,15 @@ public class AutoBidService implements IAutoBidService {
     public void unregisterAutoBid(String bidderId, String auctionId) {
         AutoBidConfig existing = autoBidRepository.findByMemberAndAuction(bidderId, auctionId);
 
-        if (existing != null) {
+        if (existing == null) {
+            throw new IllegalArgumentException("No active Auto-Bid found for this auction.");
+        }
+
+        try {
             autoBidRepository.delete(bidderId, auctionId);
             System.out.println("[AutoBid] Unregistered for user: " + bidderId + " on auction: " + auctionId);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to unregister Auto-Bid due to database error.");
         }
     }
 }

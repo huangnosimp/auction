@@ -22,7 +22,7 @@ public class AutoBidHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             String userId = client.getUserId();
-            if (userId == null) return new Response(ResponseStatus.UNAUTHORIZED, "Unauthorized");
+            if (userId == null) return new Response(ResponseStatus.UNAUTHORIZED, "Unauthorized. Please log in.");
 
             try {
                 AutoBidRequestDTO data = GsonParser.GSON.fromJson(
@@ -30,18 +30,27 @@ public class AutoBidHandler {
                         AutoBidRequestDTO.class
                 );
 
-                if (data == null) {
-                    return new Response(ResponseStatus.ERROR, "Invalid request data.");
+                if (data == null || data.getAuctionId() == null || data.getAuctionId().trim().isEmpty()) {
+                    return new Response(ResponseStatus.ERROR, "Invalid auction data.");
+                }
+                if (data.getMaxBid() <= 0) {
+                    return new Response(ResponseStatus.ERROR, "Maximum bid must be greater than 0.");
                 }
 
                 boolean success = autoBidService.registerAutoBid(
                         userId, data.getAuctionId(), data.getMaxBid(), data.getIncrement()
                 );
 
-                return success ? new Response(ResponseStatus.SUCCESS, "Registered")
-                        : new Response(ResponseStatus.ERROR, "Failed");
+                return success
+                        ? new Response(ResponseStatus.SUCCESS, "Auto-Bid registered successfully!")
+                        : new Response(ResponseStatus.ERROR, "Could not register Auto-Bid at this time.");
+
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                return new Response(ResponseStatus.ERROR, e.getMessage());
             } catch (Exception e) {
-                return new Response(ResponseStatus.ERROR, "Invalid data");
+                System.err.println("[AutoBid Register Error]: " + e.getMessage());
+                e.printStackTrace();
+                return new Response(ResponseStatus.ERROR, "Internal server error: " + e.getMessage());
             }
         }
     }
@@ -56,7 +65,7 @@ public class AutoBidHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             String userId = client.getUserId();
-            if (userId == null) return new Response(ResponseStatus.UNAUTHORIZED, "Unauthorized");
+            if (userId == null) return new Response(ResponseStatus.UNAUTHORIZED, "Unauthorized. Please log in.");
 
             try {
                 AutoBidRequestDTO data = GsonParser.GSON.fromJson(
@@ -64,14 +73,19 @@ public class AutoBidHandler {
                         AutoBidRequestDTO.class
                 );
 
-                if (data == null) {
+                if (data == null || data.getAuctionId() == null) {
                     return new Response(ResponseStatus.ERROR, "Invalid request data.");
                 }
 
                 autoBidService.unregisterAutoBid(userId, data.getAuctionId());
-                return new Response(ResponseStatus.SUCCESS, "Unregistered");
+                return new Response(ResponseStatus.SUCCESS, "Auto-Bid unregistered successfully.");
+
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                return new Response(ResponseStatus.ERROR, e.getMessage());
             } catch (Exception e) {
-                return new Response(ResponseStatus.ERROR, "Invalid data");
+                System.err.println("[AutoBid Unregister Error]: " + e.getMessage());
+                e.printStackTrace();
+                return new Response(ResponseStatus.ERROR, "Internal server error during unregistration.");
             }
         }
     }
