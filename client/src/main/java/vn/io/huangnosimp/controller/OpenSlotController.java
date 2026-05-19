@@ -71,7 +71,7 @@ public class OpenSlotController implements Initializable {
 
 
         if (nodeToRemove != null) {
-            FadeTransition ft = new FadeTransition(Duration.millis(500), nodeToRemove);
+            FadeTransition ft = new FadeTransition(Duration.millis(300), nodeToRemove);
             ft.setFromValue(1.0);
             ft.setToValue(0.0);
 

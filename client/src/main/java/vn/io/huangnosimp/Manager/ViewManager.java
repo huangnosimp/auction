@@ -43,6 +43,7 @@ public class ViewManager {
             e.printStackTrace();
         }
     }
+
     public static <T> T changeViewWithController(String fxmlFile){
         try{
             FXMLLoader loader = new FXMLLoader(ViewManager.class.getResource("/fxml/" + fxmlFile));

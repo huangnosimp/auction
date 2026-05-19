@@ -79,7 +79,9 @@ public class AuctionDetailResponseDTO {
     public long getEndTime() { return endTime; }
     public double getCurrentPrice() { return currentPrice; }
     public double getMinNextBid() { return minNextBid; }
-    public String getLeadBidder() { return leadBidder; }
+    public String getLeadBidder() {
+        return leadBidder != null ? leadBidder : "No bids yet";
+    }
     public long getLastBidTime() { return lastBidTime; }
     public int getParticipantCount() { return participantCount; }
     public int getBidCount() { return bidCount; }

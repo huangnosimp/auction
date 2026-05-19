@@ -313,3 +313,25 @@ Pane {
 .autobid-cancel-btn:hover {
     -fx-background-color: #c0392b;
 }
+#myBidLabel{
+    -fx-background-color:  #211429;
+    -fx-font-size:  15px;
+    -fx-font-weight:  bold;
+    -fx-text-fill: white;
+}
+/* 1. Đổi màu nền của tất cả các ô dữ liệu trong ListView */
+.list-view .list-cell {
+    -fx-background-color: #16181f; /* Cùng màu tối với sidebar */
+    -fx-text-fill: #ffffff;        /* Đổi màu chữ thành trắng để dễ nhìn */
+    -fx-padding: 6px 10px;         /* Tạo khoảng cách cho đẹp dòng */
+}
+
+/* 2. Đổi màu nền khi dòng đó được chọn (Selected) hoặc di chuột qua (Hover) để tránh bị lem màu trắng */
+.list-view .list-cell:filled:hover {
+    -fx-background-color: #2a2d3a;
+}
+
+.list-view .list-cell:filled:selected {
+    -fx-background-color: #3a1a4a; /* Màu tím tối giống như màu chủ đạo của bạn */
+    -fx-text-fill: #f0a500;        /* Chữ biến thành màu vàng để làm nổi bật */
+}

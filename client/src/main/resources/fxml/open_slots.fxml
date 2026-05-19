@@ -21,15 +21,7 @@
                 <TextField fx:id="txtSearch" promptText="Search auctions, items…" styleClass="os-search-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
-            <HBox alignment="CENTER_LEFT" spacing="6" styleClass="os-filter-group">
-                <ToggleButton fx:id="filterAll" selected="true" styleClass="os-filter-chip, os-filter-active" text="All" />
-                <ToggleButton fx:id="filterLive" styleClass="os-filter-chip" text="🟢 Live" />
-                <ToggleButton fx:id="filterWinning" styleClass="os-filter-chip" text="🏆 Winning" />
-                <ToggleButton fx:id="filterOutbid" styleClass="os-filter-chip" text="🔴 Outbid" />
-                <ToggleButton fx:id="filterEnding" styleClass="os-filter-chip" text="⏰ Ending Soon" />
-            </HBox>
-
-            <ComboBox fx:id="cbSort" prefWidth="140" promptText="Sort by…" styleClass="os-sort-combo" />
+            <HBox alignment="CENTER_LEFT" spacing="6" styleClass="os-filter-group" />
         </HBox>
 
     </VBox>

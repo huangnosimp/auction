@@ -22,16 +22,14 @@ import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
-import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
-import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
+import vn.io.huangnosimp.network.IServerMessageListener;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
 
-import javax.swing.text.View;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
 
@@ -42,7 +40,7 @@ import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 public class DashboardController implements Initializable {
     @FXML private BorderPane mainBorderPane;
-    @FXML private StackPane contentArea; // Cái này nằm ở file dashboard.fxml nên giữ lại
+    @FXML private StackPane contentArea;
     @FXML private Button btnOpenSlots;
     @FXML private HBox menuHbox;
     @FXML private VBox sideVbox;
@@ -55,24 +53,21 @@ public class DashboardController implements Initializable {
     public static DashboardController instance;
 
     @FXML
-    public void handleMenuAction(ActionEvent event){
+    public void handleMenuAction(ActionEvent event) {
         Button clickedButton = (Button) event.getSource();
-
-        for(Node node : menuHbox.getChildren()){
-            if(node instanceof Button){
-                Button btn = (Button) node;
+        for (Node node : menuHbox.getChildren()) {
+            if (node instanceof Button btn) {
                 btn.getStyleClass().remove("nav-btn-active");
             }
         }
         clickedButton.getStyleClass().add("nav-btn-active");
     }
 
-    public Button getActiveMenuButton(){
-        for(Node node : menuHbox.getChildren()){
-            if(node instanceof Button){
-                Button actButton = (Button) node;
-                if (actButton.getStyleClass().contains("nav-btn-active")){
-                    return actButton;
+    public Button getActiveMenuButton() {
+        for (Node node : menuHbox.getChildren()) {
+            if (node instanceof Button btn) {
+                if (btn.getStyleClass().contains("nav-btn-active")) {
+                    return btn;
                 }
             }
         }
@@ -80,13 +75,23 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
-    public void handlebtnAvatar(ActionEvent event){
+    public void handlebtnAvatar(ActionEvent event) {
         changeView("AccountView.fxml", 1);
+        for (Node node : menuHbox.getChildren()) {
+            if (node instanceof Button btn) {
+                btn.getStyleClass().remove("nav-btn-active");
+            }
+        }
     }
 
     @FXML
-    public void handlebtnDashboard(ActionEvent event){
+    public void handlebtnDashboard(ActionEvent event) {
         changeView("dashboard_home.fxml", 1);
+        handleMenuAction(event);
+    }
+    @FXML
+    public void handlebtnInventory(ActionEvent event){
+        changeView("Inventory.fxml", 1);
         handleMenuAction(event);
     }
 
@@ -94,12 +99,25 @@ public class DashboardController implements Initializable {
     public void handlebtnOpenSlots(ActionEvent event) {
         List<AuctionCardDTO> combineList = new ArrayList<>(UserSession.getJoiningListCard());
         combineList.addAll(UserSession.getMyListCard());
+
         List<AuctionCardDTO> result = new ArrayList<>();
+
         fetchUntilFull(result, combineList, 30, event, 5);
-        if(ViewManager.getCache().containsKey("open_slots.fxml")){
-            ControllerManager.getOpenSlotController().clearContainer();
-            ControllerManager.getOpenSlotController().setupOpenSlot(UserSession.getListCard());
-        }
+    }
+
+    private void applyOpenSlots(List<AuctionCardDTO> result, ActionEvent event) {
+        Platform.runLater(() -> {
+
+            UserSession.addToList(result);
+
+            if (ViewManager.getCache().containsKey("open_slots.fxml")) {
+                ControllerManager.getOpenSlotController().clearContainer();
+                ControllerManager.getOpenSlotController().setupOpenSlot(UserSession.getListCard());
+            }
+
+            ViewManager.changeView("open_slots.fxml", 1);
+            handleMenuAction(event);
+        });
     }
 
     private void fetchUntilFull(List<AuctionCardDTO> result,
@@ -108,31 +126,19 @@ public class DashboardController implements Initializable {
                                 ActionEvent event,
                                 int maxRetry) {
 
-        // Đủ số lượng hoặc hết retry → chạy UI
         if (result.size() >= target || maxRetry <= 0) {
-            Platform.runLater(() -> {
-                UserSession.addToList(result);
-                ViewManager.changeView("open_slots.fxml", 1);
-                handleMenuAction(event);
-            });
+            applyOpenSlots(result, event);
             return;
         }
 
         int needed = target - result.size();
-
-        // Lấy gấp đôi để bù cho card bị lọc
         GetPublicAcutionCardDTO requestDTO = new GetPublicAcutionCardDTO(needed * 2);
         Request request = new Request(ActionType.GET_PUBLIC_AUCTION_CARD, requestDTO);
 
         SocketManager.getClient().sendRequestAsync(request)
                 .thenAccept(response -> {
                     if (!ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                        // Request thất bại → dừng, dùng những gì đã có
-                        Platform.runLater(() -> {
-                            UserSession.addToList(result);
-                            ViewManager.changeView("open_slots.fxml", 1);
-                            handleMenuAction(event);
-                        });
+                        applyOpenSlots(result, event);
                         return;
                     }
 
@@ -143,22 +149,15 @@ public class DashboardController implements Initializable {
 
                     List<AuctionCardDTO> responseList = dto.getPublicAuctionCardList();
 
-                    // Server không còn card → dừng
                     if (responseList == null || responseList.isEmpty()) {
-                        Platform.runLater(() -> {
-                            UserSession.addToList(result);
-                            ViewManager.changeView("open_slots.fxml", 1);
-                            handleMenuAction(event);
-                        });
+                        applyOpenSlots(result, event);
                         return;
                     }
 
-                    // Tập hợp id cần loại trừ (excludeList + result đã có)
                     Set<String> excludeIds = new HashSet<>();
                     excludeList.forEach(c -> excludeIds.add(c.getAuctionId()));
                     result.forEach(c -> excludeIds.add(c.getAuctionId()));
 
-                    // Lọc và thêm vào result
                     for (AuctionCardDTO card : responseList) {
                         if (!excludeIds.contains(card.getAuctionId())) {
                             result.add(card);
@@ -167,18 +166,14 @@ public class DashboardController implements Initializable {
                         }
                     }
 
-                    // Đủ rồi → chạy UI, chưa đủ → gọi lại với retry - 1
                     if (result.size() >= target) {
-                        Platform.runLater(() -> {
-                            UserSession.addToList(result);
-                            ViewManager.changeView("open_slots.fxml", 1);
-                            handleMenuAction(event);
-                        });
+                        applyOpenSlots(result, event);
                     } else {
                         fetchUntilFull(result, excludeList, target, event, maxRetry - 1);
                     }
                 });
     }
+
     public void showToast(String title, String sub, boolean success) {
         String borderColor = success ? "#22c55e" : "#e24b4a";
         String titleColor  = success ? "#4ade80" : "#f87171";
@@ -214,23 +209,21 @@ public class DashboardController implements Initializable {
         });
         pause.play();
     }
-    private void setupDashboard(){
+
+    private void setupDashboard() {
         lblBalance.setText(calculateBalance(getDashboardInfo().getBalance()));
         ControllerManager.getDashboardHomeController().setupDashboardHome();
     }
-    private String calculateBalance(double value){
-        if(value >= 1000000000){
-            return formatNumber(value/1000000000)+" B";
-        }
-        else if (value>=1000000){
-            return formatNumber(value/1000000)+" M";
-        }
-        else {
-            return formatNumber(value/1000)+" K";
-        }
+
+    private String calculateBalance(double value) {
+        if (value >= 1000000000) return formatNumber(value / 1000000000) + " B";
+        else if (value >= 1000000) return formatNumber(value / 1000000) + " M";
+        else return formatNumber(value / 1000) + " K";
     }
+
+
     @Override
-    public void initialize(URL location, ResourceBundle resources){
+    public void initialize(URL location, ResourceBundle resources) {
         setMainBorderPane(mainBorderPane);
         ControllerManager.setDashboardController(this);
         setupDashboard();
