@@ -14,6 +14,7 @@ public class UserSession {
     private static List<AuctionCardDTO> listCard = new ArrayList<>();
     private static List<AuctionCardDTO> joiningListCard = new ArrayList<>();
     private static List<AuctionCardDTO> myListCard = new ArrayList<>();
+    private static List<AuctionCardDTO> searchListCard = new ArrayList<>();
     private static String auctionId;
     private static String username;
 
@@ -84,6 +85,13 @@ public class UserSession {
     }
     public static void removeCard(List<AuctionCardDTO> list, String Id) {
         list.removeIf(card -> card.getAuctionId().equals(Id));
+    }
+    //search
+    public static void addSearchedCard(AuctionCardDTO card){
+        searchListCard.add(card);
+    }
+    public static List<AuctionCardDTO> getSearchListCard(){
+        return searchListCard;
     }
     //auction id
     public static void setAuctionId(String Id){

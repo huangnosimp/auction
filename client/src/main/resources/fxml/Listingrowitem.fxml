@@ -2,60 +2,49 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
-<HBox alignment="CENTER_LEFT"
-      styleClass="inv-row"
-      stylesheets="@../css/Inventory.css"
-      xmlns="http://javafx.com/javafx/17.0.12"
-      xmlns:fx="http://javafx.com/fxml/1"
-      >
+<HBox alignment="CENTER_LEFT" styleClass="inv-row" stylesheets="@../css/Inventory.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
 
-    <!-- Ảnh sản phẩm -->
-    <ImageView fx:id="imgProduct"
-               fitHeight="48" fitWidth="64"
-               preserveRatio="true"
-               pickOnBounds="true"
-               style="-fx-background-color: #12141f;
-                      -fx-background-radius: 6;">
-        <HBox.margin><Insets right="12"/></HBox.margin>
-    </ImageView>
+    <!-- Ảnh sản phẩm — StackPane để có nền màu -->
+    <StackPane prefHeight="48" prefWidth="64" style="-fx-background-color: #12141f; -fx-background-radius: 6;">
+        <HBox.margin><Insets right="12" /></HBox.margin>
+        <ImageView fx:id="imgProduct" fitHeight="48" fitWidth="64" pickOnBounds="true" preserveRatio="true" />
+    </StackPane>
 
     <!-- Tên + danh mục -->
-    <VBox spacing="3" prefWidth="200">
-        <Label fx:id="lblProductName" styleClass="inv-row-name" text="Product Name" wrapText="true"/>
-        <Label fx:id="lblCategory"    styleClass="inv-row-sub"  text="Category"/>
+    <VBox prefWidth="200" spacing="3">
+        <Label fx:id="lblProductName" styleClass="inv-row-name" text="Product Name" wrapText="true" />
+        <Label fx:id="lblCategory" styleClass="inv-row-sub" text="Category" />
     </VBox>
 
     <!-- Status badge -->
-    <HBox prefWidth="90" alignment="CENTER_LEFT">
-        <Label fx:id="lblStatus" styleClass="inv-badge inv-badge-live" text="LIVE"/>
+    <HBox alignment="CENTER_LEFT" prefWidth="90">
+        <Label fx:id="lblStatus" styleClass="inv-badge inv-badge-live" text="LIVE" textFill="WHITE" />
     </HBox>
 
     <!-- Số lượt bid -->
-    <VBox prefWidth="60" alignment="CENTER_LEFT" spacing="2">
-        <Label fx:id="lblBidCount" styleClass="inv-row-val"   text="0"/>
-        <Label                     styleClass="inv-row-muted" text="bids"/>
+    <VBox alignment="CENTER_LEFT" prefWidth="60" spacing="2">
+        <Label fx:id="lblBidCount" styleClass="inv-row-val" text="0" />
+        <Label styleClass="inv-row-muted" text="bids" />
     </VBox>
 
     <!-- Giá cao nhất -->
-    <VBox prefWidth="90" alignment="CENTER_LEFT" spacing="2">
-        <Label fx:id="lblTopBid"   styleClass="inv-row-price" text="—"/>
-        <Label                     styleClass="inv-row-muted" text="top bid"/>
+    <VBox alignment="CENTER_LEFT" prefWidth="90" spacing="2">
+        <Label fx:id="lblTopBid" styleClass="inv-row-price" text="—" />
+        <Label styleClass="inv-row-muted" text="top bid" />
     </VBox>
 
     <!-- Thời gian kết thúc -->
-    <VBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="2">
-        <Label fx:id="lblEndsIn"   styleClass="inv-row-time"  text="—"/>
-        <Label fx:id="lblEndDate"  styleClass="inv-row-muted" text="—"/>
+    <VBox alignment="CENTER_LEFT" spacing="2" HBox.hgrow="ALWAYS">
+        <Label fx:id="lblEndsIn" styleClass="inv-row-time" text="—" />
+        <Label fx:id="lblEndDate" styleClass="inv-row-muted" text="—" />
     </VBox>
 
     <!-- Action button -->
-    <HBox prefWidth="80" alignment="CENTER_RIGHT">
-        <Button fx:id="btnAction"
-                styleClass="inv-btn-manage"
-                text="Manage"/>
+    <HBox alignment="CENTER_RIGHT" prefWidth="80">
+        <Button fx:id="btnAction" styleClass="inv-btn-manage" text="Manage" />
     </HBox>
 
 </HBox>

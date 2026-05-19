@@ -15,6 +15,7 @@ import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.request.JoinRoomRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
+import vn.io.huangnosimp.dto.response.PlaceBidResponseDTO;
 import vn.io.huangnosimp.dto.shared.NotificationDTO;
 import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.IServerMessageListener;
@@ -29,6 +30,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
+import static vn.io.huangnosimp.Manager.UserSession.getUsername;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 public class ItemCardController implements IServerMessageListener {
@@ -45,11 +47,16 @@ public class ItemCardController implements IServerMessageListener {
 
     @FXML private ImageView imgProduct;
 
+    private int bidCount;
+    private int bidderCount;
+
     private String auctionId;
     private List<String> displayImg;
 
     public void addInfo(AuctionCardDTO dto, String type){
         displayImg = dto.getImageUrl();
+        bidCount = dto.getBidCount();
+        bidderCount = dto.getBidderCount();
         if (displayImg != null && !displayImg.isEmpty()) {
             imgProduct.setImage(new Image(displayImg.get(0), 0, 0, true, true));
         } else {
@@ -161,7 +168,14 @@ public class ItemCardController implements IServerMessageListener {
     public void onRequestReceived(Request notification){
         NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
         if(NotificationType.NEW_BID.equals(notificationDTO.getNotificationType())){
-
+            PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
+            Platform.runLater(()->{
+                lblBidCount.setText(String.valueOf(bidCount+1) + " bids");
+                lblCurrentBid.setText(formatNumber(dto.getAmount()));
+                if(dto.getUsername().equals(getUsername())){
+                    lblYourBid.setText(formatNumber(dto.getAmount()));
+                }
+            });
         }
     }
     public void onDisconnected(String reason){}

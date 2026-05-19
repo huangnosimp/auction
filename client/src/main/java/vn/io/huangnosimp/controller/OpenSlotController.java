@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.util.Duration;
 import vn.io.huangnosimp.Manager.ControllerManager;
@@ -23,9 +24,11 @@ import vn.io.huangnosimp.util.GsonParser;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 
 public class OpenSlotController implements Initializable {
     @FXML private FlowPane cardContainer;
+    @FXML private TextField txtSearch;
 
     public FlowPane getCardContainer(){
         return cardContainer;
@@ -87,16 +90,22 @@ public class OpenSlotController implements Initializable {
             addCard(dto, "Public");
         }
     }
+
+    @FXML
+    public void handleSearchItem(){
+
+    }
     @FXML
     public void loadMorePublicCards() {
-        // Lấy tất cả id đang có
-        Set<String> existingIds = new HashSet<>();
-        UserSession.getListCard().forEach(c -> existingIds.add(c.getAuctionId()));
-        UserSession.getJoiningListCard().forEach(c -> existingIds.add(c.getAuctionId()));
-        UserSession.getMyListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+        if(txtSearch.getText() == null || txtSearch.getText().trim().isEmpty()) {
+            Set<String> existingIds = new HashSet<>();
+            UserSession.getListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+            UserSession.getJoiningListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+            UserSession.getMyListCard().forEach(c -> existingIds.add(c.getAuctionId()));
 
-        List<AuctionCardDTO> result = new ArrayList<>();
-        fetchMoreUntilFull(result, existingIds, 30, 5);
+            List<AuctionCardDTO> result = new ArrayList<>();
+            fetchMoreUntilFull(result, existingIds, 30, 5);
+        }
     }
 
     private void fetchMoreUntilFull(List<AuctionCardDTO> result,
