@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<ScrollPane fitToWidth="true" styleClass="account-scroll" stylesheets="@../css/AccountView.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.AccountViewController">
+<ScrollPane fitToWidth="true" prefHeight="799.0" prefWidth="814.0" styleClass="account-scroll" stylesheets="@../css/AccountView.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.AccountViewController">
 
     <VBox spacing="16" styleClass="center-content">
         <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
@@ -46,7 +46,7 @@
         <HBox alignment="TOP_LEFT" spacing="16">
 
             <!-- ── PROFILE CARD ── -->
-            <VBox maxWidth="260" minWidth="240" spacing="0" styleClass="sec-card">
+            <VBox maxWidth="410.0" minWidth="240" prefHeight="413.0" prefWidth="410.0" spacing="0" styleClass="sec-card">
 
                 <Label styleClass="sec-title" text="● Profile" />
                 <VBox alignment="CENTER" spacing="6" styleClass="avatar-section">
@@ -92,7 +92,7 @@
             </VBox>
 
             <!-- ── WALLET CARD ── -->
-            <VBox spacing="0" styleClass="sec-card" HBox.hgrow="ALWAYS">
+            <VBox prefHeight="413.0" prefWidth="432.0" spacing="0" styleClass="sec-card" HBox.hgrow="ALWAYS">
 
                 <Label styleClass="sec-title" text="● Wallet" />
 

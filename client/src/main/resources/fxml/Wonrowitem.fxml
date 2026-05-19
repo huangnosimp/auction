@@ -2,53 +2,43 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
-<HBox alignment="CENTER_LEFT"
-      styleClass="inv-row"
-      stylesheets="@../css/Inventory.css"
-      xmlns="http://javafx.com/javafx/17.0.12"
-      xmlns:fx="http://javafx.com/fxml/1"
-      >
+<HBox alignment="CENTER_LEFT" styleClass="inv-row" stylesheets="@../css/Inventory.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
 
     <!-- Ảnh sản phẩm -->
-    <ImageView fx:id="imgProduct"
-               fitHeight="48" fitWidth="64"
-               preserveRatio="true"
-               pickOnBounds="true"
-               style="-fx-background-color: #12141f;
-                      -fx-background-radius: 6;">
-        <HBox.margin><Insets right="12"/></HBox.margin>
+    <ImageView fx:id="imgProduct" fitHeight="48" fitWidth="64" pickOnBounds="true" preserveRatio="true" style="-fx-background-color: #12141f;                       -fx-background-radius: 6;">
+        <HBox.margin><Insets right="12" /></HBox.margin>
     </ImageView>
 
     <!-- Tên + danh mục -->
-    <VBox spacing="3" prefWidth="200">
-        <Label fx:id="lblProductName" styleClass="inv-row-name" text="Product Name" wrapText="true"/>
-        <Label fx:id="lblCategory"    styleClass="inv-row-sub"  text="Category"/>
+    <VBox prefWidth="200" spacing="3">
+        <Label fx:id="lblProductName" styleClass="inv-row-name" text="Product Name" wrapText="true" />
+        <Label fx:id="lblCategory" styleClass="inv-row-sub" text="Category" />
     </VBox>
 
     <!-- Status badge -->
-    <HBox prefWidth="90" alignment="CENTER_LEFT">
-        <Label fx:id="lblStatus" styleClass="inv-badge inv-badge-pending" text="PENDING"/>
+    <HBox alignment="CENTER_LEFT" prefWidth="90">
+        <Label fx:id="lblStatus" styleClass="inv-badge inv-badge-pending" text="PENDING" textFill="WHITE" />
     </HBox>
 
     <!-- Giá đã trả -->
-    <VBox prefWidth="90" alignment="CENTER_LEFT" spacing="2">
-        <Label fx:id="lblPaidPrice" styleClass="inv-row-price" text="0"/>
-        <Label                      styleClass="inv-row-muted" text="paid"/>
+    <VBox alignment="CENTER_LEFT" prefWidth="90" spacing="2">
+        <Label fx:id="lblPaidPrice" styleClass="inv-row-price" text="0" />
+        <Label styleClass="inv-row-muted" text="paid" />
     </VBox>
 
     <!-- Người bán -->
-    <VBox prefWidth="90" alignment="CENTER_LEFT" spacing="2">
-        <Label fx:id="lblSeller"    styleClass="inv-row-val"   text="—"/>
-        <Label                      styleClass="inv-row-muted" text="seller"/>
+    <VBox alignment="CENTER_LEFT" prefWidth="90" spacing="2">
+        <Label fx:id="lblSeller" styleClass="inv-row-val" text="—" />
+        <Label styleClass="inv-row-muted" text="seller" />
     </VBox>
 
     <!-- Thời điểm thắng -->
-    <VBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="2">
-        <Label fx:id="lblWonAt"     styleClass="inv-row-muted" text="—"/>
-        <Label                      styleClass="inv-row-muted" text="won at"/>
+    <VBox alignment="CENTER_LEFT" spacing="2" HBox.hgrow="ALWAYS">
+        <Label fx:id="lblWonAt" styleClass="inv-row-muted" text="—" />
+        <Label styleClass="inv-row-muted" text="won at" />
     </VBox>
 
 </HBox>

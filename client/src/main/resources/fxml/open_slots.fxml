@@ -20,6 +20,7 @@
                 <Label styleClass="os-search-icon" text="🔍" />
                 <TextField fx:id="txtSearch" promptText="Search auctions, items…" styleClass="os-search-field" HBox.hgrow="ALWAYS" />
             </HBox>
+         <Button mnemonicParsing="false" style="-fx-background-color: #1e2029; -fx-border-color: #3a3f56; -fx-border-radius: 8px;" text="Search" textFill="WHITE" />
 
             <HBox alignment="CENTER_LEFT" spacing="6" styleClass="os-filter-group" />
         </HBox>
