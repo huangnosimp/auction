@@ -23,6 +23,8 @@ import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
+import vn.io.huangnosimp.dto.shared.NotificationDTO;
+import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.IServerMessageListener;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
@@ -31,6 +33,7 @@ import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
 
 import java.net.URL;
+import java.time.Instant;
 import java.util.*;
 
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
@@ -38,7 +41,7 @@ import static vn.io.huangnosimp.Manager.UserSession.getDashboardInfo;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 
-public class DashboardController implements Initializable {
+public class DashboardController implements Initializable, IServerMessageListener {
     @FXML private BorderPane mainBorderPane;
     @FXML private StackPane contentArea;
     @FXML private Button btnOpenSlots;
@@ -159,7 +162,8 @@ public class DashboardController implements Initializable {
                     result.forEach(c -> excludeIds.add(c.getAuctionId()));
 
                     for (AuctionCardDTO card : responseList) {
-                        if (!excludeIds.contains(card.getAuctionId())) {
+                        long now = Instant.now().toEpochMilli();
+                        if (!excludeIds.contains(card.getAuctionId()) && now <= card.getEndTime()) {
                             result.add(card);
                             excludeIds.add(card.getAuctionId());
                             if (result.size() >= target) break;
@@ -221,6 +225,20 @@ public class DashboardController implements Initializable {
         else return formatNumber(value / 1000) + " K";
     }
 
+    @Override
+    public void onResponseReceived(Response response){}
+    public void onResponseReceived(Response response, ActionType actionType){}
+    public void onRequestReceived(Request notification){
+        NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
+        NotificationType type = notificationDTO.getNotificationType();
+        switch (type){
+            case AUCTION_ENDED -> {}
+            case AUCTION_CANCELED -> {
+
+            }
+        }
+    }
+    public void onDisconnected(String reason){}
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

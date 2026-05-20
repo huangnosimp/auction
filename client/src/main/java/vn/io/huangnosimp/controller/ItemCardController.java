@@ -42,6 +42,7 @@ public class ItemCardController implements IServerMessageListener {
     @FXML private Label lblBidderCount;
     @FXML private Label lblBidCount;
     @FXML private Label lblYourBid;
+    @FXML private Label lblBidStatus;
 
     @FXML private Button btnManage;
 
@@ -57,6 +58,9 @@ public class ItemCardController implements IServerMessageListener {
         displayImg = dto.getImageUrl();
         bidCount = dto.getBidCount();
         bidderCount = dto.getBidderCount();
+        if(dto.getCurrentPrice() == dto.getYourBid()){
+            lblBidStatus.setText("WINNING");
+        }
         if (displayImg != null && !displayImg.isEmpty()) {
             imgProduct.setImage(new Image(displayImg.get(0), 0, 0, true, true));
         } else {
@@ -174,6 +178,10 @@ public class ItemCardController implements IServerMessageListener {
                 lblCurrentBid.setText(formatNumber(dto.getAmount()));
                 if(dto.getUsername().equals(getUsername())){
                     lblYourBid.setText(formatNumber(dto.getAmount()));
+                    lblBidStatus.setText("WINNING");
+                }
+                else{
+                    lblBidStatus.setText("OUTBID");
                 }
             });
         }

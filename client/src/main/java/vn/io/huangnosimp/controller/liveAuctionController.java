@@ -405,6 +405,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                             Platform.runLater(()->{
                                 ControllerManager.getDashboardController().showToast("SUCCESS", cancelResponse.getMessage(), true);
                                 ControllerManager.getDashboardHomeController().removeFromDashBoard(this.auctionId, ControllerManager.getDashboardHomeController().getAuctionFlowPane());
+                                UserSession.removeCard(UserSession.getMyListCard(), auctionId);
                                 ViewManager.changeView("dashboard_home.fxml", 1);
                             });
                         }
@@ -496,7 +497,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                     Parent cell = loader.load();
                     BidHistoryCellController controller = loader.getController();
                     controller.setData(historyDTO, true);
-                    bidHistoryList.getItems().add(cell);
+                    bidHistoryList.getItems().add(0, cell);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -512,9 +513,9 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         setAuctionId(UserSession.getAuctionId());
         setupLineChart();
         holdTimer = new Timeline(new KeyFrame(Duration.millis(200), event -> {
-            handleIncreaseButton(); // Gọi lại hàm tăng số bạn đã viết
+            handleIncreaseButton();
         }));
-        holdTimer.setCycleCount(Animation.INDEFINITE); // Chạy vô hạn cho đến khi thả chuột
+        holdTimer.setCycleCount(Animation.INDEFINITE);
         setUpliveAuction(UserSession.getAuctionDetail());
         zoomImage();
     }

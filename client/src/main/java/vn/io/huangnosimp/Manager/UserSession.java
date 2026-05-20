@@ -83,6 +83,7 @@ public class UserSession {
     public static List<AuctionCardDTO> getMyListCard(){
         return myListCard;
     }
+
     public static void removeCard(List<AuctionCardDTO> list, String Id) {
         list.removeIf(card -> card.getAuctionId().equals(Id));
     }

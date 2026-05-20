@@ -42,8 +42,8 @@
             </center>
 
             <left>
-                <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="224.0" style="-fx-background-color: #171414;" BorderPane.alignment="CENTER">
-                    <VBox fx:id="sideVbox" spacing="10" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
+                <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="332.0" style="-fx-background-color: #12111a; -fx-border-color: transparent #2a2640 transparent transparent; -fx-border-width: 1;" BorderPane.alignment="CENTER">
+                    <VBox fx:id="sideVbox" spacing="14" AnchorPane.bottomAnchor="12" AnchorPane.leftAnchor="12" AnchorPane.rightAnchor="12" AnchorPane.topAnchor="12">
 
                         <VBox spacing="4" styleClass="stat-card">
                             <Label styleClass="stat-label" text="YOUR BALANCE" />
@@ -51,14 +51,118 @@
                             <Label styleClass="stat-link" text="+ Top Up" />
                         </VBox>
 
-                        <VBox prefHeight="145.0" prefWidth="194.0" spacing="8" styleClass="side-card">
-                            <Label styleClass="side-section-title" text="EXPIRING SOON" />
-                            <VBox fx:id="expiringList" spacing="6" />
+                        <VBox prefHeight="230.0" spacing="8" style="-fx-padding: 12;" styleClass="side-card">
+                            <HBox alignment="CENTER_LEFT" spacing="6">
+                                <Label style="-fx-text-fill: #ff6b6b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-letter-spacing: 0.5px;" text="🚨 OUTBID ALERTS" />
+                                <Label style="-fx-background-color: #ff3333; -fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-background-radius: 4; -fx-padding: 1 5 1 5;" text="5" />
+                            </HBox>
+
+                            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                                <content>
+                                    <VBox fx:id="outbidAlertsList" spacing="8" style="-fx-background-color: transparent;">
+
+                                        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #1a1515; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,51,51,0.2); -fx-border-width: 1;">
+                                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="iPhone 15 Pro Max" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ff6b6b;" text="Top: $1,600" />
+                                            </VBox>
+                                            <Button style="-fx-background-color: #ff3333; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-cursor: hand;" text="Bid +1" />
+                                        </HBox>
+
+                                        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #1a1515; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,51,51,0.2); -fx-border-width: 1;">
+                                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="RTX 4090 ROG Strix" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ff6b6b;" text="Top: $2,150" />
+                                            </VBox>
+                                            <Button style="-fx-background-color: #ff3333; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-cursor: hand;" text="Bid +1" />
+                                        </HBox>
+
+                                        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #1a1515; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,51,51,0.2); -fx-border-width: 1;">
+                                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="Keychron Q1 Pro" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ff6b6b;" text="Top: $180" />
+                                            </VBox>
+                                            <Button style="-fx-background-color: #ff3333; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-cursor: hand;" text="Bid +1" />
+                                        </HBox>
+
+                                        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #1a1515; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,51,51,0.2); -fx-border-width: 1;">
+                                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="AirPods Pro Gen 2" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ff6b6b;" text="Top: $210" />
+                                            </VBox>
+                                            <Button style="-fx-background-color: #ff3333; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-cursor: hand;" text="Bid +1" />
+                                        </HBox>
+
+                                        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #1a1515; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,51,51,0.2); -fx-border-width: 1;">
+                                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="PlayStation 5 Slim" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ff6b6b;" text="Top: $450" />
+                                            </VBox>
+                                            <Button style="-fx-background-color: #ff3333; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-cursor: hand;" text="Bid +1" />
+                                        </HBox>
+
+                                    </VBox>
+                                </content>
+                            </ScrollPane>
                         </VBox>
 
-                        <VBox spacing="8" styleClass="side-card" VBox.vgrow="ALWAYS">
-                            <Label styleClass="side-section-title" text="RECENT ACTIVITY" />
-                            <VBox fx:id="activityList" spacing="8" />
+                        <VBox spacing="8" style="-fx-padding: 12;" styleClass="side-card" VBox.vgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT" spacing="6">
+                                <Label style="-fx-text-fill: #ffcc44; -fx-font-size: 11px; -fx-font-weight: bold; -fx-letter-spacing: 0.5px;" text="⏳ CLOSING SOON" />
+                            </HBox>
+
+                            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                                <content>
+                                    <VBox fx:id="closingSoonList" spacing="8" style="-fx-background-color: transparent;">
+
+                                        <VBox spacing="4" style="-fx-background-color: #1a1824; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,204,68,0.15); -fx-border-width: 1;">
+                                            <HBox alignment="CENTER_LEFT">
+                                                <Label maxWidth="120" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="Vincent van Gogh Art" HBox.hgrow="ALWAYS" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ffcc44; -fx-font-weight: bold;" text="01m 45s" />
+                                            </HBox>
+                                            <ProgressBar maxWidth="Infinity" prefHeight="3.0" progress="0.15" style="-fx-accent: #ffcc44;" />
+                                        </VBox>
+
+                                        <VBox spacing="4" style="-fx-background-color: #1a1824; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,204,68,0.15); -fx-border-width: 1;">
+                                            <HBox alignment="CENTER_LEFT">
+                                                <Label maxWidth="120" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="Mechanical Keyboard" HBox.hgrow="ALWAYS" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ffcc44; -fx-font-weight: bold;" text="03m 12s" />
+                                            </HBox>
+                                            <ProgressBar maxWidth="Infinity" prefHeight="3.0" progress="0.32" style="-fx-accent: #ffcc44;" />
+                                        </VBox>
+
+                                        <VBox spacing="4" style="-fx-background-color: #1a1824; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,204,68,0.15); -fx-border-width: 1;">
+                                            <HBox alignment="CENTER_LEFT">
+                                                <Label maxWidth="120" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="MacBook Pro M3 Max" HBox.hgrow="ALWAYS" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ffcc44; -fx-font-weight: bold;" text="05m 50s" />
+                                            </HBox>
+                                            <ProgressBar maxWidth="Infinity" prefHeight="3.0" progress="0.55" style="-fx-accent: #ffcc44;" />
+                                        </VBox>
+
+                                        <VBox spacing="4" style="-fx-background-color: #1a1824; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,204,68,0.15); -fx-border-width: 1;">
+                                            <HBox alignment="CENTER_LEFT">
+                                                <Label maxWidth="120" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="Leica M11 Camera" HBox.hgrow="ALWAYS" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ffcc44; -fx-font-weight: bold;" text="08m 20s" />
+                                            </HBox>
+                                            <ProgressBar maxWidth="Infinity" prefHeight="3.0" progress="0.78" style="-fx-accent: #ffcc44;" />
+                                        </VBox>
+
+                                        <VBox spacing="4" style="-fx-background-color: #1a1824; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: rgba(255,204,68,0.15); -fx-border-width: 1;">
+                                            <HBox alignment="CENTER_LEFT">
+                                                <Label maxWidth="120" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #f0eeff;" text="Sony WH-1000XM5" HBox.hgrow="ALWAYS" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label style="-fx-font-size: 11px; -fx-text-fill: #ffcc44; -fx-font-weight: bold;" text="11m 05s" />
+                                            </HBox>
+                                            <ProgressBar maxWidth="Infinity" prefHeight="3.0" progress="0.91" style="-fx-accent: #ffcc44;" />
+                                        </VBox>
+
+                                    </VBox>
+                                </content>
+                            </ScrollPane>
                         </VBox>
 
                     </VBox>
@@ -72,28 +176,23 @@
                 <Insets right="20" top="80" />
             </padding>
             <children>
-
-                <HBox fx:id="toastBox" alignment="CENTER_LEFT" managed="false" spacing="10" style="-fx-background-color: #1a2e1a;                              -fx-border-color: #22c55e;                              -fx-border-width: 1;                              -fx-border-radius: 8;                              -fx-background-radius: 8;                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 10, 0, 0, 4);" visible="false">
+                <HBox fx:id="toastBox" alignment="CENTER_LEFT" managed="false" spacing="10" style="-fx-background-color: #1a2e1a; -fx-border-color: #22c55e; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 10, 0, 0, 4);" visible="false">
                     <padding><Insets bottom="12" left="14" right="16" top="12" /></padding>
                     <children>
-
                         <StackPane prefHeight="22" prefWidth="22">
                             <children>
                                 <Circle fx:id="toastIconCircle" fill="#22c55e" radius="11" StackPane.alignment="CENTER" />
                                 <Label fx:id="toastIconLabel" style="-fx-text-fill: #0a2a0a; -fx-font-size: 11px; -fx-font-weight: bold;" text="✓" StackPane.alignment="CENTER" />
                             </children>
                         </StackPane>
-
                         <VBox spacing="2">
                             <children>
                                 <Label fx:id="toastTitle" style="-fx-text-fill: #4ade80; -fx-font-size: 12px; -fx-font-weight: bold;" text="Thành công!" />
                                 <Label fx:id="toastSub" style="-fx-text-fill: #86efac; -fx-font-size: 10px;" text="" />
                             </children>
                         </VBox>
-
                     </children>
                 </HBox>
-
             </children>
         </VBox>
 
