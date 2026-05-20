@@ -24,6 +24,8 @@ public class ModelMapper {
                 member.getId(),
                 member.getUsername(),
                 member.getEmail(),
+                member.getAccountBalance(),
+                member.getFrozenBalance(),
                 member.isBanned(),
                 banUntilString
         );

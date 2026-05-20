@@ -30,9 +30,10 @@ public class AdminController implements Initializable {
     @FXML private TableView<MemberDTO> tableMembers;
     @FXML private TableColumn<MemberDTO, String> colMemberId;
     @FXML private TableColumn<MemberDTO, String> colMemberName;
+    @FXML private TableColumn<MemberDTO, String> colMemberBalance;
+    @FXML private TableColumn<MemberDTO, String> colMemberFrozen;
     @FXML private TableColumn<MemberDTO, String> colMemberStatus;
 
-    @FXML private TableColumn<MemberDTO, Void> colMemberAction;
 
 
     @FXML private TableView<AuctionCardDTO> tableAuctions;
@@ -95,9 +96,27 @@ public class AdminController implements Initializable {
             }
         });
 
+        colMemberBalance.setCellValueFactory(cellData -> {
+            double balance = cellData.getValue().getBalance();
+            String formattedBalance = "$" + String.format("%,.2f", balance);
+            return new SimpleStringProperty(formattedBalance);
+        });
+
+        colMemberBalance.setStyle("-fx-alignment: CENTER_RIGHT;");
+
+        colMemberFrozen.setCellValueFactory(cellData -> {
+            double frozen = cellData.getValue().getFrozenBalance();
+            String formattedFrozen = "$" + String.format("%,.2f", frozen);
+            return new SimpleStringProperty(formattedFrozen);
+        });
+        colMemberFrozen.setStyle("-fx-alignment: CENTER_RIGHT; -fx-text-fill: #e67e22;");
+
         colAuctionId.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAuctionId()));
         colAuctionName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProductName()));
         colAuctionPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getCurrentPrice()).asObject());
+
+        tableMembers.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableAuctions.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
     private void loadAllData() {

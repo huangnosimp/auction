@@ -41,9 +41,11 @@
 
                         <TableView fx:id="tableMembers" VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="colMemberId" prefWidth="241.80000162124634" text="ID" />
-                                <TableColumn fx:id="colMemberName" prefWidth="188.60003662109375" text="Username" />
-                                <TableColumn fx:id="colMemberStatus" prefWidth="358.39984130859375" text="Status" />
+                                <TableColumn fx:id="colMemberId" prefWidth="120" text="ID" />
+                                <TableColumn fx:id="colMemberName" prefWidth="120" text="Username" />
+                                <TableColumn fx:id="colMemberBalance" prefWidth="130" text="Account Balance" />
+                                <TableColumn fx:id="colMemberFrozen" prefWidth="130" text="Frozen Balance" />
+                                <TableColumn fx:id="colMemberStatus" prefWidth="180" text="Status" />
                             </columns>
                         </TableView>
 

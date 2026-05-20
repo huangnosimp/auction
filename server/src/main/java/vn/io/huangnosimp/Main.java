@@ -9,8 +9,12 @@ import vn.io.huangnosimp.network.SocketServer;
 import vn.io.huangnosimp.repository.*;
 import vn.io.huangnosimp.service.*;
 
+import java.util.TimeZone;
+
 public class Main {
     public static void main(String[] args) {
+        //Set up Timezone
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         //Database Connection
         DatabaseConnection dbConnection = DatabaseConnection.getInstance();
         CloudinaryConnection cloudinaryConnection = CloudinaryConnection.getInstance();
@@ -22,7 +26,7 @@ public class Main {
         IAuctionParticipantsRepository auctionParticipantsRepository = new AuctionParticipantsRepository(dbConnection);
         IBidTransactionRepository bidTransactionRepository = new BidTransactionRepository(dbConnection);
         IStatisticRepository statisticRepository = new StatisticRepository(dbConnection);
-        IAutoBidRepository autoBidRepository = new AutoBidRepository();
+        IAutoBidRepository autoBidRepository = new AutoBidRepository(userRepository, auctionRepository, dbConnection);
         //Services
         IUserService userService = new UserService(userRepository);
         ItemService itemService = new ItemService(itemRepository);
