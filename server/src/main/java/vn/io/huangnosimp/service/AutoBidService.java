@@ -12,8 +12,11 @@ import vn.io.huangnosimp.repository.IUserRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AutoBidService implements IAutoBidService {
+    private static final Logger logger = LoggerFactory.getLogger(AutoBidService.class);
     private final IAutoBidRepository autoBidRepository;
     private final IUserRepository userRepository;
     private final IAuctionRepository auctionRepository;
@@ -46,7 +49,7 @@ public class AutoBidService implements IAutoBidService {
         AutoBidConfig config = new AutoBidConfig(bidder, auction, maxBid, increment, LocalDateTime.now());
         autoBidRepository.save(config);
 
-        System.out.println("[AutoBid] User " + bidder.getUsername() + " set AutoBid for Auction " + auctionId);
+        logger.info("Registered autobid bidderId={} auctionId={}", bidderId, auctionId);
         return true;
     }
 
@@ -72,10 +75,13 @@ public class AutoBidService implements IAutoBidService {
                 BidResult result = auctionService.placeBid(config.getBidder().getId(), auctionId, nextBid, false);
 
                 if (result == BidResult.SUCCESS) {
-                    System.out.println("[AutoBid] Success for " + config.getBidder().getUsername());
+                    logger.info("Autobid placed successfully bidderId={} auctionId={}", config.getBidder().getId(), auctionId);
                     break;
                 } else {
-                    System.out.println("[AutoBid] Failed for " + config.getBidder().getUsername() + " (e.g., Not enough money)");
+                    logger.info(
+                            "Autobid placement skipped bidderId={} auctionId={} result={}",
+                            config.getBidder().getId(), auctionId, result
+                    );
                 }
             }
         }
@@ -87,7 +93,7 @@ public class AutoBidService implements IAutoBidService {
 
         if (existing != null) {
             autoBidRepository.delete(bidderId, auctionId);
-            System.out.println("[AutoBid] Unregistered for user: " + bidderId + " on auction: " + auctionId);
+            logger.info("Unregistered autobid bidderId={} auctionId={}", bidderId, auctionId);
         }
     }
 }

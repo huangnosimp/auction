@@ -12,12 +12,13 @@ import vn.io.huangnosimp.controller.RequestHandler;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.network.ClientHandle;
 import vn.io.huangnosimp.service.IAdminService;
-import vn.io.huangnosimp.model.Member;
-import vn.io.huangnosimp.model.Auction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class AdminHandler {
+    private static final Logger logger = LoggerFactory.getLogger(AdminHandler.class);
 
     private static boolean isAdmin(ClientHandle client) {
         return UserType.ADMIN.equals(client.getUserType());
@@ -36,6 +37,7 @@ public class AdminHandler {
                 return new Response(ResponseStatus.UNAUTHORIZED, "Access denied: Admins only");
             }
             List<MemberDTO> members = adminService.getAllMembers();
+            logger.info("Admin fetched all members adminId={} count={}", client.getUserId(), members.size());
             return new Response(ResponseStatus.SUCCESS, "Get all members successful", members);
         }
     }
@@ -53,6 +55,10 @@ public class AdminHandler {
 
             BanMemberRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), BanMemberRequestDTO.class);
             boolean success = adminService.lockMember(dto.getTargetId(), dto.getDurationMinutes());
+            logger.info(
+                    "Admin lock member attempted adminId={} targetId={} durationMinutes={} success={}",
+                    client.getUserId(), dto.getTargetId(), dto.getDurationMinutes(), success
+            );
             if (success) {
                 return new Response(ResponseStatus.SUCCESS, "Member locked successfully");
             }
@@ -73,6 +79,7 @@ public class AdminHandler {
 
             BanMemberRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), BanMemberRequestDTO.class);
             boolean success = adminService.unlockMember(dto.getTargetId());
+            logger.info("Admin unlock member attempted adminId={} targetId={} success={}", client.getUserId(), dto.getTargetId(), success);
 
             if (success) {
                 return new Response(ResponseStatus.SUCCESS, "Member unlocked successfully");
@@ -93,6 +100,7 @@ public class AdminHandler {
             if (!isAdmin(client)) return new Response(ResponseStatus.UNAUTHORIZED, "Access denied");
 
             List<AuctionCardDTO> auctions = adminService.getAllAuctions();
+            logger.info("Admin fetched all auctions adminId={} count={}", client.getUserId(), auctions.size());
             return new Response(ResponseStatus.SUCCESS, "Get all auctions successful", auctions);
         }
     }
@@ -110,6 +118,7 @@ public class AdminHandler {
 
             CancelAuctionRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), CancelAuctionRequestDTO.class);
             boolean success = adminService.forceCancelAuction(dto.getAuctionId());
+            logger.info("Admin force cancel attempted adminId={} auctionId={} success={}", client.getUserId(), dto.getAuctionId(), success);
 
             if (success) {
                 return new Response(ResponseStatus.SUCCESS, "Auction force canceled successfully");
@@ -130,6 +139,7 @@ public class AdminHandler {
             if (!isAdmin(client)) return new Response(ResponseStatus.UNAUTHORIZED, "Access denied");
 
             double revenue = adminService.getSystemTotalRevenue();
+            logger.info("Admin fetched revenue adminId={}", client.getUserId());
             return new Response(ResponseStatus.SUCCESS, "Revenue calculated", revenue);
         }
     }

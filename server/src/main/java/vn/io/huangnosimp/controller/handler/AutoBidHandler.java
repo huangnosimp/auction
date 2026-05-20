@@ -1,6 +1,5 @@
 package vn.io.huangnosimp.controller.handler;
 
-import com.google.gson.Gson;
 import vn.io.huangnosimp.controller.RequestHandler;
 import vn.io.huangnosimp.dto.request.AutoBidRequestDTO;
 import vn.io.huangnosimp.network.ClientHandle;
@@ -9,8 +8,11 @@ import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.service.IAutoBidService;
 import vn.io.huangnosimp.util.GsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AutoBidHandler {
+    private static final Logger logger = LoggerFactory.getLogger(AutoBidHandler.class);
 
     public static class RegisterHandler implements RequestHandler {
         private final IAutoBidService autoBidService;
@@ -37,6 +39,7 @@ public class AutoBidHandler {
                 boolean success = autoBidService.registerAutoBid(
                         userId, data.getAuctionId(), data.getMaxBid(), data.getIncrement()
                 );
+                logger.info("Register autobid attempted userId={} auctionId={} success={}", userId, data.getAuctionId(), success);
 
                 return success ? new Response(ResponseStatus.SUCCESS, "Registered")
                         : new Response(ResponseStatus.ERROR, "Failed");
@@ -69,6 +72,7 @@ public class AutoBidHandler {
                 }
 
                 autoBidService.unregisterAutoBid(userId, data.getAuctionId());
+                logger.info("Unregister autobid requested userId={} auctionId={}", userId, data.getAuctionId());
                 return new Response(ResponseStatus.SUCCESS, "Unregistered");
             } catch (Exception e) {
                 return new Response(ResponseStatus.ERROR, "Invalid data");

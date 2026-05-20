@@ -7,8 +7,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransactionRepository implements ITransactionRepository {
+    private static final Logger logger = LoggerFactory.getLogger(TransactionRepository.class);
     private final DatabaseConnection databaseConnection;
 
     public TransactionRepository(DatabaseConnection databaseConnection) {
@@ -29,7 +32,10 @@ public class TransactionRepository implements ITransactionRepository {
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("DB error when saving transaction: " + e.getMessage());
+            logger.error(
+                    "DB error when saving transaction transactionId={} userId={} type={}",
+                    transaction.getId(), transaction.getUserId(), transaction.getTransactionType(), e
+            );
         }
     }
 }

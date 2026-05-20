@@ -13,8 +13,13 @@ import vn.io.huangnosimp.dto.response.TransactionResult;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.network.*;
 import vn.io.huangnosimp.service.IUserService;
+import vn.io.huangnosimp.util.SensitiveDataMasker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserHandler {
+    private static final Logger logger = LoggerFactory.getLogger(UserHandler.class);
+
     public static class LoginHandler implements RequestHandler {
         private final IUserService userService;
         public LoginHandler(IUserService userService) {
@@ -24,6 +29,7 @@ public class UserHandler {
         public Response handle(Request request, ClientHandle client) {
             LoginRequestDTO loginRequestDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJson(request.getData()), LoginRequestDTO.class);
             LoginResult result = userService.login(loginRequestDTO.getUserType(), loginRequestDTO.getUsername(), loginRequestDTO.getPassword(), client);
+            logger.info("Login attempted username={} userType={} result={}", loginRequestDTO.getUsername(), loginRequestDTO.getUserType(), result);
             return switch (result) {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Login successful");
                 case USER_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Invalid username");
@@ -36,8 +42,10 @@ public class UserHandler {
     public static class LogoutHandler implements RequestHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
+            String userId = client.getUserId();
             client.setUserId(null);
             client.setUserType(null);
+            logger.info("Logout successful userId={}", userId);
             return new Response(ResponseStatus.SUCCESS, "Logout successful");
         }
     }
@@ -50,6 +58,10 @@ public class UserHandler {
         public Response handle(Request request, ClientHandle client) {
             RegisterRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), RegisterRequestDTO.class);
             RegisterResult result = userService.register(dto.getUserType(), dto.getUsername(), dto.getPassword(), dto.getEmail());
+            logger.info(
+                    "Register attempted username={} email={} userType={} result={}",
+                    dto.getUsername(), SensitiveDataMasker.maskEmail(dto.getEmail()), dto.getUserType(), result
+            );
             return switch (result) {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Registration successful");
                 case USERNAME_TAKEN -> new Response(ResponseStatus.FAILED, "Username already taken");
@@ -68,6 +80,7 @@ public class UserHandler {
         public Response handle(Request request, ClientHandle client) {
             DepositWithdrawRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), DepositWithdrawRequestDTO.class);
             TransactionResult result = userService.deposit(client.getUserId(), dto.getAmount());
+            logger.info("Deposit attempted userId={} amount={} result={}", client.getUserId(), dto.getAmount(), result);
             return switch (result) {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Deposit successful");
                 case INVALID_AMOUNT -> new Response(ResponseStatus.FAILED, "Invalid deposit amount");
@@ -86,6 +99,7 @@ public class UserHandler {
         public Response handle(Request request, ClientHandle client) {
             DepositWithdrawRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), DepositWithdrawRequestDTO.class);
             TransactionResult result = userService.withdraw(client.getUserId(), dto.getAmount());
+            logger.info("Withdraw attempted userId={} amount={} result={}", client.getUserId(), dto.getAmount(), result);
             return switch (result) {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Withdraw successful");
                 case INVALID_AMOUNT -> new Response(ResponseStatus.FAILED, "Invalid withdraw amount");

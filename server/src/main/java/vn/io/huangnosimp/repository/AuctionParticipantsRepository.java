@@ -6,8 +6,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuctionParticipantsRepository implements IAuctionParticipantsRepository {
+    private static final Logger logger = LoggerFactory.getLogger(AuctionParticipantsRepository.class);
     DatabaseConnection databaseConnection;
 
     public AuctionParticipantsRepository(DatabaseConnection databaseConnection) {
@@ -23,7 +26,7 @@ public class AuctionParticipantsRepository implements IAuctionParticipantsReposi
             stmt.setString(2, userId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("DB error adding participant: " + e.getMessage());
+            logger.error("DB error adding participant auctionId={} userId={}", auctionId, userId, e);
         }
     }
 
@@ -36,7 +39,7 @@ public class AuctionParticipantsRepository implements IAuctionParticipantsReposi
             stmt.setString(2, userId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("DB error removing participant: " + e.getMessage());
+            logger.error("DB error removing participant auctionId={} userId={}", auctionId, userId, e);
         }
     }
 
@@ -51,7 +54,7 @@ public class AuctionParticipantsRepository implements IAuctionParticipantsReposi
                 return rs.next();
             }
         } catch (SQLException e) {
-            System.err.println("DB error checking participant: " + e.getMessage());
+            logger.error("DB error checking participant auctionId={} userId={}", auctionId, userId, e);
             return false;
         }
     }

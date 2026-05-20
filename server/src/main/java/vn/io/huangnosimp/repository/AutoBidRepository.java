@@ -3,9 +3,11 @@ package vn.io.huangnosimp.repository;
 import vn.io.huangnosimp.model.AutoBidConfig;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AutoBidRepository implements IAutoBidRepository {
+    private static final Logger logger = LoggerFactory.getLogger(AutoBidRepository.class);
 
     private final Map<String, List<AutoBidConfig>> storage = new ConcurrentHashMap<>();
 
@@ -16,7 +18,7 @@ public class AutoBidRepository implements IAutoBidRepository {
         List<AutoBidConfig> configs = storage.get(auctionId);
         configs.removeIf(c -> c.getBidder().getId().equals(config.getBidder().getId()));
         configs.add(config);
-        System.out.println("[Repo] Saved AutoBid config for user: " + config.getBidder().getUsername());
+        logger.info("Saved autobid config auctionId={} bidderId={}", auctionId, config.getBidder().getId());
     }
 
     @Override
