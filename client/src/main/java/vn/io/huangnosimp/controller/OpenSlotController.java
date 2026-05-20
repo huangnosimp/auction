@@ -25,10 +25,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 public class OpenSlotController implements Initializable {
     @FXML private FlowPane cardContainer;
     @FXML private TextField txtSearch;
+    private String lastSearchWord = "";
+    private static final Pattern DIACRITICS_PATTERN = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 
     public FlowPane getCardContainer(){
         return cardContainer;
@@ -92,29 +96,42 @@ public class OpenSlotController implements Initializable {
     }
 
     @FXML
-    public void handleSearchItem(){
+    public void handleSearch() {
+        Set<String> existingIds = new HashSet<>();
+        UserSession.getJoiningListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+        UserSession.getMyListCard().forEach(c -> existingIds.add(c.getAuctionId()));
 
+        List<AuctionCardDTO> result = new ArrayList<>();
+        fetchMoreUntilFull(result, existingIds, 30, 5, txtSearch.getText(), false);
     }
     @FXML
     public void loadMorePublicCards() {
-        if(txtSearch.getText() == null || txtSearch.getText().trim().isEmpty()) {
-            Set<String> existingIds = new HashSet<>();
-            UserSession.getListCard().forEach(c -> existingIds.add(c.getAuctionId()));
-            UserSession.getJoiningListCard().forEach(c -> existingIds.add(c.getAuctionId()));
-            UserSession.getMyListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+        Set<String> existingIds = new HashSet<>();
+        UserSession.getListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+        UserSession.getJoiningListCard().forEach(c -> existingIds.add(c.getAuctionId()));
+        UserSession.getMyListCard().forEach(c -> existingIds.add(c.getAuctionId()));
 
-            List<AuctionCardDTO> result = new ArrayList<>();
-            fetchMoreUntilFull(result, existingIds, 30, 5);
-        }
+        List<AuctionCardDTO> result = new ArrayList<>();
+        fetchMoreUntilFull(result, existingIds, 30, 5, lastSearchWord, true);
+    }
+
+
+
+    public static String removeDiacritics(String str) {
+        if (str == null) return "";
+        String normalized = Normalizer.normalize(str, Normalizer.Form.NFD);
+        return DIACRITICS_PATTERN.matcher(normalized).replaceAll("");
     }
 
     private void fetchMoreUntilFull(List<AuctionCardDTO> result,
                                     Set<String> existingIds,
                                     int target,
-                                    int maxRetry) {
+                                    int maxRetry,
+                                    String searchName,
+                                    boolean isLoadMore) {
 
         if (result.size() >= target || maxRetry <= 0) {
-            applyResult(result);
+            applyResult(result, searchName, isLoadMore);
             return;
         }
 
@@ -125,7 +142,7 @@ public class OpenSlotController implements Initializable {
         SocketManager.getClient().sendRequestAsync(request)
                 .thenAccept(response -> {
                     if (!ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                        applyResult(result);
+                        applyResult(result, searchName, isLoadMore);
                         return;
                     }
 
@@ -137,32 +154,53 @@ public class OpenSlotController implements Initializable {
                     List<AuctionCardDTO> responseList = dto.getPublicAuctionCardList();
 
                     if (responseList == null || responseList.isEmpty()) {
-                        applyResult(result);
+                        applyResult(result, searchName, isLoadMore);
                         return;
                     }
 
-                    for (AuctionCardDTO card : responseList) {
-                        if (!existingIds.contains(card.getAuctionId())) {
-                            result.add(card);
-                            existingIds.add(card.getAuctionId());
-                            if (result.size() >= target) break;
+                    if (searchName != null && !searchName.trim().isEmpty()) {
+                        String keyword = removeDiacritics(searchName.trim().toLowerCase());
+                        for (AuctionCardDTO card : responseList) {
+                            String cardName = removeDiacritics(card.getProductName().toLowerCase());
+                            if (!existingIds.contains(card.getAuctionId())
+                                    && cardName.contains(keyword)) {
+                                result.add(card);
+                                existingIds.add(card.getAuctionId());
+                                if (result.size() >= target) break;
+                            }
+                        }
+                    } else {
+                        for (AuctionCardDTO card : responseList) {
+                            if (!existingIds.contains(card.getAuctionId())) {
+                                result.add(card);
+                                existingIds.add(card.getAuctionId());
+                                if (result.size() >= target) break;
+                            }
                         }
                     }
 
                     if (result.size() >= target) {
-                        applyResult(result);
+                        applyResult(result, searchName, isLoadMore);
                     } else {
-                        fetchMoreUntilFull(result, existingIds, target, maxRetry - 1);
+                        fetchMoreUntilFull(result, existingIds, target, maxRetry - 1,
+                                searchName, isLoadMore);
                     }
                 });
     }
 
-    // Tách riêng để tránh lặp code Platform.runLater
-    private void applyResult(List<AuctionCardDTO> result) {
+    private void applyResult(List<AuctionCardDTO> result,
+                             String searchName,
+                             boolean isLoadMore) {
         Platform.runLater(() -> {
-            UserSession.getListCard().addAll(result); // thêm vào session, không xóa
+            if (!isLoadMore) {
+                UserSession.getListCard().clear();
+                clearContainer();
+                lastSearchWord = (searchName == null) ? "" : searchName.trim();
+            }
+
+            UserSession.getListCard().addAll(result);
             for (AuctionCardDTO card : result) {
-                addCard(card, "Public"); // gọi trực tiếp trong controller
+                addCard(card, "Public");
             }
         });
     }
