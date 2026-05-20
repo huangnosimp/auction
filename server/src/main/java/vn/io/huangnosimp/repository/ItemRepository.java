@@ -10,8 +10,11 @@ import vn.io.huangnosimp.model.Vehicle;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ItemRepository implements IItemRepository {
+    private static final Logger logger = LoggerFactory.getLogger(ItemRepository.class);
     private final DatabaseConnection databaseConnection;
 
     public ItemRepository(DatabaseConnection databaseConnection) {
@@ -77,7 +80,7 @@ public class ItemRepository implements IItemRepository {
                 conn.setAutoCommit(originalAutoCommit);
             }
         } catch (SQLException e) {
-            System.err.println("DB error when saving item: " + e.getMessage());
+            logger.error("DB error when saving item itemId={}", item.getId(), e);
         }
     }
     @Override
@@ -92,7 +95,7 @@ public class ItemRepository implements IItemRepository {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("DB error in findById: " + e.getMessage());
+            logger.error("DB error when finding item by id itemId={}", itemId, e);
         }
         return null;
     }
@@ -106,7 +109,7 @@ public class ItemRepository implements IItemRepository {
             stmt.setString(2, itemId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("DB error when updating item owner: " + e.getMessage());
+            logger.error("DB error when updating item owner itemId={} ownerId={}", itemId, ownerId, e);
         }
     }
 
@@ -118,7 +121,7 @@ public class ItemRepository implements IItemRepository {
             stmt.setString(1, itemId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("DB error when deleting item: " + e.getMessage());
+            logger.error("DB error when deleting item itemId={}", itemId, e);
         }
         return false;
     }

@@ -13,8 +13,12 @@ import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.service.IStatisticService;
 import vn.io.huangnosimp.util.GsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StatisticHandler {
+    private static final Logger logger = LoggerFactory.getLogger(StatisticHandler.class);
+
     public static class GetDashboardInfoHandler implements RequestHandler {
         private final IStatisticService statisticService;
 
@@ -25,6 +29,7 @@ public class StatisticHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             DashboardResponseDTO dashboardInfo = statisticService.getDashboardStatistics(client.getUserId());
+            logger.info("Fetched dashboard info userId={}", client.getUserId());
             return new Response(ResponseStatus.SUCCESS, dashboardInfo);
         }
     }
@@ -39,8 +44,10 @@ public class StatisticHandler {
         public Response handle(Request request, ClientHandle client) {
             GetAuctionDetailRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetAuctionDetailRequestDTO.class);
             if (dto.getAuctionId() == null || dto.getAuctionId().isBlank()) {
+                logger.warn("Invalid auction detail request userId={}", client.getUserId());
                 return new Response(ResponseStatus.FAILED, "Invalid auction ID");
             }
+            logger.info("Fetched auction detail userId={} auctionId={}", client.getUserId(), dto.getAuctionId());
             return new Response(ResponseStatus.SUCCESS, statisticService.getAuctionDetail(client.getUserId(), dto.getAuctionId()));
         }
     }
@@ -54,8 +61,10 @@ public class StatisticHandler {
         public Response handle(Request request, ClientHandle client) {
             GetJoiningAuctionCardDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetJoiningAuctionCardDTO.class);
              if (dto.getAuctionId() == null || dto.getAuctionId().isBlank()) {
+                logger.warn("Invalid joining auction card request userId={}", client.getUserId());
                 return new Response(ResponseStatus.FAILED, "Invalid auction ID");
             }
+            logger.info("Fetched joining auction card userId={} auctionId={}", client.getUserId(), dto.getAuctionId());
             return new Response(ResponseStatus.SUCCESS, statisticService.getJoiningAuctionCard(dto.getAuctionId()));
         }
     }
@@ -69,9 +78,11 @@ public class StatisticHandler {
         public Response handle(Request request, ClientHandle client) {
             GetPublicAcutionCardDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetPublicAcutionCardDTO.class);
             if (dto.getQuantity() <= 0) {
+                 logger.warn("Invalid public auction card request userId={} quantity={}", client.getUserId(), dto.getQuantity());
                  return new Response(ResponseStatus.FAILED, "Invalid quantity");
             }
             GetPublicAuctionCardResponseDTO dtoResponse = new GetPublicAuctionCardResponseDTO(statisticService.getPublicAuctionCard(dto.getQuantity()));
+            logger.info("Fetched public auction cards userId={} quantity={}", client.getUserId(), dto.getQuantity());
             return new Response(ResponseStatus.SUCCESS, dtoResponse);
         }
     }
@@ -83,6 +94,7 @@ public class StatisticHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             GetPostedAuctionCardResponseDTO dtoResponse = new GetPostedAuctionCardResponseDTO(statisticService.getPostedAuctionCard(client.getUserId()));
+            logger.info("Fetched posted auction cards userId={}", client.getUserId());
             return new Response(ResponseStatus.SUCCESS, dtoResponse);
         }
     }

@@ -9,8 +9,11 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserRepository implements IUserRepository {
+    private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
     private final DatabaseConnection databaseConnection;
 
     public UserRepository(DatabaseConnection databaseConnection) {
@@ -27,7 +30,7 @@ public class UserRepository implements IUserRepository {
                 return rs.next();
             }
         } catch (SQLException e) {
-            System.err.println("DB error when checking username: " + e.getMessage());
+            logger.error("DB error when checking username", e);
             return false;
         }
     }
@@ -42,7 +45,7 @@ public class UserRepository implements IUserRepository {
                 return rs.next();
             }
         } catch (SQLException e) {
-            System.err.println("DB error when checking email: " + e.getMessage());
+            logger.error("DB error when checking email", e);
             return false;
         }
     }
@@ -60,7 +63,7 @@ public class UserRepository implements IUserRepository {
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
-            System.err.println("DB error when saving user: " + e.getMessage());
+            logger.error("DB error when saving user userId={} role={}", userId, role, e);
             return false;
         }
     }
@@ -77,7 +80,7 @@ public class UserRepository implements IUserRepository {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("DB error when finding user by username: " + e.getMessage());
+            logger.error("DB error when finding user by username", e);
         }
         return null;
     }
@@ -94,7 +97,7 @@ public class UserRepository implements IUserRepository {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("DB error when finding user by ID: " + e.getMessage());
+            logger.error("DB error when finding user by id userId={}", userId, e);
         }
         return null;
     }
@@ -108,7 +111,7 @@ public class UserRepository implements IUserRepository {
             stmt.setString(2, userId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("DB error when updating balance: " + e.getMessage());
+            logger.error("DB error when updating balance userId={}", userId, e);
             return false;
         }
     }
@@ -122,7 +125,7 @@ public class UserRepository implements IUserRepository {
             stmt.setString(2, userId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("DB error when updating frozen balance: " + e.getMessage());
+            logger.error("DB error when updating frozen balance userId={}", userId, e);
             return false;
         }
     }
@@ -166,7 +169,7 @@ public class UserRepository implements IUserRepository {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("DB error updating ban status: " + e.getMessage());
+            logger.error("DB error updating ban status userId={} isBanned={}", userId, isBanned, e);
             return false;
         }
     }
@@ -187,7 +190,7 @@ public class UserRepository implements IUserRepository {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("DB error when finding all users: " + e.getMessage());
+            logger.error("DB error when finding all users", e);
         }
         return users;
     }

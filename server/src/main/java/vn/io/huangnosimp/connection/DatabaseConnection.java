@@ -5,8 +5,11 @@ import java.sql.SQLException;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DatabaseConnection {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
     private static final int MAX_THREAD_POOL_SIZE = 20;
     private static final int MIN_IDLE_CONNECTIONS = 5;
     private static final int CONNECTION_TIMEOUT_MS = 30000;
@@ -31,7 +34,7 @@ public class DatabaseConnection {
         config.setConnectionTimeout(CONNECTION_TIMEOUT_MS);
 
         this.dataSource = new HikariDataSource(config);
-        System.out.println("[DatabaseConnection] HikariCP Connection Pool initialized successfully.");
+        logger.info("HikariCP connection pool initialized");
     }
     public static DatabaseConnection getInstance() {
         if (instance == null) {
@@ -49,7 +52,7 @@ public class DatabaseConnection {
     public void closePool() {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
-            System.out.println("[DatabaseConnection] Connection Pool close successfully.");
+            logger.info("HikariCP connection pool closed");
         }
     }
 }

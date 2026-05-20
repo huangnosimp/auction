@@ -7,6 +7,8 @@ build/
 docker/.env
 .env
 docker/server.jar
+docker/logs/
+logs/
 
 ### IntelliJ IDEA ###
 .idea

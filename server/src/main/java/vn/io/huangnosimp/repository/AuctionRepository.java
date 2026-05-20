@@ -9,8 +9,11 @@ import vn.io.huangnosimp.model.Member;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuctionRepository implements IAuctionRepository {
+    private static final Logger logger = LoggerFactory.getLogger(AuctionRepository.class);
     private final DatabaseConnection databaseConnection;
     private final IUserRepository userRepository;
     private final IItemRepository itemRepository;
@@ -46,7 +49,7 @@ public class AuctionRepository implements IAuctionRepository {
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("DB error when saving auction: " + e.getMessage());
+            logger.error("DB error when saving auction auctionId={}", auction.getId(), e);
         }
     }
 
@@ -62,7 +65,7 @@ public class AuctionRepository implements IAuctionRepository {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("DB error in findById(Auction): " + e.getMessage());
+            logger.error("DB error when finding auction by id auctionId={}", auctionId, e);
         }
         return null;
     }
@@ -75,7 +78,7 @@ public class AuctionRepository implements IAuctionRepository {
             stmt.setString(1, auctionId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("DB error when deleting auction: " + e.getMessage());
+            logger.error("DB error when deleting auction auctionId={}", auctionId, e);
         }
         return false;
     }
@@ -122,7 +125,7 @@ public class AuctionRepository implements IAuctionRepository {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("DB error when finding all auctions: " + e.getMessage());
+            logger.error("DB error when finding all auctions", e);
         }
         return auctions;
     }

@@ -4,8 +4,11 @@ import vn.io.huangnosimp.connection.DatabaseConnection;
 import vn.io.huangnosimp.model.BidTransaction;
 
 import java.sql.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BidTransactionRepository implements IBidTransactionRepository {
+    private static final Logger logger = LoggerFactory.getLogger(BidTransactionRepository.class);
     DatabaseConnection databaseConnection;
 
     public BidTransactionRepository(DatabaseConnection databaseConnection) {
@@ -24,7 +27,10 @@ public class BidTransactionRepository implements IBidTransactionRepository {
             stmt.setTimestamp(5, new Timestamp(bidTransaction.getCreatedAt()));
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("DB error when saving bid transaction: " + e.getMessage());
+            logger.error(
+                    "DB error when saving bid transaction bidTransactionId={} auctionId={} bidderId={}",
+                    bidTransaction.getId(), bidTransaction.getAuctionId(), bidTransaction.getBidderId(), e
+            );
         }
     }
 }
