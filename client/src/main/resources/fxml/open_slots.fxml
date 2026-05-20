@@ -11,15 +11,16 @@
             <Label styleClass="os-title" text="🔥 Open Slots" />
             <Label styleClass="os-live-badge" text="LIVE" />
             <Region HBox.hgrow="ALWAYS" />
-            <Label fx:id="lblResultCount" styleClass="os-result-count" text="Showing 6 of 24 auctions" />
+            <Label fx:id="lblResultCount" styleClass="os-result-count" text="Showing ______ auctions" />
         </HBox>
 
         <HBox alignment="CENTER_LEFT" spacing="10">
 
             <HBox alignment="CENTER_LEFT" spacing="6" styleClass="os-search-box" HBox.hgrow="ALWAYS">
                 <Label styleClass="os-search-icon" text="🔍" />
-                <TextField fx:id="txtSearch" promptText="Search auctions, items…" styleClass="os-search-field" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="txtSearch" onAction="#handleSearch" promptText="Search auctions, items…" styleClass="os-search-field" HBox.hgrow="ALWAYS" />
             </HBox>
+         <Button mnemonicParsing="false" onAction="#handleSearch" style="-fx-background-color: #1e2029; -fx-border-color: #3a3f56; -fx-border-radius: 8px;" text="Search" textFill="WHITE" />
 
             <HBox alignment="CENTER_LEFT" spacing="6" styleClass="os-filter-group" />
         </HBox>

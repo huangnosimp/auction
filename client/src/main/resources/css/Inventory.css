@@ -350,3 +350,14 @@
     -fx-text-fill: #8b8fa8;
     -fx-font-size: 12px;
 }
+
+/* ── Row background override ─────────────────────────── */
+/* Override transparent → màu card để row không trong suốt */
+
+.inv-row {
+    -fx-background-color: #23262f;
+}
+
+.inv-row:hover {
+    -fx-background-color: #2a2d3e;
+}
