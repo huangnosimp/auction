@@ -5,6 +5,8 @@ import vn.io.huangnosimp.model.Auction;
 import vn.io.huangnosimp.model.AutoBidConfig;
 import vn.io.huangnosimp.model.Member;
 import vn.io.huangnosimp.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AutoBidRepository implements IAutoBidRepository {
+    private static final Logger logger = LoggerFactory.getLogger(AutoBidRepository.class);
 
     private final Map<String, Map<String, AutoBidConfig>> storage = new ConcurrentHashMap<>();
 
@@ -54,9 +57,15 @@ public class AutoBidRepository implements IAutoBidRepository {
             ps.setTimestamp(8, Timestamp.valueOf(config.getRegisteredAt()));
 
             ps.executeUpdate();
-            System.out.println("[Repo] Synced AutoBid to MySQL for user: " + config.getBidder().getUsername());
+            logger.info(
+                    "Saved autobid config bidderId={} auctionId={} maxBid={} increment={}",
+                    memberId, auctionId, config.getMaxBid(), config.getIncrement()
+            );
         } catch (SQLException e) {
-            System.err.println("[Repo Error] Failed to sync AutoBid to MySQL: " + e.getMessage());
+            logger.error(
+                    "DB error when saving autobid config bidderId={} auctionId={}",
+                    memberId, auctionId, e
+            );
         }
     }
 
@@ -96,11 +105,17 @@ public class AutoBidRepository implements IAutoBidRepository {
 
             ps.setString(1, memberId);
             ps.setString(2, auctionId);
-            ps.executeUpdate();
-            System.out.println("[Repo] Deleted AutoBid from MySQL for user ID: " + memberId);
+            int deletedRows = ps.executeUpdate();
+            logger.info(
+                    "Deleted autobid config bidderId={} auctionId={} deletedRows={}",
+                    memberId, auctionId, deletedRows
+            );
 
         } catch (SQLException e) {
-            System.err.println("[Repo Error] Failed to delete AutoBid from MySQL: " + e.getMessage());
+            logger.error(
+                    "DB error when deleting autobid config bidderId={} auctionId={}",
+                    memberId, auctionId, e
+            );
         }
     }
 
@@ -128,13 +143,17 @@ public class AutoBidRepository implements IAutoBidRepository {
                     storage.computeIfAbsent(auctionId, k -> new ConcurrentHashMap<>())
                             .put(bidderId, config);
                     count++;
+                } else {
+                    logger.warn(
+                            "Skipped autobid config during warmup bidderId={} auctionId={} userFound={} auctionFound={}",
+                            bidderId, auctionId, user != null, auction != null
+                    );
                 }
             }
-            System.out.println("[Repo] Successfully warmed up " + count + " AutoBid configs from DB to RAM!");
+            logger.info("Loaded autobid configs from database count={}", count);
 
         } catch (SQLException e) {
-            System.err.println("[Repo Error] Critical! Failed to load AutoBids from Database: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("DB error when loading autobid configs from database", e);
         }
     }
 }

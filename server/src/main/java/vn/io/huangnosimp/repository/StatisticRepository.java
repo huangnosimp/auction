@@ -13,8 +13,11 @@ import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StatisticRepository implements IStatisticRepository {
+    private static final Logger logger = LoggerFactory.getLogger(StatisticRepository.class);
     private final DatabaseConnection databaseConnection;
 
     public StatisticRepository(DatabaseConnection databaseConnection) {
@@ -44,7 +47,7 @@ public class StatisticRepository implements IStatisticRepository {
                 return new DashboardResponseDTO(balance, 0, winningBids, outBids, wonTotal, Collections.emptyList(), username);
             }
         } catch (SQLException e) {
-            System.err.println("DB error when fetching user scalar statistics: " + e.getMessage());
+            logger.error("DB error when fetching user scalar statistics userId={}", userId, e);
         }
         return new DashboardResponseDTO(0.0, 0, 0, 0, 0, Collections.emptyList(), null);
     }
@@ -72,7 +75,7 @@ public class StatisticRepository implements IStatisticRepository {
                 rooms.add(mapRowToAuctionCard(connection, rs));
             }
         } catch (SQLException e) {
-            System.err.println("DB error when fetching active rooms: " + e.getMessage());
+            logger.error("DB error when fetching active rooms userId={}", userId, e);
         }
         return rooms;
     }
@@ -156,7 +159,7 @@ public class StatisticRepository implements IStatisticRepository {
             }
 
         } catch (SQLException e) {
-            System.err.println("DB error when fetching auction details: " + e.getMessage());
+            logger.error("DB error when fetching auction details auctionId={}", auctionId, e);
         }
 
         return result;
@@ -182,7 +185,7 @@ public class StatisticRepository implements IStatisticRepository {
                 return mapRowToAuctionCard(connection, rs);
             }
         } catch (SQLException e) {
-            System.err.println("DB error when fetching auction card: " + e.getMessage());
+            logger.error("DB error when fetching auction card auctionId={}", auctionId, e);
         }
         return null;
     }
@@ -210,7 +213,7 @@ public class StatisticRepository implements IStatisticRepository {
                 rooms.add(mapRowToAuctionCard(connection, rs));
             }
         } catch (SQLException e) {
-            System.err.println("DB error when fetching public auction cards: " + e.getMessage());
+            logger.error("DB error when fetching public auction cards quantity={}", quantity, e);
         }
         return rooms;
     }
@@ -236,7 +239,7 @@ public class StatisticRepository implements IStatisticRepository {
                 rooms.add(mapRowToAuctionCard(connection, rs));
             }
         } catch (SQLException e) {
-            System.err.println("DB error when fetching posted auction cards: " + e.getMessage());
+            logger.error("DB error when fetching posted auction cards userId={}", userId, e);
         }
         return rooms;
     }

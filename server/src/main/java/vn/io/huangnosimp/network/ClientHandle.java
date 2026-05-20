@@ -9,8 +9,11 @@ import java.io.*;
 import java.net.Socket;
 import com.google.gson.JsonSyntaxException;
 import vn.io.huangnosimp.enums.UserType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientHandle implements Runnable {
+    private static final Logger logger = LoggerFactory.getLogger(ClientHandle.class);
     private  final Socket clientSocket;
     private final MessageRouter router;
     private String userId;
@@ -60,11 +63,10 @@ public class ClientHandle implements Runnable {
              
             this.out = tryOut;
             ClientSessionManager.getInstance().addClient(this);
+            logger.info("Client connected remoteAddress={}", clientSocket.getInetAddress());
 
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                System.out.println("[ClientHandle] Received: " + inputLine);
-
                 try {
                     Request request = GsonParser.GSON.fromJson(inputLine, Request.class);
                     Response response = router.route(request, this);
@@ -76,14 +78,14 @@ public class ClientHandle implements Runnable {
                         sendResponse(response);
                     }
                 } catch (JsonSyntaxException e) {
-                    System.out.println("[ClientHandle] Invalid JSON format from client.");
+                    logger.warn("Invalid JSON format from client remoteAddress={}", clientSocket.getInetAddress());
                     this.out.println("{\"error\": \"Invalid JSON\"}");
                 } catch (Exception e) {
-                    System.out.println("[ClientHandle] Error processing message: " + e.getMessage());
+                    logger.error("Error processing client message remoteAddress={}", clientSocket.getInetAddress(), e);
                 }
             }
         } catch (IOException e) {
-            System.out.println("[ClientHandle] Client disconnected or I/O error: " + e.getMessage());
+            logger.info("Client disconnected or I/O error remoteAddress={}", clientSocket.getInetAddress(), e);
         } finally {
             ClientSessionManager.getInstance().removeClient(this);
         }
@@ -93,7 +95,7 @@ public class ClientHandle implements Runnable {
         try {
             clientSocket.close();
         } catch (IOException e) {
-            System.err.println("[ClientHandle] Error closing client socket: " + e.getMessage());
+            logger.warn("Error closing client socket remoteAddress={}", clientSocket.getInetAddress(), e);
         }
     }
 }

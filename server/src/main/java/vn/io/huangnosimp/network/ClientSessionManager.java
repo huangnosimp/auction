@@ -9,8 +9,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientSessionManager {
+    private static final Logger logger = LoggerFactory.getLogger(ClientSessionManager.class);
     private static final ClientSessionManager instance = new ClientSessionManager();
     private final Set<ClientHandle> activeClients = new CopyOnWriteArraySet<>();
     private final Map<String, Set<ClientHandle>> auctionRooms = new ConcurrentHashMap<>();
@@ -60,7 +63,7 @@ public class ClientSessionManager {
                 try {
                     client.sendRequest(request);
                 } catch (Exception e) {
-                    System.err.println("[ClientSessionManager] Error broadcasting to room: " + e.getMessage());
+                    logger.warn("Error broadcasting to room auctionId={}", auctionId, e);
                 }
             }
         }
@@ -86,7 +89,7 @@ public class ClientSessionManager {
                 try {
                     client.sendRequest(request);
                 } catch (Exception e) {
-                    System.err.println("[ClientSessionManager] Error sending to user " + userId + ": " + e.getMessage());
+                    logger.warn("Error sending request to user userId={}", userId, e);
                 }
             }
         }
@@ -101,10 +104,10 @@ public class ClientSessionManager {
                     client.sendResponse(new Response(ResponseStatus.BANNED, "You have been banned by the administrator."));
                     client.close();
                     removeClient(client);
-                    System.out.println("[ClientSessionManager] Banned and disconnected user: " + userId);
+                    logger.info("Banned and disconnected user userId={}", userId);
                     break;
                 } catch (Exception e) {
-                    System.err.println("[ClientSessionManager] Error while banning user " + userId + ": " + e.getMessage());
+                    logger.warn("Error while banning user userId={}", userId, e);
                 }
             }
         }
@@ -120,7 +123,7 @@ public class ClientSessionManager {
         broadcastToRoom(auctionId, cancelMsg);
 
         auctionRooms.remove(auctionId);
-        System.out.println("[ClientSessionManager] Destroyed room for canceled auction: " + auctionId);
+        logger.info("Destroyed room for canceled auction auctionId={}", auctionId);
     }
 
     public boolean isUserOnline(String userId) {
