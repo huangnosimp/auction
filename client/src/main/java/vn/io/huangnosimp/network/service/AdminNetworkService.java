@@ -1,10 +1,10 @@
 package vn.io.huangnosimp.network.service;
 
 import vn.io.huangnosimp.dto.request.BanMemberRequestDTO;
+import vn.io.huangnosimp.dto.response.AuctionAdminDTO;
 import vn.io.huangnosimp.network.SocketClient;
 import com.google.gson.reflect.TypeToken;
 import vn.io.huangnosimp.dto.request.CancelAuctionRequestDTO;
-import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
@@ -57,12 +57,12 @@ public class AdminNetworkService {
     }
 
     // 4. Lấy danh sách đấu giá
-    public CompletableFuture<List<AuctionCardDTO>> getAllAuctionsAsync() {
+    public CompletableFuture<List<AuctionAdminDTO>> getAllAuctionsAsync() {
         Request request = new Request(ActionType.ADMIN_GET_ALL_AUCTIONS, null);
 
         return socketClient.sendRequestAsync(request).thenApply(response -> {
             if (response.getStatus() == ResponseStatus.SUCCESS) {
-                Type listType = new TypeToken<List<AuctionCardDTO>>(){}.getType();
+                Type listType = new TypeToken<List<AuctionAdminDTO>>(){}.getType();
                 return GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), listType);
             }
             return Collections.emptyList();

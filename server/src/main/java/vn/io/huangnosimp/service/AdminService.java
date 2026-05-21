@@ -1,7 +1,7 @@
 package vn.io.huangnosimp.service;
 
 import vn.io.huangnosimp.dto.response.AuctionActionResult;
-import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.AuctionAdminDTO;
 import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.enums.AuctionStatus;
 import vn.io.huangnosimp.model.Admin;
@@ -110,8 +110,8 @@ public class AdminService implements IAdminService {
     }
 
     @Override
-    public List<AuctionCardDTO> getAllAuctions() {
-        return ModelMapper.toAuctionCardDTOList(auctionRepo.findAll());
+    public List<AuctionAdminDTO> getAllAuctions() {
+        return ModelMapper.toAuctionAdminDTOList(auctionRepo.findAll());
     }
 
     @Override

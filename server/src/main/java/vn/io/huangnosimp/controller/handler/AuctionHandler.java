@@ -72,7 +72,7 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             PlaceBidRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), PlaceBidRequestDTO.class);
-            BidResult result = auctionService.placeBid(client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), false);
+            BidResult result = auctionService.placeBid(client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), true);
             logger.info(
                     "Place bid attempted bidderId={} auctionId={} amount={} result={}",
                     client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), result

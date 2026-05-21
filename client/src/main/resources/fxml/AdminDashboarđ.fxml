@@ -68,9 +68,15 @@
 
                         <TableView fx:id="tableAuctions" VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="colAuctionId" prefWidth="241.80000162124634" text="Auction ID" />
-                                <TableColumn fx:id="colAuctionName" prefWidth="188.60003662109375" text="Product" />
-                                <TableColumn fx:id="colAuctionPrice" prefWidth="358.39984130859375" text="Current Price" />
+                                <TableColumn fx:id="colAuctionId" prefWidth="100.0" text="Auction ID" />
+                                <TableColumn fx:id="colAuctionName" prefWidth="200.0" text="Product" />
+                                <TableColumn fx:id="colSellerName" prefWidth="120.0" text="Seller" />
+                                <TableColumn fx:id="colStartPrice" prefWidth="130.0" text="Starting Price" />
+                                <TableColumn fx:id="colAuctionPrice" prefWidth="130.0" text="Current Price" />
+                                <TableColumn fx:id="colStartTime" prefWidth="150.0" text="Start Time" />
+                                <TableColumn fx:id="colEndTime" prefWidth="150.0" text="End Time" />
+                                <TableColumn fx:id="colStatus" prefWidth="100.0" text="Status" />
+                                <TableColumn fx:id="colWinnerName" prefWidth="120.0" text="Winner" />
                             </columns>
                         </TableView>
 
