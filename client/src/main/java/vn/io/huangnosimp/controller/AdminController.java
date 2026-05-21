@@ -2,18 +2,21 @@ package vn.io.huangnosimp.controller;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import vn.io.huangnosimp.dto.response.AuctionAdminDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.network.service.AdminNetworkService;
 import vn.io.huangnosimp.Manager.SocketManager;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
 
@@ -36,12 +39,18 @@ public class AdminController implements Initializable {
 
 
 
-    @FXML private TableView<AuctionCardDTO> tableAuctions;
-    @FXML private TableColumn<AuctionCardDTO, String> colAuctionId;
-    @FXML private TableColumn<AuctionCardDTO, String> colAuctionName;
-    @FXML private TableColumn<AuctionCardDTO, Double> colAuctionPrice;
+    @FXML private TableView<AuctionAdminDTO> tableAuctions;
+    @FXML private TableColumn<AuctionAdminDTO, String> colAuctionId;
+    @FXML private TableColumn<AuctionAdminDTO, String> colAuctionName;
+    @FXML private TableColumn<AuctionAdminDTO, Double> colAuctionPrice;
+    @FXML private TableColumn<AuctionAdminDTO, String> colSellerName;
+    @FXML private TableColumn<AuctionAdminDTO, Double> colStartPrice;
+    @FXML private TableColumn<AuctionAdminDTO, LocalDateTime> colStartTime;
+    @FXML private TableColumn<AuctionAdminDTO, LocalDateTime> colEndTime;
+    @FXML private TableColumn<AuctionAdminDTO, String> colStatus;
+    @FXML private TableColumn<AuctionAdminDTO, String> colWinnerName;
 
-    @FXML private TableColumn<AuctionCardDTO, Void> colAuctionAction;
+    @FXML private TableColumn<AuctionAdminDTO, Void> colAuctionAction;
 
     private AdminNetworkService networkService;
 
@@ -111,9 +120,15 @@ public class AdminController implements Initializable {
         });
         colMemberFrozen.setStyle("-fx-alignment: CENTER_RIGHT; -fx-text-fill: #e67e22;");
 
-        colAuctionId.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAuctionId()));
-        colAuctionName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProductName()));
+        colAuctionId.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getId()));
+        colAuctionName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItemName()));
         colAuctionPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getCurrentPrice()).asObject());
+        colSellerName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getSellerName()));
+        colStartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getStartingPrice()).asObject());
+        colStartTime.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getStartTime()));
+        colEndTime.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getEndTime()));
+        colStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
+        colWinnerName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getWinnerName()));
 
         tableMembers.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableAuctions.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -151,17 +166,17 @@ public class AdminController implements Initializable {
         networkService.getAllAuctionsAsync().thenAccept(auctions -> {
             Platform.runLater(() -> {
                 // Lưu lại ID của auction đang được chọn
-                AuctionCardDTO selectedAuction = tableAuctions.getSelectionModel().getSelectedItem();
-                String selectedAuctionId = (selectedAuction != null) ? selectedAuction.getAuctionId() : null;
+                AuctionAdminDTO selectedAuction = tableAuctions.getSelectionModel().getSelectedItem();
+                String selectedAuctionId = (selectedAuction != null) ? selectedAuction.getId() : null;
 
                 // Cập nhật dữ liệu mới vào bảng
-                ObservableList<AuctionCardDTO> auctionData = FXCollections.observableArrayList(auctions);
+                ObservableList<AuctionAdminDTO> auctionData = FXCollections.observableArrayList(auctions);
                 tableAuctions.setItems(auctionData);
 
                 // Tìm và bôi xanh lại dòng cũ
                 if (selectedAuctionId != null) {
-                    for (AuctionCardDTO a : auctionData) {
-                        if (a.getAuctionId().equals(selectedAuctionId)) {
+                    for (AuctionAdminDTO a : auctionData) {
+                        if (a.getId().equals(selectedAuctionId)) {
                             tableAuctions.getSelectionModel().select(a);
                             break;
                         }
@@ -234,7 +249,7 @@ public class AdminController implements Initializable {
 
     @FXML
     public void handleForceCancelAuction() {
-        AuctionCardDTO selectedAuction = tableAuctions.getSelectionModel().getSelectedItem();
+        AuctionAdminDTO selectedAuction = tableAuctions.getSelectionModel().getSelectedItem();
         if (selectedAuction == null) {
             showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng chọn một phiên đấu giá để hủy!");
             return;
@@ -243,12 +258,12 @@ public class AdminController implements Initializable {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Xác nhận");
         confirm.setHeaderText("Bạn có chắc chắn muốn hủy phiên đấu giá này?");
-        confirm.setContentText("Sản phẩm: " + selectedAuction.getProductName());
+        confirm.setContentText("Sản phẩm: " + selectedAuction.getItemName());
 
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 // Chạy lệnh gửi qua mạng
-                networkService.forceCancelAuctionAsync(selectedAuction.getAuctionId()).thenAccept(success -> {
+                networkService.forceCancelAuctionAsync(selectedAuction.getId()).thenAccept(success -> {
                     Platform.runLater(() -> {
                         if (success) {
                             showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã hủy phiên đấu giá!");

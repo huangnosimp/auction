@@ -8,6 +8,7 @@ import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.network.SocketServer;
 import vn.io.huangnosimp.repository.*;
 import vn.io.huangnosimp.service.*;
+import vn.io.huangnosimp.util.ModelMapper;
 
 import java.util.TimeZone;
 
@@ -27,6 +28,8 @@ public class Main {
         IBidTransactionRepository bidTransactionRepository = new BidTransactionRepository(dbConnection);
         IStatisticRepository statisticRepository = new StatisticRepository(dbConnection);
         IAutoBidRepository autoBidRepository = new AutoBidRepository(userRepository, auctionRepository, dbConnection);
+        //Utils
+        ModelMapper.setUserRepository(userRepository);
         //Services
         IUserService userService = new UserService(userRepository);
         ItemService itemService = new ItemService(itemRepository);
