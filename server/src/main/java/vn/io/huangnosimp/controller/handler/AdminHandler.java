@@ -2,7 +2,7 @@ package vn.io.huangnosimp.controller.handler;
 
 import vn.io.huangnosimp.dto.request.BanMemberRequestDTO;
 import vn.io.huangnosimp.dto.request.CancelAuctionRequestDTO;
-import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.AuctionAdminDTO;
 import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.enums.UserType;
 import vn.io.huangnosimp.util.GsonParser;
@@ -99,7 +99,7 @@ public class AdminHandler {
         public Response handle(Request request, ClientHandle client) {
             if (!isAdmin(client)) return new Response(ResponseStatus.UNAUTHORIZED, "Access denied");
 
-            List<AuctionCardDTO> auctions = adminService.getAllAuctions();
+            List<AuctionAdminDTO> auctions = adminService.getAllAuctions();
             logger.info("Admin fetched all auctions adminId={} count={}", client.getUserId(), auctions.size());
             return new Response(ResponseStatus.SUCCESS, "Get all auctions successful", auctions);
         }

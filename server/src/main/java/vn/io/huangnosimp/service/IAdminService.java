@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.service;
 
+import vn.io.huangnosimp.dto.response.AuctionAdminDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.model.Admin;
@@ -13,7 +14,7 @@ public interface IAdminService {
     List<MemberDTO> getAllMembers();
     boolean lockMember(String memberId, int durationInMinutes);
     boolean unlockMember(String memberId);
-    List<AuctionCardDTO> getAllAuctions();
+    List<AuctionAdminDTO> getAllAuctions();
     boolean forceCancelAuction(String auctionId);
     double getSystemTotalRevenue();
 }
