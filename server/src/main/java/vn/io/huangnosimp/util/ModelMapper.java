@@ -19,7 +19,7 @@ public class ModelMapper {
     private static IUserRepository userRepository;
 
     public static void setUserRepository(IUserRepository userRepo) {
-        ModelMapper.userRepository = userRepository;
+        ModelMapper.userRepository = userRepo;
     }
 
     public static MemberDTO toMemberDTO(Member member) {
@@ -59,12 +59,16 @@ public class ModelMapper {
         String statusStr = (auction.getStatus() != null) ? auction.getStatus().name() : "UNKNOWN";
 
 
-        String winnerName = "Chưa có";
+        String winnerName = "None";
         String winnerId = auction.getCurrentWinnerId();
 
-        if (winnerId != null && !winnerId.isEmpty()) {
-            User winnerOpt = userRepository.findById(winnerId);
-            winnerName = winnerOpt.getUsername();
+        if (winnerId != null && !winnerId.trim().isEmpty() && userRepository != null) {
+            User winner = userRepository.findById(winnerId);
+            if (winner != null) {
+                winnerName = winner.getUsername();
+            } else {
+                winnerName = "ID: " + winnerId;
+            }
         }
 
         return new AuctionAdminDTO(
