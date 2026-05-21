@@ -219,7 +219,7 @@ public class StatisticRepository implements IStatisticRepository {
     }
 
     @Override
-    public List<AuctionCardDTO> getPostedAuctionCard(String userId) {
+    public List<AuctionCardDTO> getPostedAuctionCard(String userId, int amount) {
         List<AuctionCardDTO> rooms = new ArrayList<>();
         String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
@@ -229,17 +229,79 @@ public class StatisticRepository implements IStatisticRepository {
                      "(SELECT COUNT(DISTINCT bt2.bidder_id) FROM bidtransactions bt2 WHERE bt2.auction_id = a.id) AS bidder_count " +
                      "FROM auctions a " +
                      "JOIN items i ON a.item_id = i.id " +
-                     "WHERE a.seller_id = ? AND a.status IN ('OPEN', 'RUNNING')";
+                     "WHERE a.seller_id = ? AND a.status IN ('OPEN', 'RUNNING') " +
+                     "ORDER BY a.start_time DESC " +
+                     "LIMIT ?";
                      
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, userId);
+            statement.setInt(2, amount);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 rooms.add(mapRowToAuctionCard(connection, rs));
             }
         } catch (SQLException e) {
-            logger.error("DB error when fetching posted auction cards userId={}", userId, e);
+            logger.error("DB error when fetching posted auction cards userId={} amount={}", userId, amount, e);
+        }
+        return rooms;
+    }
+
+    @Override
+    public List<AuctionCardDTO> getWonAuction(String userId, int amount) {
+        List<AuctionCardDTO> rooms = new ArrayList<>();
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
+                     "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
+                     "(SELECT IFNULL(MAX(bid_amount), 0) FROM bidtransactions bt WHERE bt.auction_id = a.id AND bt.bidder_id = ?) AS your_bid, " +
+                     "a.start_time AS start_time, a.end_time AS end_time, " +
+                     "(SELECT COUNT(*) FROM bidtransactions bt2 WHERE bt2.auction_id = a.id) AS bid_count, " +
+                     "(SELECT COUNT(DISTINCT bt3.bidder_id) FROM bidtransactions bt3 WHERE bt3.auction_id = a.id) AS bidder_count " +
+                     "FROM auctions a " +
+                     "JOIN items i ON a.item_id = i.id " +
+                     "WHERE a.winner_id = ? AND a.status IN ('FINISHED', 'PAID') " +
+                     "ORDER BY a.end_time DESC " +
+                     "LIMIT ?";
+
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, userId);
+            statement.setString(2, userId);
+            statement.setInt(3, amount);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                rooms.add(mapRowToAuctionCard(connection, rs));
+            }
+        } catch (SQLException e) {
+            logger.error("DB error when fetching won auctions userId={} amount={}", userId, amount, e);
+        }
+        return rooms;
+    }
+
+    @Override
+    public List<AuctionCardDTO> getEndedPostedAuction(String userId, int amount) {
+        List<AuctionCardDTO> rooms = new ArrayList<>();
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
+                     "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
+                     "0 AS your_bid, " +
+                     "a.start_time AS start_time, a.end_time AS end_time, " +
+                     "(SELECT COUNT(*) FROM bidtransactions bt WHERE bt.auction_id = a.id) AS bid_count, " +
+                     "(SELECT COUNT(DISTINCT bt2.bidder_id) FROM bidtransactions bt2 WHERE bt2.auction_id = a.id) AS bidder_count " +
+                     "FROM auctions a " +
+                     "JOIN items i ON a.item_id = i.id " +
+                     "WHERE a.seller_id = ? AND a.status IN ('FINISHED', 'PAID') " +
+                     "ORDER BY a.end_time DESC " +
+                     "LIMIT ?";
+
+        try (Connection connection = databaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, userId);
+            statement.setInt(2, amount);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                rooms.add(mapRowToAuctionCard(connection, rs));
+            }
+        } catch (SQLException e) {
+            logger.error("DB error when fetching ended posted auctions userId={} amount={}", userId, amount, e);
         }
         return rooms;
     }

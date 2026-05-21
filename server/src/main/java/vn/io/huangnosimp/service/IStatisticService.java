@@ -11,5 +11,7 @@ public interface IStatisticService {
     AuctionDetailResponseDTO getAuctionDetail(String userId, String auctionId);
     AuctionCardDTO getJoiningAuctionCard(String userId);
     List<AuctionCardDTO> getPublicAuctionCard(int quantity);
-    List<AuctionCardDTO> getPostedAuctionCard(String userId);
+    List<AuctionCardDTO> getPostedAuctionCard(String userId, int amount);
+    List<AuctionCardDTO> getWonAuction(String userId, int amount);
+    List<AuctionCardDTO> getEndedPostedAuction(String userId, int amount);
 }
