@@ -2,8 +2,11 @@ package vn.io.huangnosimp.controller.handler;
 
 import vn.io.huangnosimp.controller.RequestHandler;
 import vn.io.huangnosimp.dto.request.GetAuctionDetailRequestDTO;
+import vn.io.huangnosimp.dto.request.GetEndedPostedAuctionDTO;
 import vn.io.huangnosimp.dto.request.GetJoiningAuctionCardDTO;
+import vn.io.huangnosimp.dto.request.GetPostedAuctionDTO;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
+import vn.io.huangnosimp.dto.request.GetWonAuctionDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.response.GetPostedAuctionCardResponseDTO;
 import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
@@ -93,9 +96,49 @@ public class StatisticHandler {
         }
         @Override
         public Response handle(Request request, ClientHandle client) {
-            GetPostedAuctionCardResponseDTO dtoResponse = new GetPostedAuctionCardResponseDTO(statisticService.getPostedAuctionCard(client.getUserId()));
-            logger.info("Fetched posted auction cards userId={}", client.getUserId());
+            GetPostedAuctionDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetPostedAuctionDTO.class);
+            if (dto == null || dto.getAmount() <= 0) {
+                logger.warn("Invalid posted auction card request userId={} amount={}", client.getUserId(), dto == null ? null : dto.getAmount());
+                return new Response(ResponseStatus.FAILED, "Invalid amount");
+            }
+
+            GetPostedAuctionCardResponseDTO dtoResponse = new GetPostedAuctionCardResponseDTO(statisticService.getPostedAuctionCard(client.getUserId(), dto.getAmount()));
+            logger.info("Fetched posted auction cards userId={} amount={}", client.getUserId(), dto.getAmount());
             return new Response(ResponseStatus.SUCCESS, dtoResponse);
+        }
+    }
+    public static class GetWonAuctionHandler implements RequestHandler {
+        private final IStatisticService statisticService;
+        public GetWonAuctionHandler(IStatisticService statisticService) {
+            this.statisticService = statisticService;
+        }
+        @Override
+        public Response handle(Request request, ClientHandle client) {
+            GetWonAuctionDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetWonAuctionDTO.class);
+            if (dto == null || dto.getAmount() <= 0) {
+                logger.warn("Invalid won auction request userId={} amount={}", client.getUserId(), dto == null ? null : dto.getAmount());
+                return new Response(ResponseStatus.FAILED, "Invalid amount");
+            }
+
+            logger.info("Fetched won auctions userId={} amount={}", client.getUserId(), dto.getAmount());
+            return new Response(ResponseStatus.SUCCESS, statisticService.getWonAuction(client.getUserId(), dto.getAmount()));
+        }
+    }
+    public static class GetEndedPostedAuctionHandler implements RequestHandler {
+        private final IStatisticService statisticService;
+        public GetEndedPostedAuctionHandler(IStatisticService statisticService) {
+            this.statisticService = statisticService;
+        }
+        @Override
+        public Response handle(Request request, ClientHandle client) {
+            GetEndedPostedAuctionDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), GetEndedPostedAuctionDTO.class);
+            if (dto == null || dto.getAmount() <= 0) {
+                logger.warn("Invalid ended posted auction request userId={} amount={}", client.getUserId(), dto == null ? null : dto.getAmount());
+                return new Response(ResponseStatus.FAILED, "Invalid amount");
+            }
+
+            logger.info("Fetched ended posted auctions userId={} amount={}", client.getUserId(), dto.getAmount());
+            return new Response(ResponseStatus.SUCCESS, statisticService.getEndedPostedAuction(client.getUserId(), dto.getAmount()));
         }
     }
 }
