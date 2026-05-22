@@ -16,7 +16,9 @@ import vn.io.huangnosimp.network.service.AdminNetworkService;
 import vn.io.huangnosimp.Manager.SocketManager;
 
 import java.net.URL;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 
@@ -42,11 +44,11 @@ public class AdminController implements Initializable {
     @FXML private TableView<AuctionAdminDTO> tableAuctions;
     @FXML private TableColumn<AuctionAdminDTO, String> colAuctionId;
     @FXML private TableColumn<AuctionAdminDTO, String> colAuctionName;
-    @FXML private TableColumn<AuctionAdminDTO, Double> colAuctionPrice;
+    @FXML private TableColumn<AuctionAdminDTO, String> colAuctionPrice;
     @FXML private TableColumn<AuctionAdminDTO, String> colSellerName;
-    @FXML private TableColumn<AuctionAdminDTO, Double> colStartPrice;
-    @FXML private TableColumn<AuctionAdminDTO, LocalDateTime> colStartTime;
-    @FXML private TableColumn<AuctionAdminDTO, LocalDateTime> colEndTime;
+    @FXML private TableColumn<AuctionAdminDTO, String> colStartPrice;
+    @FXML private TableColumn<AuctionAdminDTO, String> colStartTime;
+    @FXML private TableColumn<AuctionAdminDTO, String> colEndTime;
     @FXML private TableColumn<AuctionAdminDTO, String> colStatus;
     @FXML private TableColumn<AuctionAdminDTO, String> colWinnerName;
 
@@ -59,7 +61,6 @@ public class AdminController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         networkService = new AdminNetworkService(SocketManager.getClient());
-
         setupTableColumns();
         loadAllData();
 
@@ -107,26 +108,35 @@ public class AdminController implements Initializable {
 
         colMemberBalance.setCellValueFactory(cellData -> {
             double balance = cellData.getValue().getBalance();
-            String formattedBalance = "$" + String.format("%,.2f", balance);
-            return new SimpleStringProperty(formattedBalance);
+            return new SimpleStringProperty("$" + String.format(Locale.US, "%,.0f", balance));
         });
-
         colMemberBalance.setStyle("-fx-alignment: CENTER_RIGHT;");
 
         colMemberFrozen.setCellValueFactory(cellData -> {
             double frozen = cellData.getValue().getFrozenBalance();
-            String formattedFrozen = "$" + String.format("%,.2f", frozen);
-            return new SimpleStringProperty(formattedFrozen);
+            return new SimpleStringProperty("$" + String.format(Locale.US, "%,.0f", frozen));
         });
         colMemberFrozen.setStyle("-fx-alignment: CENTER_RIGHT; -fx-text-fill: #e67e22;");
 
         colAuctionId.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getId()));
         colAuctionName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItemName()));
-        colAuctionPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getCurrentPrice()).asObject());
+
+        colAuctionPrice.setCellValueFactory(cellData -> {
+            double price = cellData.getValue().getCurrentPrice();
+            return new SimpleStringProperty("$" + String.format(Locale.US, "%,.0f", price));
+        });
+        colAuctionPrice.setStyle("-fx-alignment: CENTER_RIGHT;");
+
         colSellerName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getSellerName()));
-        colStartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getStartingPrice()).asObject());
-        colStartTime.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getStartTime()));
-        colEndTime.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getEndTime()));
+
+        colStartPrice.setCellValueFactory(cellData -> {
+            double price = cellData.getValue().getStartingPrice();
+            return new SimpleStringProperty("$" + String.format(Locale.US, "%,.0f", price));
+        });
+        colStartPrice.setStyle("-fx-alignment: CENTER_RIGHT;");
+
+        colStartTime.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStartTime()));
+        colEndTime.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEndTime()));
         colStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
         colWinnerName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getWinnerName()));
 
