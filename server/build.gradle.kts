@@ -18,7 +18,7 @@ dependencies {
     testImplementation("com.h2database:h2:2.4.240")
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("org.slf4j:slf4j-api:2.0.17")
-    implementation("ch.qos.logback:logback-classic:1.5.18")
+    implementation("ch.qos.logback:logback-classic:1.5.32")
     implementation("com.mysql:mysql-connector-j:9.6.0")
     implementation("org.mindrot:jbcrypt:0.4")
     implementation("com.zaxxer:HikariCP:7.0.2")
