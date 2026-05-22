@@ -19,7 +19,7 @@ public class ModelMapper {
     private static IUserRepository userRepository;
 
     public static void setUserRepository(IUserRepository userRepo) {
-        ModelMapper.userRepository = userRepository;
+        ModelMapper.userRepository = userRepo;
     }
 
     public static MemberDTO toMemberDTO(Member member) {
@@ -51,20 +51,27 @@ public class ModelMapper {
     public static AuctionAdminDTO toAuctionAdminDTO(Auction auction) {
         if (auction == null) return null;
 
-        LocalDateTime start = LocalDateTime.ofInstant(Instant.ofEpochMilli(auction.getStartTime()), ZoneId.systemDefault());
-        LocalDateTime end = LocalDateTime.ofInstant(Instant.ofEpochMilli(auction.getEndTime()), ZoneId.systemDefault());
+        DateTimeFormatter TimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        LocalDateTime startLocal = LocalDateTime.ofInstant(Instant.ofEpochMilli(auction.getStartTime()), ZoneId.systemDefault());
+        LocalDateTime endLocal = LocalDateTime.ofInstant(Instant.ofEpochMilli(auction.getEndTime()), ZoneId.systemDefault());
+
+        String startTimeStr = (startLocal != null) ? startLocal.format(TimeFormatter) : "N/A";
+        String endTimeStr = (endLocal != null) ? endLocal.format(TimeFormatter) : "N/A";
 
         String sellerName = (auction.getSeller() != null) ? auction.getSeller().getUsername() : "N/A";
 
         String statusStr = (auction.getStatus() != null) ? auction.getStatus().name() : "UNKNOWN";
 
-
-        String winnerName = "Chưa có";
+        String winnerName = "None";
         String winnerId = auction.getCurrentWinnerId();
 
-        if (winnerId != null && !winnerId.isEmpty()) {
-            User winnerOpt = userRepository.findById(winnerId);
-            winnerName = winnerOpt.getUsername();
+        if (winnerId != null && !winnerId.trim().isEmpty() && userRepository != null) {
+            User winner = userRepository.findById(winnerId);
+            if (winner != null) {
+                winnerName = winner.getUsername();
+            } else {
+                winnerName = "ID: " + winnerId;
+            }
         }
 
         return new AuctionAdminDTO(
@@ -73,8 +80,8 @@ public class ModelMapper {
                 sellerName,
                 auction.getStartPrice(),
                 auction.getCurrentPrice(),
-                start,
-                end,
+                startTimeStr,
+                endTimeStr,
                 statusStr,
                 winnerName
         );
