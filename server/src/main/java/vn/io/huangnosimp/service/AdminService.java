@@ -1,5 +1,8 @@
 package vn.io.huangnosimp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import vn.io.huangnosimp.dto.response.AuctionActionResult;
 import vn.io.huangnosimp.dto.response.AuctionAdminDTO;
 import vn.io.huangnosimp.dto.response.MemberDTO;
@@ -18,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class AdminService implements IAdminService {
+    private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
     private static final double COMMISSION_RATE = 0.05;
 
     private final IUserRepository userRepo;
@@ -36,6 +40,7 @@ public class AdminService implements IAdminService {
         if (user instanceof Admin) {
             return (Admin) user;
         }
+        logger.debug("Admin lookup returned no admin userId={}", adminId);
         return null;
     }
 
@@ -45,7 +50,7 @@ public class AdminService implements IAdminService {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-        return userRepo.findAll().stream()
+        List<MemberDTO> members = userRepo.findAll().stream()
                 .filter(user -> user instanceof Member)
                 .map(user -> {
                     Member member = (Member) user;
@@ -76,6 +81,8 @@ public class AdminService implements IAdminService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+        logger.info("Loaded members for admin count={}", members.size());
+        return members;
     }
 
     @Override
@@ -93,10 +100,13 @@ public class AdminService implements IAdminService {
 
             if (isSuccess) {
                 ClientSessionManager.getInstance().banUser(memberId);
+                logger.info("Member locked memberId={} durationInMinutes={}", memberId, durationInMinutes);
                 return true;
             }
+            logger.error("Member lock failed while updating ban status memberId={}", memberId);
         }
 
+        logger.warn("Member lock rejected memberId={} durationInMinutes={}", memberId, durationInMinutes);
         return false;
     }
 
@@ -104,14 +114,23 @@ public class AdminService implements IAdminService {
     public boolean unlockMember(String memberId) {
         var user = userRepo.findById(memberId);
         if (user instanceof Member) {
-            return userRepo.updateBanStatus(memberId, false, null);
+            boolean unlocked = userRepo.updateBanStatus(memberId, false, null);
+            if (unlocked) {
+                logger.info("Member unlocked memberId={}", memberId);
+            } else {
+                logger.error("Member unlock failed while updating ban status memberId={}", memberId);
+            }
+            return unlocked;
         }
+        logger.warn("Member unlock rejected because user was not a member memberId={}", memberId);
         return false;
     }
 
     @Override
     public List<AuctionAdminDTO> getAllAuctions() {
-        return ModelMapper.toAuctionAdminDTOList(auctionRepo.findAll());
+        List<AuctionAdminDTO> auctions = ModelMapper.toAuctionAdminDTOList(auctionRepo.findAll());
+        logger.info("Loaded auctions for admin count={}", auctions.size());
+        return auctions;
     }
 
     @Override
@@ -124,6 +143,9 @@ public class AdminService implements IAdminService {
 
         if (isSuccess) {
             ClientSessionManager.getInstance().destroyRoom(auctionId);
+            logger.info("Auction force canceled by admin auctionId={}", auctionId);
+        } else {
+            logger.warn("Auction force cancel failed auctionId={} result={}", auctionId, result);
         }
 
         return isSuccess;
@@ -131,9 +153,11 @@ public class AdminService implements IAdminService {
 
     @Override
     public double getSystemTotalRevenue() {
-        return auctionRepo.findAll().stream()
+        double revenue = auctionRepo.findAll().stream()
                 .filter(a -> a.getStatus() == AuctionStatus.PAID)
                 .mapToDouble(a -> a.getCurrentPrice() * COMMISSION_RATE)
                 .sum();
+        logger.info("Calculated system total revenue revenue={}", revenue);
+        return revenue;
     }
 }

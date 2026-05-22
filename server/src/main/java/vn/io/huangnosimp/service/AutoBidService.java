@@ -37,14 +37,28 @@ public class AutoBidService implements IAutoBidService {
     @Override
     public boolean registerAutoBid(String bidderId, String auctionId, double maxBid, double increment) {
         User user = userRepository.findById(bidderId);
-        if (!(user instanceof Member bidder)) return false;
+        if (!(user instanceof Member bidder)) {
+            logger.warn("Autobid registration rejected because bidder was not found bidderId={} auctionId={}", bidderId, auctionId);
+            return false;
+        }
 
         Auction auction = auctionRepository.findById(auctionId);
 
-        if (bidder == null || auction == null) return false;
-        if (increment <= 0) return false;
+        if (auction == null) {
+            logger.warn("Autobid registration rejected because auction was not found bidderId={} auctionId={}", bidderId, auctionId);
+            return false;
+        }
+        if (increment <= 0) {
+            logger.warn("Autobid registration rejected due to invalid increment bidderId={} auctionId={} increment={}",
+                    bidderId, auctionId, increment);
+            return false;
+        }
 
-        if (maxBid <= auction.getCurrentPrice()) return false;
+        if (maxBid <= auction.getCurrentPrice()) {
+            logger.info("Autobid registration rejected because max bid is too low bidderId={} auctionId={} maxBid={} currentPrice={}",
+                    bidderId, auctionId, maxBid, auction.getCurrentPrice());
+            return false;
+        }
 
         AutoBidConfig config = new AutoBidConfig(bidder, auction, maxBid, increment, LocalDateTime.now());
         autoBidRepository.save(config);
@@ -56,12 +70,18 @@ public class AutoBidService implements IAutoBidService {
     @Override
     public void processAutoBids(String auctionId) {
         List<AutoBidConfig> configs = autoBidRepository.findByAuctionId(auctionId);
-        if (configs == null || configs.isEmpty()) return;
+        if (configs == null || configs.isEmpty()) {
+            logger.debug("No autobid configs found auctionId={}", auctionId);
+            return;
+        }
 
         configs.sort(Comparator.comparing(AutoBidConfig::getRegisteredAt));
 
         Auction auction = auctionRepository.findById(auctionId);
-        if (auction == null) return;
+        if (auction == null) {
+            logger.warn("Autobid processing skipped because auction was not found auctionId={}", auctionId);
+            return;
+        }
 
         double currentPrice = auction.getCurrentPrice();
         String currentWinnerId = auction.getCurrentWinnerId();
@@ -94,6 +114,8 @@ public class AutoBidService implements IAutoBidService {
         if (existing != null) {
             autoBidRepository.delete(bidderId, auctionId);
             logger.info("Unregistered autobid bidderId={} auctionId={}", bidderId, auctionId);
+        } else {
+            logger.debug("Autobid unregister skipped because config was not found bidderId={} auctionId={}", bidderId, auctionId);
         }
     }
 }
