@@ -73,7 +73,7 @@ public class AuctionService implements IAuctionService {
                                             long endTime, ItemCondition condition, double minimumIncrement,
                                             double buyNowPrice, List<String> imageUrl) {
         if (!isValidOpenAuctionInput(sellerId, itemName, description, itemType, attributes, startPrice)
-                || endTime <= startTime || startTime > System.currentTimeMillis()) {
+                || endTime <= startTime || startTime < System.currentTimeMillis()) {
             return null;
         }
         Member seller = userService.getMember(sellerId);

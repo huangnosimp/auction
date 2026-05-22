@@ -79,6 +79,8 @@ public class Main {
         router.registerHandler(ActionType.GET_JOINING_AUCTION_CARD, new StatisticHandler.GetJoiningAuctionCardHandler(statisticService));
         router.registerHandler(ActionType.GET_PUBLIC_AUCTION_CARD, new StatisticHandler.GetPublicAuctionCardHandler(statisticService));
         router.registerHandler(ActionType.GET_POSTED_AUCTION_CARD, new StatisticHandler.GetPostedAuctionCardHandler(statisticService));
+        router.registerHandler(ActionType.GET_WON_AUCTION, new StatisticHandler.GetWonAuctionHandler(statisticService));
+        router.registerHandler(ActionType.GET_ENDED_POSTED_AUCTION, new StatisticHandler.GetEndedPostedAuctionHandler(statisticService));
         //Start Server
         SocketServer server = new SocketServer(26676, router);
         Runtime.getRuntime().addShutdownHook(new Thread(AuctionScheduler::shutdown));

@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
+import vn.io.huangnosimp.dto.request.GetPostedAuctionDTO;
 import vn.io.huangnosimp.dto.request.LoginRequestDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.response.GetPostedAuctionCardResponseDTO;
@@ -60,7 +61,7 @@ public class LoginController {
             SocketManager.getClient().sendRequestAsync(request)
                     .thenAccept(response -> {
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                            Request getMineRequest = new Request(ActionType.GET_POSTED_AUCTION_CARD, null);
+                            Request getMineRequest = new Request(ActionType.GET_POSTED_AUCTION_CARD, new GetPostedAuctionDTO(30));
                             SocketManager.getClient().sendRequestAsync(getMineRequest)
                                     .thenAccept(getPostedResponse -> {
                                         GetPostedAuctionCardResponseDTO dto =  GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(getPostedResponse.getData()), GetPostedAuctionCardResponseDTO.class);

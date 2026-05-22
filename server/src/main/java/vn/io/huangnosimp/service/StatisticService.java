@@ -61,10 +61,26 @@ public class StatisticService implements IStatisticService {
     }
 
     @Override
-    public List<AuctionCardDTO> getPostedAuctionCard(String userId) {
-        if (userId == null || userId.isBlank()) {
+    public List<AuctionCardDTO> getPostedAuctionCard(String userId, int amount) {
+        if (userId == null || userId.isBlank() || amount <= 0) {
             return Collections.emptyList();
         }
-        return statisticRepository.getPostedAuctionCard(userId);
+        return statisticRepository.getPostedAuctionCard(userId, amount);
+    }
+
+    @Override
+    public List<AuctionCardDTO> getWonAuction(String userId, int amount) {
+        if (userId == null || userId.isBlank() || amount <= 0) {
+            return Collections.emptyList();
+        }
+        return statisticRepository.getWonAuction(userId, amount);
+    }
+
+    @Override
+    public List<AuctionCardDTO> getEndedPostedAuction(String userId, int amount) {
+        if (userId == null || userId.isBlank() || amount <= 0) {
+            return Collections.emptyList();
+        }
+        return statisticRepository.getEndedPostedAuction(userId, amount);
     }
 }
