@@ -1,5 +1,8 @@
 package vn.io.huangnosimp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import vn.io.huangnosimp.connection.CloudinaryConnection;
 import vn.io.huangnosimp.dto.response.CloudinaryUploadSignatureResponseDTO;
 
@@ -11,6 +14,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class CloudinaryService implements ICloudinaryService {
+    private static final Logger logger = LoggerFactory.getLogger(CloudinaryService.class);
     private static final String DEFAULT_FOLDER = "auction/products";
 
     private final CloudinaryConnection cloudinaryConnection;
@@ -22,9 +26,11 @@ public class CloudinaryService implements ICloudinaryService {
     @Override
     public CloudinaryUploadSignatureResponseDTO createUploadSignature(String userId, String requestedFolder) {
         if (!cloudinaryConnection.isConfigured()) {
+            logger.error("Cloudinary upload signature rejected because connection is not configured userId={}", userId);
             throw new IllegalStateException("Cloudinary environment variables are not configured");
         }
         if (userId == null || userId.isBlank()) {
+            logger.warn("Cloudinary upload signature rejected because user id is missing");
             throw new IllegalArgumentException("User id is required");
         }
 
@@ -36,6 +42,7 @@ public class CloudinaryService implements ICloudinaryService {
         paramsToSign.put("timestamp", timestamp);
 
         String signature = sha1(buildParameterString(paramsToSign) + cloudinaryConnection.getApiSecret());
+        logger.info("Cloudinary upload signature created userId={} folder={}", userId, folder);
         return new CloudinaryUploadSignatureResponseDTO(
                 cloudinaryConnection.getCloudName(),
                 cloudinaryConnection.getApiKey(),
