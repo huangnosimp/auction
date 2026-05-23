@@ -23,6 +23,10 @@ import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
+import vn.io.huangnosimp.dto.request.GetPostedAuctionDTO;
+import vn.io.huangnosimp.dto.request.GetEndedPostedAuctionDTO;
+import vn.io.huangnosimp.dto.request.GetWonAuctionDTO;
+import vn.io.huangnosimp.dto.response.GetPostedAuctionCardResponseDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
 import vn.io.huangnosimp.dto.shared.NotificationDTO;
@@ -50,6 +54,7 @@ public class DashboardController implements Initializable, IServerMessageListene
     @FXML private BorderPane mainBorderPane;
     @FXML private StackPane contentArea;
     @FXML private Button btnOpenSlots;
+    @FXML private Button btnInventory;
     @FXML private HBox menuHbox;
     @FXML private VBox sideVbox;
     @FXML private Label lblBalance;
@@ -102,8 +107,74 @@ public class DashboardController implements Initializable, IServerMessageListene
     }
     @FXML
     public void handlebtnInventory(ActionEvent event){
-        changeView("Inventory.fxml", 1);
-        handleMenuAction(event);
+        showInventoryView();
+    }
+
+    public void showInventoryView() {
+        Request activeListingsReq = new Request(ActionType.GET_POSTED_AUCTION_CARD, new GetPostedAuctionDTO(30));
+        Request endedListingsReq = new Request(ActionType.GET_ENDED_POSTED_AUCTION, new GetEndedPostedAuctionDTO(30));
+        Request wonReq = new Request(ActionType.GET_WON_AUCTION, new GetWonAuctionDTO(30));
+
+        SocketManager.getClient().sendRequestAsync(activeListingsReq)
+            .thenCombine(SocketManager.getClient().sendRequestAsync(endedListingsReq), (activeRes, endedRes) -> {
+                List<AuctionCardDTO> activeList = new ArrayList<>();
+                List<AuctionCardDTO> endedList = new ArrayList<>();
+                if (activeRes != null && ResponseStatus.SUCCESS.equals(activeRes.getStatus())) {
+                    GetPostedAuctionCardResponseDTO dto = GsonParser.GSON.fromJson(
+                        GsonParser.GSON.toJsonTree(activeRes.getData()),
+                        GetPostedAuctionCardResponseDTO.class
+                    );
+                    if (dto != null && dto.getAuctionCards() != null) {
+                        activeList.addAll(dto.getAuctionCards());
+                    }
+                }
+                if (endedRes != null && ResponseStatus.SUCCESS.equals(endedRes.getStatus())) {
+                    List<AuctionCardDTO> list = GsonParser.GSON.fromJson(
+                        GsonParser.GSON.toJsonTree(endedRes.getData()),
+                        new TypeToken<List<AuctionCardDTO>>(){}.getType()
+                    );
+                    if (list != null) {
+                        endedList.addAll(list);
+                    }
+                }
+                List<AuctionCardDTO> allListings = new ArrayList<>();
+                allListings.addAll(activeList);
+                allListings.addAll(endedList);
+                return allListings;
+            })
+            .thenCombine(SocketManager.getClient().sendRequestAsync(wonReq), (allListings, wonRes) -> {
+                List<AuctionCardDTO> wonList = new ArrayList<>();
+                if (wonRes != null && ResponseStatus.SUCCESS.equals(wonRes.getStatus())) {
+                    List<AuctionCardDTO> list = GsonParser.GSON.fromJson(
+                        GsonParser.GSON.toJsonTree(wonRes.getData()),
+                        new TypeToken<List<AuctionCardDTO>>(){}.getType()
+                    );
+                    if (list != null) {
+                        wonList.addAll(list);
+                    }
+                }
+                
+                Platform.runLater(() -> {
+                    changeView("Inventory.fxml", 1);
+                    InventoryController inventoryController = ControllerManager.getInventoryController();
+                    if (inventoryController != null) {
+                        inventoryController.setData(allListings, wonList);
+                    }
+                    
+                    for (Node node : menuHbox.getChildren()) {
+                        if (node instanceof Button btn) {
+                            btn.getStyleClass().remove("nav-btn-active");
+                        }
+                    }
+                    if (btnInventory != null) {
+                        btnInventory.getStyleClass().add("nav-btn-active");
+                    }
+                });
+                return null;
+            }).exceptionally(ex -> {
+                ex.printStackTrace();
+                return null;
+            });
     }
 
     @FXML
