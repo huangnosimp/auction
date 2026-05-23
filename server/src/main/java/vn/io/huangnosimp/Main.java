@@ -10,6 +10,7 @@ import vn.io.huangnosimp.repository.*;
 import vn.io.huangnosimp.service.*;
 import vn.io.huangnosimp.util.ModelMapper;
 
+import javax.swing.*;
 import java.util.TimeZone;
 
 public class Main {
@@ -73,6 +74,7 @@ public class Main {
         //AutoBid Handler
         router.registerHandler(ActionType.REGISTER_AUTO_BID, new AutoBidHandler.RegisterHandler(autoBidService));
         router.registerHandler(ActionType.UNREGISTER_AUTO_BID, new AutoBidHandler.UnregisterHandler(autoBidService));
+        router.registerHandler(ActionType.GET_USER_AUTO_BIDS, new AutoBidHandler.GetUserAutoBidsHandler(autoBidService));
         //Statistic Handler
         router.registerHandler(ActionType.GET_DASHBOARD_INFO, new StatisticHandler.GetDashboardInfoHandler(statisticService));
         router.registerHandler(ActionType.GET_AUCTION_DETAIL, new StatisticHandler.GetAuctionDetailHandler(statisticService));
