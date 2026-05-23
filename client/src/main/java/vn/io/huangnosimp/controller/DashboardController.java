@@ -295,7 +295,7 @@ public class DashboardController implements Initializable, IServerMessageListene
 
     private void addOutbidCardToUI(){
         outbidAlertsList.getChildren().clear();
-        for(AuctionCardDTO dto : getDashboardInfo().getAuctionCardInfo()){
+        for(AuctionCardDTO dto : getJoiningListCard()){
             if(dto.getYourBid() < dto.getCurrentPrice()){
                 try{
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/outbid_item.fxml"));

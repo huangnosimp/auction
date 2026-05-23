@@ -53,7 +53,6 @@
                     <padding><Insets bottom="10" /></padding>
                     <Label styleClass="avatar-circle" text="👤" />
                     <Label fx:id="usernameLabel" styleClass="uname" text="HoangChim88" />
-                    <Label styleClass="uid" text="ID: #HC-00142" />
                     <Label styleClass="verified-badge" text="VERIFIED" />
                <Button mnemonicParsing="false" onAction="#handleLogOut" prefHeight="25.0" prefWidth="76.0" styleClass="btn-dep" text="Log Out" />
                 </VBox>
@@ -63,11 +62,11 @@
                 <VBox spacing="0" styleClass="info-table">
                     <HBox styleClass="info-row">
                         <Label styleClass="ir-key" text="Email" HBox.hgrow="ALWAYS" />
-                        <Label styleClass="ir-val" text="user@gmail.com" />
+                        <Label fx:id="emailLabel" styleClass="ir-val" text="user@gmail.com" />
                     </HBox>
                     <HBox styleClass="info-row">
                         <Label styleClass="ir-key" text="Member since" HBox.hgrow="ALWAYS" />
-                        <Label styleClass="ir-val" text="Jan 2024" />
+                        <Label styleClass="ir-val" />
                     </HBox>
                     <HBox styleClass="info-row">
                         <Label styleClass="ir-key" text="KYC Status" HBox.hgrow="ALWAYS" />

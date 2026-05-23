@@ -37,9 +37,12 @@ public class AccountViewController implements Initializable {
     @FXML private TextField witAmount;
 
     @FXML private Label usernameLabel;
+    @FXML private Label emailLabel;
 
     private void setUpAccountView(){
+
         usernameLabel.setText(UserSession.getUsername());
+        emailLabel.setText(UserSession.getEmail());
     }
     @FXML
     public void handleLogOut(){
