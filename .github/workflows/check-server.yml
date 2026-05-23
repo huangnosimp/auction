@@ -19,3 +19,7 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew :server:compileJava
+      - name: Run Tests
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :server:test
