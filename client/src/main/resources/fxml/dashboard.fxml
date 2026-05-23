@@ -42,8 +42,8 @@
             </center>
 
             <left>
-                <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="224.0" style="-fx-background-color: #171414;" BorderPane.alignment="CENTER">
-                    <VBox fx:id="sideVbox" spacing="10" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
+                <AnchorPane fx:id="side" prefHeight="693.0" prefWidth="311.0" styleClass="sidebar-container" BorderPane.alignment="CENTER">
+                    <VBox fx:id="sideVbox" spacing="14" AnchorPane.bottomAnchor="12" AnchorPane.leftAnchor="12" AnchorPane.rightAnchor="12" AnchorPane.topAnchor="12">
 
                         <VBox spacing="4" styleClass="stat-card">
                             <Label styleClass="stat-label" text="YOUR BALANCE" />
@@ -51,15 +51,125 @@
                             <Label styleClass="stat-link" text="+ Top Up" />
                         </VBox>
 
-                        <VBox prefHeight="145.0" prefWidth="194.0" spacing="8" styleClass="side-card">
-                            <Label styleClass="side-section-title" text="EXPIRING SOON" />
-                            <VBox fx:id="expiringList" spacing="6" />
-                        </VBox>
+                        <SplitPane orientation="VERTICAL" dividerPositions="0.4" styleClass="sidebar-split-pane" VBox.vgrow="ALWAYS">
+                            <items>
 
-                        <VBox spacing="8" styleClass="side-card" VBox.vgrow="ALWAYS">
-                            <Label styleClass="side-section-title" text="RECENT ACTIVITY" />
-                            <VBox fx:id="activityList" spacing="8" />
-                        </VBox>
+                                <VBox prefHeight="230.0" spacing="8" styleClass="side-card, side-card-outbid">
+                                    <HBox alignment="CENTER_LEFT" spacing="6">
+                                        <Label styleClass="side-title-outbid" text="🚨 OUTBID ALERTS" />
+                                        <Label fx:id="outbidBadge" styleClass="side-badge-outbid" text="0" />
+                                    </HBox>
+
+                                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="side-scroll" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                                        <content>
+                                            <VBox fx:id="outbidAlertsList" spacing="8" styleClass="side-list-container">
+
+                                                <HBox alignment="CENTER_LEFT" spacing="8" styleClass="outbid-item-row">
+                                                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                        <Label styleClass="side-item-title" text="iPhone 15 Pro Max" />
+                                                        <Label styleClass="side-item-value-outbid" text="Top: $1,600" />
+                                                    </VBox>
+                                                    <Button styleClass="side-quick-bid-btn" text="Bid +1" />
+                                                </HBox>
+
+                                                <HBox alignment="CENTER_LEFT" spacing="8" styleClass="outbid-item-row">
+                                                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                        <Label styleClass="side-item-title" text="RTX 4090 ROG Strix" />
+                                                        <Label styleClass="side-item-value-outbid" text="Top: $2,150" />
+                                                    </VBox>
+                                                    <Button styleClass="side-quick-bid-btn" text="Bid +1" />
+                                                </HBox>
+
+                                                <HBox alignment="CENTER_LEFT" spacing="8" styleClass="outbid-item-row">
+                                                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                        <Label styleClass="side-item-title" text="Keychron Q1 Pro" />
+                                                        <Label styleClass="side-item-value-outbid" text="Top: $180" />
+                                                    </VBox>
+                                                    <Button styleClass="side-quick-bid-btn" text="Bid +1" />
+                                                </HBox>
+
+                                                <HBox alignment="CENTER_LEFT" spacing="8" styleClass="outbid-item-row">
+                                                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                        <Label styleClass="side-item-title" text="AirPods Pro Gen 2" />
+                                                        <Label styleClass="side-item-value-outbid" text="Top: $210" />
+                                                    </VBox>
+                                                    <Button styleClass="side-quick-bid-btn" text="Bid +1" />
+                                                </HBox>
+
+                                                <HBox alignment="CENTER_LEFT" spacing="8" styleClass="outbid-item-row">
+                                                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                                        <Label styleClass="side-item-title" text="PlayStation 5 Slim" />
+                                                        <Label styleClass="side-item-value-outbid" text="Top: $450" />
+                                                    </VBox>
+                                                    <Button styleClass="side-quick-bid-btn" text="Bid +1" />
+                                                </HBox>
+
+                                            </VBox>
+                                        </content>
+                                    </ScrollPane>
+                                </VBox>
+
+                                <VBox spacing="8" styleClass="side-card">
+                                    <HBox alignment="CENTER_LEFT" spacing="6">
+                                        <Label styleClass="side-title-closing" text="⏳ CLOSING SOON" />
+                                    </HBox>
+
+                                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="side-scroll" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                                        <content>
+                                            <VBox fx:id="closingSoonList" spacing="8" styleClass="side-list-container">
+
+                                                <VBox spacing="4" styleClass="closing-item-row">
+                                                    <HBox alignment="CENTER_LEFT">
+                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="Vincent van Gogh Art" HBox.hgrow="ALWAYS" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <Label styleClass="side-item-time-val" text="01m 45s" />
+                                                    </HBox>
+                                                    <ProgressBar maxWidth="Infinity" progress="0.15" styleClass="side-progress-bar" />
+                                                </VBox>
+
+                                                <VBox spacing="4" styleClass="closing-item-row">
+                                                    <HBox alignment="CENTER_LEFT">
+                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="Mechanical Keyboard" HBox.hgrow="ALWAYS" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <Label styleClass="side-item-time-val" text="03m 12s" />
+                                                    </HBox>
+                                                    <ProgressBar maxWidth="Infinity" progress="0.32" styleClass="side-progress-bar" />
+                                                </VBox>
+
+                                                <VBox spacing="4" styleClass="closing-item-row">
+                                                    <HBox alignment="CENTER_LEFT">
+                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="MacBook Pro M3 Max" HBox.hgrow="ALWAYS" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <Label styleClass="side-item-time-val" text="05m 50s" />
+                                                    </HBox>
+                                                    <ProgressBar maxWidth="Infinity" progress="0.55" styleClass="side-progress-bar" />
+                                                </VBox>
+
+                                                <VBox spacing="4" styleClass="closing-item-row">
+                                                    <HBox alignment="CENTER_LEFT">
+                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="Leica M11 Camera" HBox.hgrow="ALWAYS" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <Label styleClass="side-item-time-val" text="08m 20s" />
+                                                    </HBox>
+                                                    <ProgressBar maxWidth="Infinity" progress="0.78" styleClass="side-progress-bar" />
+                                                </VBox>
+
+                                                <VBox spacing="4" styleClass="closing-item-row">
+                                                    <HBox alignment="CENTER_LEFT">
+                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="Sony WH-1000XM5" HBox.hgrow="ALWAYS" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <Label styleClass="side-item-time-val" text="11m 05s" />
+                                                    </HBox>
+                                                    <ProgressBar maxWidth="Infinity" progress="0.91" styleClass="side-progress-bar" />
+                                                </VBox>
+
+                                            </VBox>
+                                        </content>
+                                    </ScrollPane>
+                                </VBox>
+
+                            </items>
+                        </SplitPane>
 
                     </VBox>
                 </AnchorPane>
@@ -72,28 +182,23 @@
                 <Insets right="20" top="80" />
             </padding>
             <children>
-
-                <HBox fx:id="toastBox" alignment="CENTER_LEFT" managed="false" spacing="10" style="-fx-background-color: #1a2e1a;                              -fx-border-color: #22c55e;                              -fx-border-width: 1;                              -fx-border-radius: 8;                              -fx-background-radius: 8;                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 10, 0, 0, 4);" visible="false">
+                <HBox fx:id="toastBox" alignment="CENTER_LEFT" managed="false" spacing="10" styleClass="toast-box" visible="false">
                     <padding><Insets bottom="12" left="14" right="16" top="12" /></padding>
                     <children>
-
                         <StackPane prefHeight="22" prefWidth="22">
                             <children>
-                                <Circle fx:id="toastIconCircle" fill="#22c55e" radius="11" StackPane.alignment="CENTER" />
-                                <Label fx:id="toastIconLabel" style="-fx-text-fill: #0a2a0a; -fx-font-size: 11px; -fx-font-weight: bold;" text="✓" StackPane.alignment="CENTER" />
+                                <Circle fx:id="toastIconCircle" radius="11" styleClass="toast-circle" StackPane.alignment="CENTER" />
+                                <Label fx:id="toastIconLabel" styleClass="toast-icon-text" text="✓" StackPane.alignment="CENTER" />
                             </children>
                         </StackPane>
-
                         <VBox spacing="2">
                             <children>
-                                <Label fx:id="toastTitle" style="-fx-text-fill: #4ade80; -fx-font-size: 12px; -fx-font-weight: bold;" text="Thành công!" />
-                                <Label fx:id="toastSub" style="-fx-text-fill: #86efac; -fx-font-size: 10px;" text="" />
+                                <Label fx:id="toastTitle" styleClass="toast-title-text" text="Thành công!" />
+                                <Label fx:id="toastSub" styleClass="toast-sub-text" text="" />
                             </children>
                         </VBox>
-
                     </children>
                 </HBox>
-
             </children>
         </VBox>
 

@@ -5,9 +5,6 @@ public class AutoBidRequestDTO {
     private double maxBid;
     private double increment;
 
-    public AutoBidRequestDTO() {
-    }
-
     public AutoBidRequestDTO(String auctionId, double maxBid, double increment) {
         this.auctionId = auctionId;
         this.maxBid = maxBid;

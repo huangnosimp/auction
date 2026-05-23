@@ -4,7 +4,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="rootVbox" prefWidth="243.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
+<VBox fx:id="rootVbox" prefWidth="205.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
 
     <children>
 

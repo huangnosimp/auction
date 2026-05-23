@@ -5,7 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox alignment="CENTER_LEFT" styleClass="inv-row" stylesheets="@../css/Inventory.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<HBox alignment="CENTER_LEFT" styleClass="inv-row" stylesheets="@../css/Inventory.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.RowItemController">
 
     <!-- Ảnh sản phẩm — StackPane để có nền màu -->
     <StackPane prefHeight="48" prefWidth="64" style="-fx-background-color: #12141f; -fx-background-radius: 6;">
@@ -13,16 +13,10 @@
         <ImageView fx:id="imgProduct" fitHeight="48" fitWidth="64" pickOnBounds="true" preserveRatio="true" />
     </StackPane>
 
-    <!-- Tên + danh mục -->
+    <!-- Tên -->
     <VBox prefWidth="200" spacing="3">
         <Label fx:id="lblProductName" styleClass="inv-row-name" text="Product Name" wrapText="true" />
-        <Label fx:id="lblCategory" styleClass="inv-row-sub" text="Category" />
     </VBox>
-
-    <!-- Status badge -->
-    <HBox alignment="CENTER_LEFT" prefWidth="90">
-        <Label fx:id="lblStatus" styleClass="inv-badge inv-badge-live" text="LIVE" textFill="WHITE" />
-    </HBox>
 
     <!-- Số lượt bid -->
     <VBox alignment="CENTER_LEFT" prefWidth="60" spacing="2">

@@ -17,6 +17,8 @@ public class UserSession {
     private static List<AuctionCardDTO> searchListCard = new ArrayList<>();
     private static String auctionId;
     private static String username;
+    private static String email;
+    private static double balance;
 
     public static void clearAllSession(){
         dashboardInfo = null;
@@ -83,6 +85,7 @@ public class UserSession {
     public static List<AuctionCardDTO> getMyListCard(){
         return myListCard;
     }
+
     public static void removeCard(List<AuctionCardDTO> list, String Id) {
         list.removeIf(card -> card.getAuctionId().equals(Id));
     }
@@ -106,5 +109,25 @@ public class UserSession {
     }
     public static String getUsername(){
         return username;
+    }
+    //email
+    public static void setEmail(String em){
+        email = em;
+    }
+    public static String getEmail(){
+        return email;
+    }
+    //balance
+    public static void setBalance(double amount){
+        balance = amount;
+    }
+    public static void addBalance(double newBalance){
+        balance += newBalance;
+    }
+    public static void minusBalance(double amount){
+        balance -= amount;
+    }
+    public static double getBalance(){
+        return balance;
     }
 }
