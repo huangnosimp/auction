@@ -24,6 +24,7 @@ public enum ActionType {
 
     REGISTER_AUTO_BID,
     UNREGISTER_AUTO_BID,
+    GET_USER_AUTO_BIDS,
 
     NOTIFICATION,
 

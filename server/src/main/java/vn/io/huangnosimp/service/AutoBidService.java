@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.service;
 
+import vn.io.huangnosimp.dto.response.AutoBidResponseDTO;
 import vn.io.huangnosimp.dto.response.BidResult;
 import vn.io.huangnosimp.model.AutoBidConfig;
 import vn.io.huangnosimp.model.Auction;
@@ -10,10 +11,12 @@ import vn.io.huangnosimp.repository.IAuctionRepository;
 import vn.io.huangnosimp.repository.IUserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vn.io.huangnosimp.util.ModelMapper;
 
 public class AutoBidService implements IAutoBidService {
     private static final Logger logger = LoggerFactory.getLogger(AutoBidService.class);
@@ -133,4 +136,18 @@ public class AutoBidService implements IAutoBidService {
             logger.debug("Autobid unregister skipped because config was not found bidderId={} auctionId={}", bidderId, auctionId);
         }
     }
+
+    @Override
+    public List<AutoBidResponseDTO> getAutoBidsByUserId(String userId) {
+        List<AutoBidConfig> configs = autoBidRepository.findByUserId(userId);
+
+        if (configs != null && !configs.isEmpty()) {
+            logger.info("Fetched {} autobid configs for userId={}", configs.size(), userId);
+            return ModelMapper.toAutoBidResponseDTOList(configs);
+        } else {
+            logger.debug("No autobid configs found for userId={}", userId);
+            return new ArrayList<>();
+        }
+    }
+
 }

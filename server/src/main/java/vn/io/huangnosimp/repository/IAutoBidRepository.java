@@ -9,4 +9,5 @@ public interface IAutoBidRepository {
     List<AutoBidConfig> findByAuctionId(String auctionId);
     AutoBidConfig findByMemberAndAuction(String memberId, String auctionId);
     void delete(String memberId, String auctionId);
+    List<AutoBidConfig> findByUserId(String userId);
 }

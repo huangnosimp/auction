@@ -1,7 +1,9 @@
 package vn.io.huangnosimp.util;
 
 import vn.io.huangnosimp.dto.response.AuctionAdminDTO;
+import vn.io.huangnosimp.dto.response.AutoBidResponseDTO;
 import vn.io.huangnosimp.model.Auction;
+import vn.io.huangnosimp.model.AutoBidConfig;
 import vn.io.huangnosimp.model.Member;
 import vn.io.huangnosimp.dto.response.MemberDTO;
 import vn.io.huangnosimp.model.User;
@@ -11,6 +13,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,6 +93,33 @@ public class ModelMapper {
     public static List<AuctionAdminDTO> toAuctionAdminDTOList(List<Auction> auctions) {
         return auctions.stream()
                 .map(ModelMapper::toAuctionAdminDTO)
+                .collect(Collectors.toList());
+    }
+
+    public static AutoBidResponseDTO toAutoBidResponseDTO(AutoBidConfig config) {
+        if (config == null) return null;
+
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String registeredAtStr = (config.getRegisteredAt() != null)
+                ? config.getRegisteredAt().format(timeFormatter)
+                : "N/A";
+
+        return new AutoBidResponseDTO(
+                config.getId(),
+                config.getMaxBid(),
+                config.getIncrement(),
+                config.getAuction().getId(),
+                registeredAtStr
+        );
+    }
+
+    public static List<AutoBidResponseDTO> toAutoBidResponseDTOList(List<AutoBidConfig> configs) {
+        if (configs == null) {
+            return new ArrayList<>();
+        }
+
+        return configs.stream()
+                .map(ModelMapper::toAutoBidResponseDTO)
                 .collect(Collectors.toList());
     }
 }

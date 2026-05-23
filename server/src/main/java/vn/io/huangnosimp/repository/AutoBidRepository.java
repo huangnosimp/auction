@@ -81,6 +81,28 @@ public class AutoBidRepository implements IAutoBidRepository {
     }
 
     @Override
+    public List<AutoBidConfig> findByUserId(String userId) {
+        List<AutoBidConfig> result = new ArrayList<>();
+
+        if (storage == null || storage.isEmpty()) {
+            return result;
+        }
+
+        for (Map<String, AutoBidConfig> auctionConfigs : storage.values()) {
+            if (auctionConfigs != null && !auctionConfigs.isEmpty()) {
+                for (AutoBidConfig config : auctionConfigs.values()) {
+                    if (config.getBidder() != null && userId.equals(config.getBidder().getId())) {
+                        result.add(config);
+                    }
+                }
+
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public AutoBidConfig findByMemberAndAuction(String memberId, String auctionId) {
         Map<String, AutoBidConfig> auctionConfigs = storage.get(auctionId);
 
