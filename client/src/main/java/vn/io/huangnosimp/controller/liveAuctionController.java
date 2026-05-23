@@ -175,7 +175,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         descriptionLabel.setText(DTO.getDescription());//mô tả
         sidebarBuyNowPriceLabel.setText(formatNumber(DTO.getBuyNowPrice()));//giá mua ngay
         startDateLabel.setText(formatEpochSecond(DTO.getStartTime()));//thời điểm bắt đầu
-        if(DTO.getBuyNowPrice() == 0){
+        if(DTO.getBuyNowPrice() == 0 || DTO.getCurrentPrice() >= DTO.getBuyNowPrice()){
             buyNowDisplay.setVisible(false);
             buyNowDisplay.setManaged(false);
         }
@@ -258,14 +258,26 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         lineChart.setLegendVisible(false);
         lineChart.setTitle("Auction");
         xAxis.setLabel("Lượt đặt");
-        xAxis.setAutoRanging(true);
-        xAxis.setTickLabelsVisible(false);
+        xAxis.setAutoRanging(false);
+        xAxis.setTickLabelsVisible(true);
+        xAxis.setMinorTickVisible(false);
+        xAxis.setLowerBound(1);
+        xAxis.setUpperBound(10);
+        xAxis.setTickUnit(1);
 
         yAxis.setLabel("Giá (đ)");
         yAxis.setAutoRanging(true);
 
         priceSeries.setName("Price");
         lineChart.getData().add(priceSeries);
+    }
+
+    private void updateXAxisRange() {
+        xAxis.setAutoRanging(false);
+        xAxis.setLowerBound(1);
+        int maxIndex = Math.max(10, bidIndex);
+        xAxis.setUpperBound(maxIndex);
+        xAxis.setTickUnit(1);
     }
 
     public void loadChartHistory(List<PricePointDTO> history){
@@ -275,6 +287,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             bidIndex++;
             priceSeries.getData().add(new XYChart.Data<>(bidIndex, dto.getPrice()));
         }
+        updateXAxisRange();
     }
 
     public void loadBidHistory(List<BidHistoryDTO> history){
@@ -292,7 +305,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         }
     }
     @FXML
-    public void handleReturnToDashboard(ActionEvent event){
+    public void handleReturnToDashboard(){
 
         Button ActBtn = ControllerManager.getDashboardController().getActiveMenuButton();
         if(ActBtn.getText().equals("Dashboard")){
@@ -405,6 +418,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                             Platform.runLater(()->{
                                 ControllerManager.getDashboardController().showToast("SUCCESS", cancelResponse.getMessage(), true);
                                 ControllerManager.getDashboardHomeController().removeFromDashBoard(this.auctionId, ControllerManager.getDashboardHomeController().getAuctionFlowPane());
+                                UserSession.removeCard(UserSession.getMyListCard(), auctionId);
                                 ViewManager.changeView("dashboard_home.fxml", 1);
                             });
                         }
@@ -447,6 +461,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                 case PLACE_BID -> {
                     if(ResponseStatus.SUCCESS.equals(response.getStatus())) {
                         ControllerManager.getDashboardController().showToast("SUCCESS", response.getMessage(), true);
+                        ControllerManager.getDashboardController().removeOutbidItem(auctionId);
                     }
                     else {
                         ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
@@ -467,40 +482,71 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     }
     public void onRequestReceived(Request notification) {
         NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
-        if(NotificationType.NEW_BID.equals(notificationDTO.getNotificationType())) {
-            PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
-            BidHistoryDTO historyDTO = new BidHistoryDTO(
-                    dto.getUsername(), dto.getAmount(), dto.getPlaceAt()
-            );
+        NotificationType type = notificationDTO.getNotificationType();
+        switch (type){
+            case NEW_BID -> {
+                PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
+                BidHistoryDTO historyDTO = new BidHistoryDTO(
+                        dto.getUsername(), dto.getAmount(), dto.getPlaceAt()
+                );
 
-            Platform.runLater(() -> {
-                if (dto.getUsername().equals(UserSession.getUsername())) {
-                    btnPlaceBid.setDisable(true);
-                    statusLabel.setText("WINNING");
-                } else {
-                    btnPlaceBid.setDisable(false);
-                    statusLabel.setText("OUTBID");
-                }
-                bidIndex++;
-                bidCountLabel.setText(String.valueOf(bidIndex));
-                leadBidderLabel.setText(dto.getUsername());
-                priceSeries.getData().add(new XYChart.Data<>(bidIndex, dto.getAmount()));
-                currentPriceLabel.setText(formatNumber(dto.getAmount()));
-                minNextBidLabel.setText(formatNumber(dto.getAmount() + minCount));
-                lastBidTimeLabel.setText(formatEpochSecond(dto.getPlaceAt()));
+                Platform.runLater(() -> {
+                    if (dto.getUsername().equals(UserSession.getUsername())) {
+                        btnPlaceBid.setDisable(true);
+                        statusLabel.setText("WINNING");
+                        if (ControllerManager.getDashboardController() != null) {
+                            ControllerManager.getDashboardController().removeOutbidItem(notificationDTO.getAuctionId());
+                        }
+                    } else {
+                        btnPlaceBid.setDisable(false);
+                        statusLabel.setText("OUTBID");
+                        if (ControllerManager.getDashboardController() != null) {
+                            String productName = UserSession.getAuctionDetail() != null ? UserSession.getAuctionDetail().getProductName() : "Auction #" + notificationDTO.getAuctionId();
+                            ControllerManager.getDashboardController().addOrUpdateOutbidItem(notificationDTO.getAuctionId(), productName, dto.getAmount());
+                        }
+                    }
+                    bidIndex++;
+                    bidCountLabel.setText(String.valueOf(bidIndex));
+                    leadBidderLabel.setText(dto.getUsername());
+                    priceSeries.getData().add(new XYChart.Data<>(bidIndex, dto.getAmount()));
+                    updateXAxisRange();
+                    currentPriceLabel.setText(formatNumber(dto.getAmount()));
+                    minNextBidLabel.setText(formatNumber(dto.getAmount() + minCount));
+                    myBidLabel.setText(formatNumber(dto.getAmount() + minCount));
+                    lastBidTimeLabel.setText(formatEpochSecond(dto.getPlaceAt()));
 
-                try {
-                    FXMLLoader loader = new FXMLLoader(
-                            getClass().getResource("/fxml/bid_history_cell.fxml")
-                    );
-                    Parent cell = loader.load();
-                    BidHistoryCellController controller = loader.getController();
-                    controller.setData(historyDTO, true);
-                    bidHistoryList.getItems().add(cell);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+                    if (UserSession.getAuctionDetail() != null && UserSession.getAuctionDetail().getBuyNowPrice() > 0) {
+                        if (dto.getAmount() >= UserSession.getAuctionDetail().getBuyNowPrice()) {
+                            buyNowDisplay.setVisible(false);
+                            buyNowDisplay.setManaged(false);
+                        }
+                    }
+
+                    try {
+                        FXMLLoader loader = new FXMLLoader(
+                                getClass().getResource("/fxml/bid_history_cell.fxml")
+                        );
+                        Parent cell = loader.load();
+                        BidHistoryCellController controller = loader.getController();
+                        controller.setData(historyDTO, true);
+                        bidHistoryList.getItems().add(0, cell);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+            case AUCTION_CANCELED -> {
+                Platform.runLater(()->{
+                    handleReturnToDashboard();
+                    ControllerManager.getDashboardController().showToast("Auction has been canceled buy the seller", null, true);
+                });
+            }
+            case AUCTION_ENDED -> {
+                Platform.runLater(()->{
+                    handleReturnToDashboard();
+                    ControllerManager.getDashboardController().showToast("Auction Ended", null, true);
+                });
+            }
         }
     }
 
@@ -512,9 +558,9 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         setAuctionId(UserSession.getAuctionId());
         setupLineChart();
         holdTimer = new Timeline(new KeyFrame(Duration.millis(200), event -> {
-            handleIncreaseButton(); // Gọi lại hàm tăng số bạn đã viết
+            handleIncreaseButton();
         }));
-        holdTimer.setCycleCount(Animation.INDEFINITE); // Chạy vô hạn cho đến khi thả chuột
+        holdTimer.setCycleCount(Animation.INDEFINITE);
         setUpliveAuction(UserSession.getAuctionDetail());
         zoomImage();
     }

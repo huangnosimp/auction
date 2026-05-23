@@ -29,8 +29,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import static vn.io.huangnosimp.Manager.UserSession.getDashboardInfo;
-import static vn.io.huangnosimp.Manager.UserSession.getMyListCard;
+import static vn.io.huangnosimp.Manager.UserSession.*;
 
 public class dashboard_homeController implements Initializable, IServerMessageListener {
     @FXML private FlowPane auctionFlowPane;
@@ -47,11 +46,11 @@ public class dashboard_homeController implements Initializable, IServerMessageLi
     public FlowPane getAuctionFlowPane(){return auctionFlowPane;}
     public FlowPane getFlowJoined(){return flowJoined;}
     public void setupDashboardHome(){
-        statActiveBids.setText(String.valueOf(getDashboardInfo().getJoinedRooms()));
+        statActiveBids.setText(String.valueOf(getJoiningListCard().size()));
         statWinning.setText(String.valueOf(getDashboardInfo().getWinningBids()));
         statOutbid.setText(String.valueOf(getDashboardInfo().getOutBids()));
         statWonTotal.setText(String.valueOf(getDashboardInfo().getWonTotal()));
-        for(AuctionCardDTO DTO : getDashboardInfo().getAuctionCardInfo()){
+        for(AuctionCardDTO DTO : getJoiningListCard()){
             addToDashboard(DTO, "Joining", flowJoined);
         }
         for(AuctionCardDTO DTO1 : getMyListCard()){

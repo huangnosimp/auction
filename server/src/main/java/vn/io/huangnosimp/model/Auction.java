@@ -136,7 +136,15 @@ public class Auction extends Entity {
         return minimumIncrement;
     }
 
+    public void setMinimumIncrement(double minimumIncrement) {
+        this.minimumIncrement = minimumIncrement;
+    }
+
     public double getBuyNowPrice() {
         return buyNowPrice;
+    }
+
+    public void setBuyNowPrice(double buyNowPrice) {
+        this.buyNowPrice = buyNowPrice;
     }
 }

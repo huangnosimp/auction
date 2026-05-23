@@ -8,6 +8,7 @@ public class ControllerManager {
     private static liveAuctionController liveAuctionController;
     private static OpenSlotController openSlotController;
     private static AccountViewController accountViewController;
+    private static InventoryController inventoryController;
     public static void clearAllController(){
         loginController = null;
         dashboardController = null;
@@ -15,6 +16,7 @@ public class ControllerManager {
         liveAuctionController = null;
         openSlotController = null;
         accountViewController = null;
+        inventoryController = null;
     }
     //login
     public static LoginController getLoginController(){
@@ -62,6 +64,11 @@ public class ControllerManager {
         return accountViewController;
     }
 
-
-
+    //inventory
+    public static InventoryController getInventoryController(){
+        return inventoryController;
+    }
+    public static void setInventoryController(InventoryController inv){
+        inventoryController = inv;
+    }
 }

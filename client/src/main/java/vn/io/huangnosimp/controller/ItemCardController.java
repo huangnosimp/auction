@@ -28,6 +28,8 @@ import vn.io.huangnosimp.util.GsonParser;
 import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 import static vn.io.huangnosimp.Manager.UserSession.getUsername;
@@ -42,6 +44,7 @@ public class ItemCardController implements IServerMessageListener {
     @FXML private Label lblBidderCount;
     @FXML private Label lblBidCount;
     @FXML private Label lblYourBid;
+    @FXML private Label lblBidStatus;
 
     @FXML private Button btnManage;
 
@@ -57,6 +60,9 @@ public class ItemCardController implements IServerMessageListener {
         displayImg = dto.getImageUrl();
         bidCount = dto.getBidCount();
         bidderCount = dto.getBidderCount();
+        if(dto.getCurrentPrice() == dto.getYourBid()){
+            lblBidStatus.setText("WINNING");
+        }
         if (displayImg != null && !displayImg.isEmpty()) {
             imgProduct.setImage(new Image(displayImg.get(0), 0, 0, true, true));
         } else {
@@ -143,40 +149,77 @@ public class ItemCardController implements IServerMessageListener {
     }
     @FXML
     public void handleEnterRoom(){
-        GetAuctionDetailRequestDTO getDetail = new GetAuctionDetailRequestDTO(auctionId);
-        SocketManager.getClient().sendRequestAsync(new Request(ActionType.GET_AUCTION_DETAIL, getDetail))
-                .thenAccept(response -> {
-                    if(ResponseStatus.SUCCESS.equals(response.getStatus())){
-                        AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionDetailResponseDTO.class);
-                        Platform.runLater(()->{
-                            UserSession.setAuctionDetail(auctionResponse);
-                            UserSession.setAuctionId(auctionId);
-                            liveAuctionController controller = changeViewWithController("liveAuction.fxml");
-                            controller.setUpPreviewImg(displayImg);
-                            if (btnManage.getText().equals("Manage")) {
-                                controller.setInvisible();
-                            }
-                        });
+        JoinRoomRequestDTO joinRoomRequest = new JoinRoomRequestDTO(auctionId);
+
+        Request request = new Request(ActionType.JOIN_ROOM, joinRoomRequest);
+
+        SocketManager.getClient().sendRequestAsync(request)
+                .thenAccept(joinRoomResponse -> {
+                    if(ResponseStatus.SUCCESS.equals(joinRoomResponse.getStatus())){
+                        GetAuctionDetailRequestDTO getDetail = new GetAuctionDetailRequestDTO(auctionId);
+                        SocketManager.getClient().sendRequestAsync(new Request(ActionType.GET_AUCTION_DETAIL, getDetail))
+                                .thenAccept(response -> {
+                                    if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+                                        AuctionDetailResponseDTO auctionResponse = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response.getData()), AuctionDetailResponseDTO.class);
+                                        Platform.runLater(()->{
+                                            UserSession.setAuctionDetail(auctionResponse);
+                                            UserSession.setAuctionId(auctionId);
+                                            liveAuctionController controller = changeViewWithController("liveAuction.fxml");
+                                            controller.setUpPreviewImg(displayImg);
+                                            if (btnManage.getText().equals("Manage")) {
+                                                controller.setInvisible();
+                                            }
+                                        });
+                                    }
+                                    if(ResponseStatus.FAILED.equals(response.getStatus())){
+                                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                                    }
+                                });
                     }
-                    if(ResponseStatus.FAILED.equals(response.getStatus())){
-                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                    if(ResponseStatus.FAILED.equals(joinRoomResponse.getStatus())){
+                        ControllerManager.getDashboardController().showToast("FAILED", joinRoomResponse.getMessage(), false);
                     }
                 });
+
     }
     public void onResponseReceived(Response response){}
     public void onResponseReceived(Response response, ActionType actionType){}
     public void onRequestReceived(Request notification){
         NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
-        if(NotificationType.NEW_BID.equals(notificationDTO.getNotificationType())){
-            PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
-            Platform.runLater(()->{
-                lblBidCount.setText(String.valueOf(bidCount+1) + " bids");
-                lblCurrentBid.setText(formatNumber(dto.getAmount()));
-                if(dto.getUsername().equals(getUsername())){
-                    lblYourBid.setText(formatNumber(dto.getAmount()));
+        NotificationType notificationType = notificationDTO.getNotificationType();
+        switch (notificationType){
+            case NEW_BID -> {
+                PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
+                Platform.runLater(()->{
+                    lblBidCount.setText(String.valueOf(bidCount+1) + " bids");
+                    lblCurrentBid.setText(formatNumber(dto.getAmount()));
+                    if(dto.getUsername().equals(getUsername())){
+                        lblYourBid.setText(formatNumber(dto.getAmount()));
+                        lblBidStatus.setText("WINNING");
+                    }
+                    else{
+                        lblBidStatus.setText("OUTBID");
+                    }
+                });
+            }
+            case OUTBID -> {
+                if(notificationDTO.getAuctionId().equals(auctionId)){
+                    String msg = (String) notificationDTO.getData();
+                    lblCurrentBid.setText(formatNumber(extractPrice(msg)));
+                    lblBidStatus.setText("OUTBID");
                 }
-            });
+            }
         }
     }
     public void onDisconnected(String reason){}
+    private double extractPrice(String message) {
+        Pattern pattern = Pattern.compile("Current price is ([\\d.]+) in room");
+        Matcher matcher = pattern.matcher(message);
+
+        if (matcher.find()) {
+            return Double.parseDouble(matcher.group(1));
+        }
+
+        throw new IllegalArgumentException("Không tìm thấy giá trong chuỗi: " + message);
+    }
 }

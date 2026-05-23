@@ -10,6 +10,7 @@ public class DashboardResponseDTO {
     private final int wonTotal;
     private final List<AuctionCardDTO> auctionCardInfo;
     private final String username;
+    private final String email;
 
     public DashboardResponseDTO(
             double balance,
@@ -18,7 +19,8 @@ public class DashboardResponseDTO {
             int outBids,
             int wonTotal,
             List<AuctionCardDTO> auctionCardInfo,
-            String username) {
+            String username,
+            String email) {
         this.balance = balance;
         this.joinedRooms = activeBids;
         this.winningBids = winningBids;
@@ -26,6 +28,7 @@ public class DashboardResponseDTO {
         this.wonTotal = wonTotal;
         this.auctionCardInfo = auctionCardInfo;
         this.username = username;
+        this.email = email;
     }
 
 
@@ -57,4 +60,7 @@ public class DashboardResponseDTO {
         return username;
     }
 
+    public String getEmail() {
+        return email;
+    }
 }

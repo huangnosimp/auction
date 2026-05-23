@@ -8,7 +8,8 @@
       styleClass="inventory-root"
       stylesheets="@../css/Inventory.css"
       xmlns="http://javafx.com/javafx/17.0.12"
-      xmlns:fx="http://javafx.com/fxml/1">
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="vn.io.huangnosimp.controller.InventoryController">
 
     <!-- ═══════════════ HEADER ═══════════════ -->
     <HBox alignment="CENTER_LEFT" styleClass="inv-header">
@@ -85,7 +86,6 @@
             <HBox styleClass="inv-col-header">
                 <padding><Insets top="8" right="16" bottom="8" left="16"/></padding>
                 <Label styleClass="inv-col-lbl" text="Product" prefWidth="200"/>
-                <Label styleClass="inv-col-lbl" text="Status"  prefWidth="90"/>
                 <Label styleClass="inv-col-lbl" text="Bids"    prefWidth="60"/>
                 <Label styleClass="inv-col-lbl" text="Top Bid" prefWidth="90"/>
                 <Label styleClass="inv-col-lbl" text="Ends"    HBox.hgrow="ALWAYS"/>
@@ -139,9 +139,7 @@
             <HBox styleClass="inv-col-header">
                 <padding><Insets top="8" right="16" bottom="8" left="16"/></padding>
                 <Label styleClass="inv-col-lbl" text="Product"  prefWidth="200"/>
-                <Label styleClass="inv-col-lbl" text="Status"   prefWidth="90"/>
                 <Label styleClass="inv-col-lbl" text="Paid"     prefWidth="90"/>
-                <Label styleClass="inv-col-lbl" text="Seller"   prefWidth="90"/>
                 <Label styleClass="inv-col-lbl" text="Won at"   HBox.hgrow="ALWAYS"/>
             </HBox>
 
