@@ -24,9 +24,8 @@ dependencies {
     implementation("com.zaxxer:HikariCP:7.0.2")
     implementation(project(":common"))
     implementation("com.cloudinary:cloudinary-http5:2.3.2")
-    testImplementation("org.mockito:mockito-core:5.11.0")
+    testImplementation("org.mockito:mockito-core:5.22.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
-    testImplementation("org.mockito:mockito-inline:5.2.0")
 
 }
 

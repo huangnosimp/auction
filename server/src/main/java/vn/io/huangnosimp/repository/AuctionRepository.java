@@ -30,7 +30,8 @@ public class AuctionRepository implements IAuctionRepository {
         //add save bidders
         String sql = "INSERT INTO Auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status, minimum_increment, buy_now_price) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE winner_id = VALUES(winner_id), end_time = VALUES(end_time), final_price = VALUES(final_price), status = VALUES(status)";
+                "ON DUPLICATE KEY UPDATE winner_id = VALUES(winner_id), end_time = VALUES(end_time), final_price = VALUES(final_price), " +
+                "status = VALUES(status), minimum_increment = VALUES(minimum_increment), buy_now_price = VALUES(buy_now_price)";
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -92,6 +93,8 @@ public class AuctionRepository implements IAuctionRepository {
         long endTime = rs.getTimestamp("end_time").getTime();
         double startingPrice = rs.getDouble("starting_price");
         double finalPrice = rs.getDouble("final_price");
+        double minimumIncrement = rs.getDouble("minimum_increment");
+        double buyNowPrice = rs.getDouble("buy_now_price");
         String statusStr = rs.getString("status");
         long createdAt = rs.getTimestamp("created_at").getTime();
 
@@ -103,6 +106,8 @@ public class AuctionRepository implements IAuctionRepository {
         Auction auction = new Auction(id, item, seller, startingPrice, startTime, endTime, createdAt);
         auction.setCurrentWinnerId(winnerId);
         auction.setCurrentPrice(finalPrice > 0 ? finalPrice : startingPrice);
+        auction.setMinimumIncrement(minimumIncrement);
+        auction.setBuyNowPrice(buyNowPrice);
         if (statusStr != null) {
             auction.setStatus(AuctionStatus.valueOf(statusStr));
         }

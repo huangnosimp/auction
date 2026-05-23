@@ -27,8 +27,8 @@ public class TransactionRepository implements ITransactionRepository {
             stmt.setString(1, transaction.getId());
             stmt.setString(2, transaction.getUserId());
             stmt.setDouble(3, transaction.getAmount());
-            stmt.setTimestamp(6, new Timestamp(transaction.getCreatedAt()));
-            stmt.setString(4, transaction.getTransactionType().name());
+            stmt.setTimestamp(4, new Timestamp(transaction.getCreatedAt()));
+            stmt.setString(5, transaction.getTransactionType().name());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
