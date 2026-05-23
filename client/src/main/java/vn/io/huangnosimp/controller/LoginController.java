@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import vn.io.huangnosimp.Manager.SceneManager;
 import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
@@ -16,6 +17,9 @@ import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import java.util.List;
+import java.util.ArrayList;
 
 import static vn.io.huangnosimp.Manager.ViewManager.changeMainStage;
 
@@ -62,21 +66,37 @@ public class LoginController {
                     .thenAccept(response -> {
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
                             Request getMineRequest = new Request(ActionType.GET_POSTED_AUCTION_CARD, new GetPostedAuctionDTO(30));
-                            SocketManager.getClient().sendRequestAsync(getMineRequest)
-                                    .thenAccept(getPostedResponse -> {
-                                        GetPostedAuctionCardResponseDTO dto =  GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(getPostedResponse.getData()), GetPostedAuctionCardResponseDTO.class);
-                                        UserSession.addMyCard(dto.getAuctionCards());
-                                    });
                             Request dashboardRequest = new Request(ActionType.GET_DASHBOARD_INFO, null);
-                            SocketManager.getClient().sendRequestAsync(dashboardRequest)
-                                    .thenAccept(dashboardResponse->{
-                                        DashboardResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(dashboardResponse.getData()), DashboardResponseDTO.class);
+
+                            SocketManager.getClient().sendRequestAsync(getMineRequest)
+                                    .thenCombine(SocketManager.getClient().sendRequestAsync(dashboardRequest), (getPostedResponse, dashboardResponse) -> {
+                                        GetPostedAuctionCardResponseDTO postedDto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(getPostedResponse.getData()), GetPostedAuctionCardResponseDTO.class);
+                                        UserSession.addMyCard(postedDto.getAuctionCards());
+
+                                        DashboardResponseDTO dashboardDto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(dashboardResponse.getData()), DashboardResponseDTO.class);
+
                                         Platform.runLater(() -> {
-                                            UserSession.setDashboardInfo(dto);
-                                            UserSession.setUsername(dto.getUsername());
-                                            UserSession.addJoiningCard(dto.getAuctionCardInfo());
+                                            UserSession.setDashboardInfo(dashboardDto);
+                                            UserSession.setUsername(dashboardDto.getUsername());
+                                            UserSession.setEmail(dashboardDto.getEmail());
+                                            UserSession.setBalance(dashboardDto.getBalance());
+
+                                            List<AuctionCardDTO> joinedRooms = new ArrayList<>();
+                                            if (dashboardDto.getAuctionCardInfo() != null) {
+                                                for (AuctionCardDTO card : dashboardDto.getAuctionCardInfo()) {
+                                                    boolean isManaged = UserSession.getMyListCard().stream()
+                                                            .anyMatch(myCard -> myCard.getAuctionId().equals(card.getAuctionId()));
+                                                    if (!isManaged) {
+                                                        joinedRooms.add(card);
+                                                    }
+                                                }
+                                            }
+                                            UserSession.addJoiningCard(joinedRooms);
+
                                             changeMainStage("dashboard.fxml");
+                                            SceneManager.getStage().setMaximized(true);
                                         });
+                                        return null;
                                     });
                         }
                         else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){
@@ -93,7 +113,7 @@ public class LoginController {
             SocketManager.getClient().sendRequestAsync(request)
                     .thenAccept(response -> {
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                            Platform.runLater(()-> changeMainStage("AdminDashboarđ.fxml")); // Lưu ý chữ 'đ' cuối giống code cũ của bạn
+                            Platform.runLater(()-> changeMainStage("AdminDashboarđ.fxml"));
                         }
                         else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){
                             Platform.runLater(()-> showAlert("UNAUTHORIZED", response.getMessage()));

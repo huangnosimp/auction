@@ -426,7 +426,7 @@ public class AuctionService implements IAuctionService {
 
             auction.setCurrentWinnerId(userId);
             auction.setCurrentPrice(buyNowPrice);
-            auction.setStatusPaid();
+            auction.setStatus(AuctionStatus.PAID);
             auctionRepository.save(auction);
 
             Member seller = auction.getSeller();
