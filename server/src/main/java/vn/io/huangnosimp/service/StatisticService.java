@@ -23,7 +23,7 @@ public class StatisticService implements IStatisticService {
     public DashboardResponseDTO getDashboardStatistics(String userId) {
         if (userId == null || userId.isBlank()) {
             logger.warn("Dashboard statistics request rejected because user id is missing");
-            return new DashboardResponseDTO(0.0, 0, 0, 0, 0, Collections.emptyList(), null);
+            return new DashboardResponseDTO(0.0, 0, 0, 0, 0, Collections.emptyList(), null, null);
         }
 
         DashboardResponseDTO scalars = statisticRepository.getUserScalarStatistics(userId);
@@ -38,7 +38,8 @@ public class StatisticService implements IStatisticService {
                 scalars.getOutBids(),
                 scalars.getWonTotal(),
                 activeRooms,
-                scalars.getUsername()
+                scalars.getUsername(),
+                scalars.getEmail()
         );
     }
 
