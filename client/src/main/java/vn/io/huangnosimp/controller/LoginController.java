@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import vn.io.huangnosimp.Manager.SceneManager;
 import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
@@ -74,8 +75,11 @@ public class LoginController {
                                         Platform.runLater(() -> {
                                             UserSession.setDashboardInfo(dto);
                                             UserSession.setUsername(dto.getUsername());
+                                            UserSession.setBalance(dto.getBalance());
                                             UserSession.addJoiningCard(dto.getAuctionCardInfo());
+
                                             changeMainStage("dashboard.fxml");
+                                            SceneManager.getStage().setMaximized(true);
                                         });
                                     });
                         }
@@ -93,7 +97,7 @@ public class LoginController {
             SocketManager.getClient().sendRequestAsync(request)
                     .thenAccept(response -> {
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
-                            Platform.runLater(()-> changeMainStage("AdminDashboarđ.fxml")); // Lưu ý chữ 'đ' cuối giống code cũ của bạn
+                            Platform.runLater(()-> changeMainStage("AdminDashboarđ.fxml"));
                         }
                         else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){
                             Platform.runLater(()-> showAlert("UNAUTHORIZED", response.getMessage()));

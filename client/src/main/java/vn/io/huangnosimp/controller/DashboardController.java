@@ -5,8 +5,10 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -32,12 +34,15 @@ import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.Instant;
 import java.util.*;
 
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 import static vn.io.huangnosimp.Manager.UserSession.getDashboardInfo;
+import static vn.io.huangnosimp.Manager.UserSession.getJoiningListCard;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 
@@ -52,6 +57,9 @@ public class DashboardController implements Initializable, IServerMessageListene
     @FXML private HBox toastBox;
     @FXML private Label toastTitle, toastSub, toastIconLabel;
     @FXML private Circle toastIconCircle;
+    @FXML private ScrollPane outBidScrollPane;
+    @FXML private VBox outbidAlertsList;
+    @FXML private Label outbidBadge;
 
     public static DashboardController instance;
 
@@ -214,15 +222,83 @@ public class DashboardController implements Initializable, IServerMessageListene
         pause.play();
     }
 
-    private void setupDashboard() {
-        lblBalance.setText(calculateBalance(getDashboardInfo().getBalance()));
-        ControllerManager.getDashboardHomeController().setupDashboardHome();
+    private void addOutbidCardToUI(){
+        outbidAlertsList.getChildren().clear();
+        for(AuctionCardDTO dto : getDashboardInfo().getAuctionCardInfo()){
+            if(dto.getYourBid() < dto.getCurrentPrice()){
+                try{
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/outbid_item.fxml"));
+                    Parent node = loader.load();
+                    OutbidItemController controller = loader.getController();
+                    controller.setUp(dto);
+                    outbidAlertsList.getChildren().add(node);
+                    node.setUserData(dto.getAuctionId());
+                }
+                catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    public void removeOutbidItem(String Id){
+        outbidAlertsList.getChildren().removeIf(node -> Id.equals(node.getUserData()));
+        updateOutbidBadge();
     }
 
-    private String calculateBalance(double value) {
-        if (value >= 1000000000) return formatNumber(value / 1000000000) + " B";
-        else if (value >= 1000000) return formatNumber(value / 1000000) + " M";
-        else return formatNumber(value / 1000) + " K";
+    public void addOrUpdateOutbidItem(String auctionId, String productName, double currentPrice) {
+        Platform.runLater(() -> {
+            removeOutbidItem(auctionId);
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/outbid_item.fxml"));
+                Parent node = loader.load();
+                OutbidItemController controller = loader.getController();
+                controller.setUpManual(auctionId, productName, currentPrice);
+                outbidAlertsList.getChildren().add(node);
+                node.setUserData(auctionId);
+                updateOutbidBadge();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private double parsePriceFromMessage(String msg, double defaultValue) {
+        if (msg == null) return defaultValue;
+        try {
+            String prefix = "Current price is ";
+            int idx = msg.indexOf(prefix);
+            if (idx != -1) {
+                int endIdx = msg.indexOf(" in room", idx + prefix.length());
+                if (endIdx != -1) {
+                    String priceStr = msg.substring(idx + prefix.length(), endIdx).trim();
+                    return Double.parseDouble(priceStr);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return defaultValue;
+    }
+
+    private void setupDashboard() {
+        lblBalance.setText(formatNumber(calculateBalance(getDashboardInfo().getBalance()))+" VND");
+        ControllerManager.getDashboardHomeController().setupDashboardHome();
+        addOutbidCardToUI();
+        updateOutbidBadge();
+    }
+
+    public void updateOutbidBadge() {
+        int count = outbidAlertsList.getChildren().size();
+        outbidBadge.setText(String.valueOf(count));
+        outbidBadge.setVisible(count > 0);
+        outbidBadge.setManaged(count > 0);
+    }
+
+    public void updateBalance(double amount){
+        lblBalance.setText(formatNumber(calculateBalance(amount))+" VND");
+    }
+    private double calculateBalance(double value) {
+        return Double.parseDouble(BigDecimal.valueOf(value).toPlainString());
     }
 
     @Override
@@ -232,9 +308,34 @@ public class DashboardController implements Initializable, IServerMessageListene
         NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
         NotificationType type = notificationDTO.getNotificationType();
         switch (type){
-            case AUCTION_ENDED -> {}
+            case OUTBID -> {
+                Platform.runLater(() -> {
+                    String auctionId = notificationDTO.getAuctionId();
+                    String msg = notificationDTO.getData() != null ? notificationDTO.getData().toString() : "";
+                    double currentPrice = parsePriceFromMessage(msg, 0.0);
+                    
+                    String productName = "Auction #" + auctionId;
+                    for (AuctionCardDTO dto : getJoiningListCard()) {
+                        if (auctionId.equals(dto.getAuctionId())) {
+                            productName = dto.getProductName();
+                            if (currentPrice <= 0.0) {
+                                currentPrice = dto.getCurrentPrice();
+                            }
+                            break;
+                        }
+                    }
+                    addOrUpdateOutbidItem(auctionId, productName, currentPrice);
+                });
+            }
+            case AUCTION_ENDED -> {
+                Platform.runLater(() -> {
+                    removeOutbidItem(notificationDTO.getAuctionId());
+                });
+            }
             case AUCTION_CANCELED -> {
-
+                Platform.runLater(() -> {
+                    removeOutbidItem(notificationDTO.getAuctionId());
+                });
             }
         }
     }

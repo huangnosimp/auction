@@ -49,7 +49,7 @@
             <VBox maxWidth="410.0" minWidth="240" prefHeight="413.0" prefWidth="410.0" spacing="0" styleClass="sec-card">
 
                 <Label styleClass="sec-title" text="● Profile" />
-                <VBox alignment="CENTER" spacing="6" styleClass="avatar-section">
+                <VBox alignment="CENTER" prefHeight="199.0" prefWidth="329.0" spacing="6" styleClass="avatar-section">
                     <padding><Insets bottom="10" /></padding>
                     <Label styleClass="avatar-circle" text="👤" />
                     <Label fx:id="usernameLabel" styleClass="uname" text="HoangChim88" />
@@ -66,10 +66,6 @@
                         <Label styleClass="ir-val" text="user@gmail.com" />
                     </HBox>
                     <HBox styleClass="info-row">
-                        <Label styleClass="ir-key" text="Phone" HBox.hgrow="ALWAYS" />
-                        <Label styleClass="ir-val" text="+84 9xx xxx xxx" />
-                    </HBox>
-                    <HBox styleClass="info-row">
                         <Label styleClass="ir-key" text="Member since" HBox.hgrow="ALWAYS" />
                         <Label styleClass="ir-val" text="Jan 2024" />
                     </HBox>
@@ -82,12 +78,12 @@
                 <Separator styleClass="sec-divider" />
 
                 <HBox spacing="8" styleClass="action-row">
-                    <Button fx:id="btnDeposit" maxWidth="Infinity" onAction="#handleDeposit" text="Deposit" HBox.hgrow="ALWAYS">
+                    <Button fx:id="btnDeposit" maxWidth="Infinity" onAction="#handleEnterDeposit" text="Deposit" HBox.hgrow="ALWAYS">
                   <styleClass>
                      <String fx:value="btn-dep" />
                      <String fx:value="btn-wit" />
                   </styleClass></Button>
-                    <Button fx:id="btnWithdraw" maxWidth="Infinity" onAction="#handleWithDraw" styleClass="btn-wit" text="Withdraw" HBox.hgrow="ALWAYS" />
+                    <Button fx:id="btnWithdraw" maxWidth="Infinity" onAction="#handleEnterWithDraw" styleClass="btn-wit" text="Withdraw" HBox.hgrow="ALWAYS" />
                 </HBox>
             </VBox>
 
@@ -155,7 +151,7 @@
                         <Button fx:id="mDepMomo" maxWidth="Infinity" styleClass="meth" text="Momo" HBox.hgrow="ALWAYS" />
                         <Button fx:id="mDepUsdt" maxWidth="Infinity" styleClass="meth" text="USDT" HBox.hgrow="ALWAYS" />
                     </HBox>
-                    <Label styleClass="fl" text="AMOUNT (USD)" />
+                    <Label styleClass="fl" text="AMOUNT (VND)" />
                     <TextField fx:id="depAmount" promptText="Enter amount..." styleClass="fund-input" />
                     <HBox spacing="6">
                         <Button styleClass="qa-btn" text="50" />
@@ -163,7 +159,7 @@
                         <Button styleClass="qa-btn" text="500" />
                         <Button styleClass="qa-btn" text="1,000" />
                     </HBox>
-                    <Button maxWidth="Infinity" styleClass="submit-dep" text="Confirm Deposit" />
+                    <Button fx:id="confirmDep" onAction="#handleDeposit" styleClass="submit-dep" text="Confirm Deposit" />
                 </VBox>
 
                 <!-- Pane: Withdraw -->
@@ -183,7 +179,7 @@
                         <Button styleClass="qa-btn" text="500" />
                     </HBox>
                     <Label styleClass="avail-note" text="Available: $1,550  ·  Min withdrawal: $10" />
-                    <Button maxWidth="Infinity" styleClass="submit-wit" text="Confirm Withdrawal" />
+                    <Button fx:id="confirmWit" maxWidth="Infinity" onAction="#handleWithDraw" styleClass="submit-wit" text="Confirm Withdrawal" />
                 </VBox>
 
             </VBox>

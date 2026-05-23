@@ -17,6 +17,7 @@ public class UserSession {
     private static List<AuctionCardDTO> searchListCard = new ArrayList<>();
     private static String auctionId;
     private static String username;
+    private static double balance;
 
     public static void clearAllSession(){
         dashboardInfo = null;
@@ -107,5 +108,18 @@ public class UserSession {
     }
     public static String getUsername(){
         return username;
+    }
+    //balance
+    public static void setBalance(double amount){
+        balance = amount;
+    }
+    public static void addBalance(double newBalance){
+        balance += newBalance;
+    }
+    public static void minusBalance(double amount){
+        balance -= amount;
+    }
+    public static double getBalance(){
+        return balance;
     }
 }
