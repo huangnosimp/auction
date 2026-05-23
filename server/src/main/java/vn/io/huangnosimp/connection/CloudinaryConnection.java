@@ -1,6 +1,10 @@
 package vn.io.huangnosimp.connection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CloudinaryConnection {
+    private static final Logger logger = LoggerFactory.getLogger(CloudinaryConnection.class);
     private final String cloudName;
     private final String apiKey;
     private final String apiSecret;
@@ -10,6 +14,13 @@ public class CloudinaryConnection {
         this.cloudName = System.getenv("CLOUDINARY_CLOUD_NAME");
         this.apiKey = System.getenv("CLOUDINARY_API_KEY");
         this.apiSecret = System.getenv("CLOUDINARY_API_SECRET");
+        if (isConfigured()) {
+            logger.info("Cloudinary connection configured cloudName={}", cloudName);
+        } else {
+            logger.warn(
+                    "Cloudinary environment variables are not fully configured cloudNamePresent={} apiKeyPresent={} apiSecretPresent={}",
+                    isPresent(cloudName), isPresent(apiKey), isPresent(apiSecret));
+        }
     }
 
     public static CloudinaryConnection getInstance() {

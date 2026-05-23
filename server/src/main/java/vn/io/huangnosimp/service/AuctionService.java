@@ -1,5 +1,8 @@
 package vn.io.huangnosimp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 import vn.io.huangnosimp.dto.response.AuctionActionResult;
@@ -21,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AuctionService implements IAuctionService {
+    private static final Logger logger = LoggerFactory.getLogger(AuctionService.class);
     private final IAuctionRepository auctionRepository;
     private final IUserService userService;
     private final IItemService itemService;
@@ -50,20 +54,26 @@ public class AuctionService implements IAuctionService {
 
     public void setScheduler(AuctionScheduler scheduler) {
         this.scheduler = scheduler;
+        logger.info("Auction scheduler attached");
     }
 
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
+        logger.info("Notification service attached to auction service");
     }
 
     public void setAutoBidService(IAutoBidService autoBidService) {
         this.autoBidService = autoBidService;
+        logger.info("Auto bid service attached to auction service");
     }
 
     @Override
     public void shutdown() {
         if (scheduler != null) {
             scheduler.shutdown();
+            logger.info("Auction service shutdown completed");
+        } else {
+            logger.info("Auction service shutdown completed without scheduler");
         }
     }
 
@@ -74,16 +84,26 @@ public class AuctionService implements IAuctionService {
                                             double buyNowPrice, List<String> imageUrl) {
         if (!isValidOpenAuctionInput(sellerId, itemName, description, itemType, attributes, startPrice)
                 || endTime <= startTime || startTime < System.currentTimeMillis()) {
+            logger.warn(
+                    "Auction creation rejected sellerId={} itemType={} startPrice={} startTime={} endTime={}",
+                    sellerId, itemType, startPrice, startTime, endTime);
             return null;
         }
         Member seller = userService.getMember(sellerId);
         if (seller == null) {
+            logger.warn("Auction creation rejected because seller was not found sellerId={}", sellerId);
             return null;
         }
         Item item = itemService.createItem(sellerId, itemName, description, itemType, attributes, condition, imageUrl);
         Auction auction = new Auction(item, seller, startPrice, startTime, endTime, minimumIncrement, buyNowPrice);
         auctionRepository.save(auction);
-        scheduler.scheduleAuction(auction);
+        if (scheduler != null) {
+            scheduler.scheduleAuction(auction);
+        } else {
+            logger.warn("Auction created without scheduler auctionId={}", auction.getId());
+        }
+        logger.info("Auction created auctionId={} sellerId={} itemId={} startPrice={}",
+                auction.getId(), sellerId, item.getId(), startPrice);
         return new AuctionCardDTO(auction.getId(), item.getName(), auction.getStartPrice(), 0, auction.getStartTime(), auction.getEndTime(), 0, 0, imageUrl);
     }
 
@@ -100,6 +120,10 @@ public class AuctionService implements IAuctionService {
             if (auction != null && auction.getStatus() == AuctionStatus.OPEN) {
                 auction.setStatusRunning();
                 auctionRepository.save(auction);
+                logger.info("Auction started auctionId={}", auctionId);
+            } else {
+                logger.warn("Auction start skipped auctionId={} found={} status={}",
+                        auctionId, auction != null, auction != null ? auction.getStatus() : null);
             }
         }
     }
@@ -111,6 +135,10 @@ public class AuctionService implements IAuctionService {
             if (auction != null && auction.getStatus() == AuctionStatus.RUNNING) {
                 auction.setStatusFinish();
                 auctionRepository.save(auction);
+                logger.info("Auction marked finished auctionId={}", auctionId);
+            } else {
+                logger.warn("Auction finish skipped auctionId={} found={} status={}",
+                        auctionId, auction != null, auction != null ? auction.getStatus() : null);
             }
         }
         processPayment(auctionId);
@@ -123,22 +151,29 @@ public class AuctionService implements IAuctionService {
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction == null) {
+                logger.warn("Bid rejected because auction was not found auctionId={} bidderId={}", auctionId, bidderId);
                 return BidResult.AUCTION_NOT_FOUND;
             }
             if (auction.getStatus() != AuctionStatus.RUNNING) {
+                logger.info("Bid rejected because auction is not running auctionId={} bidderId={} status={}",
+                        auctionId, bidderId, auction.getStatus());
                 return BidResult.AUCTION_ENDED;
             }
             if (!auctionParticipantsRepository.isParticipant(auctionId, bidderId)) {
+                logger.info("Bid rejected because bidder is not in room auctionId={} bidderId={}", auctionId, bidderId);
                 return BidResult.NOT_IN_ROOM;
             }
             Member bidder = userService.getMember(bidderId);
             if (bidder == null || bidder.getId().equals(auction.getSeller().getId())) {
+                logger.warn("Bid rejected because bidder is invalid auctionId={} bidderId={}", auctionId, bidderId);
                 return BidResult.ERROR;
             }
             
             boolean isFirstBid = auction.getCurrentWinnerId() == null;
             double requiredMinBid = isFirstBid ? auction.getCurrentPrice() : (auction.getCurrentPrice() + auction.getMinimumIncrement());
             if (amount < requiredMinBid) {
+                logger.info("Bid rejected because amount is too low auctionId={} bidderId={} amount={} requiredMinBid={}",
+                        auctionId, bidderId, amount, requiredMinBid);
                 return BidResult.BID_TOO_LOW;
             }
 
@@ -148,11 +183,15 @@ public class AuctionService implements IAuctionService {
             if (previousWinnerId != null && previousWinnerId.equals(bidderId)) {
                 double delta = amount - previousPrice;
                 if (!bidder.freezeMoney(delta)) {
+                    logger.info("Bid rejected due to insufficient funds for delta auctionId={} bidderId={} delta={}",
+                            auctionId, bidderId, delta);
                     return BidResult.INSUFFICIENT_FUNDS;
                 }
                 auction.setCurrentPrice(amount);
             } else {
                 if (!bidder.freezeMoney(amount)) {
+                    logger.info("Bid rejected due to insufficient funds auctionId={} bidderId={} amount={}",
+                            auctionId, bidderId, amount);
                     return BidResult.INSUFFICIENT_FUNDS;
                 }
                 if (previousWinnerId != null) {
@@ -161,12 +200,16 @@ public class AuctionService implements IAuctionService {
                         bidder.unfreezeMoney(amount);
                         userService.updateBalance(bidder.getId(), bidder.getAccountBalance());
                         userService.updateFrozenBalance(bidder.getId(), bidder.getFrozenBalance());
+                        logger.error("Bid failed because previous winner was not found auctionId={} previousWinnerId={}",
+                                auctionId, previousWinnerId);
                         return BidResult.ERROR;
                     }
                     if (!previousWinner.unfreezeMoney(previousPrice)) {
                         bidder.unfreezeMoney(amount);
                         userService.updateBalance(bidder.getId(), bidder.getAccountBalance());
                         userService.updateFrozenBalance(bidder.getId(), bidder.getFrozenBalance());
+                        logger.error("Bid failed because previous winner funds could not be unfrozen auctionId={} previousWinnerId={}",
+                                auctionId, previousWinnerId);
                         return BidResult.ERROR;
                     }
                     userService.updateBalance(previousWinner.getId(), previousWinner.getAccountBalance());
@@ -194,10 +237,13 @@ public class AuctionService implements IAuctionService {
                 long newEndTime = System.currentTimeMillis() + 60 * 1000;
                 scheduler.extendTime(auction, newEndTime);
             }
+            logger.info("Bid placed auctionId={} bidderId={} amount={} previousWinnerId={}",
+                    auctionId, bidderId, amount, previousWinnerId);
             bidSuccess = BidResult.SUCCESS;
         }
 
         if (bidSuccess == BidResult.SUCCESS && triggerAutoBid && autoBidService != null) {
+            logger.debug("Triggering auto bids auctionId={}", auctionId);
             autoBidService.processAutoBids(auctionId);
         }
 
@@ -210,6 +256,7 @@ public class AuctionService implements IAuctionService {
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction == null) {
+                logger.warn("Auction cancel rejected because auction was not found auctionId={}", auctionId);
                 return AuctionActionResult.AUCTION_NOT_FOUND;
             }
             if (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
@@ -232,8 +279,10 @@ public class AuctionService implements IAuctionService {
                 if (scheduler != null) {
                     scheduler.cancelTimers(auctionId);
                 }
+                logger.info("Auction canceled auctionId={}", auctionId);
                 success = AuctionActionResult.SUCCESS;
             } else {
+                logger.info("Auction cancel rejected due to invalid state auctionId={} status={}", auctionId, auction.getStatus());
                 success = AuctionActionResult.INVALID_STATE;
             }
         }
@@ -280,13 +329,27 @@ public class AuctionService implements IAuctionService {
                                     notificationService.notifyAuctionEnded(auctionId, winner.getUsername(),
                                             auction.getCurrentPrice());
                                 }
+                                logger.info("Auction payment processed auctionId={} winnerId={} sellerId={} amount={}",
+                                        auctionId, winner.getId(), seller.getId(), auction.getCurrentPrice());
                             } else {
                                 winner.unfreezeMoney(auction.getCurrentPrice());
                                 seller.withdraw(auction.getCurrentPrice());
+                                logger.error("Auction payment failed because ownership transfer failed auctionId={}", auctionId);
                             }
+                        } else {
+                            logger.error("Auction payment failed because frozen money could not be deducted auctionId={} winnerId={}",
+                                    auctionId, winner.getId());
                         }
+                    } else {
+                        logger.error("Auction payment skipped because winner or seller was missing auctionId={} winnerFound={} sellerFound={}",
+                                auctionId, winner != null, seller != null);
                     }
+                } else {
+                    logger.info("Auction payment skipped because auction has no winner auctionId={}", auctionId);
                 }
+            } else {
+                logger.warn("Auction payment skipped auctionId={} found={} status={}",
+                        auctionId, auction != null, auction != null ? auction.getStatus() : null);
             }
         }
         if (success) {
@@ -300,16 +363,21 @@ public class AuctionService implements IAuctionService {
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction == null) {
+                logger.warn("Buy now rejected because auction was not found auctionId={} userId={}", auctionId, userId);
                 return BidResult.AUCTION_NOT_FOUND;
             }
             if (auction.getStatus() != AuctionStatus.RUNNING && auction.getStatus() != AuctionStatus.OPEN) {
+                logger.info("Buy now rejected because auction state is invalid auctionId={} userId={} status={}",
+                        auctionId, userId, auction.getStatus());
                 return BidResult.AUCTION_ENDED;
             }
             if (auction.getBuyNowPrice() <= 0) {
+                logger.warn("Buy now rejected because price is not configured auctionId={} userId={}", auctionId, userId);
                 return BidResult.ERROR;
             }
             Member buyer = userService.getMember(userId);
             if (buyer == null || buyer.getId().equals(auction.getSeller().getId())) {
+                logger.warn("Buy now rejected because buyer is invalid auctionId={} userId={}", auctionId, userId);
                 return BidResult.ERROR;
             }
             
@@ -320,10 +388,14 @@ public class AuctionService implements IAuctionService {
             if (previousWinnerId != null && previousWinnerId.equals(userId)) {
                 double delta = buyNowPrice - previousPrice;
                 if (delta > 0 && !buyer.freezeMoney(delta)) {
+                    logger.info("Buy now rejected due to insufficient funds for delta auctionId={} userId={} delta={}",
+                            auctionId, userId, delta);
                     return BidResult.INSUFFICIENT_FUNDS;
                 }
             } else {
                 if (!buyer.freezeMoney(buyNowPrice)) {
+                    logger.info("Buy now rejected due to insufficient funds auctionId={} userId={} amount={}",
+                            auctionId, userId, buyNowPrice);
                     return BidResult.INSUFFICIENT_FUNDS;
                 }
             }
@@ -335,6 +407,7 @@ public class AuctionService implements IAuctionService {
                 } else {
                     buyer.unfreezeMoney(buyNowPrice);
                 }
+                logger.error("Buy now failed because ownership transfer failed auctionId={} userId={}", auctionId, userId);
                 return BidResult.ERROR;
             }
 
@@ -372,6 +445,7 @@ public class AuctionService implements IAuctionService {
             if (scheduler != null) {
                 scheduler.cancelTimers(auctionId);
             }
+            logger.info("Buy now completed auctionId={} userId={} amount={}", auctionId, userId, buyNowPrice);
         }
         auctionLocks.remove(auctionId);
         return BidResult.SUCCESS;
@@ -383,17 +457,22 @@ public class AuctionService implements IAuctionService {
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction == null) {
+                logger.warn("Join auction rejected because auction was not found auctionId={} userId={}", auctionId, userId);
                 return AuctionActionResult.AUCTION_NOT_FOUND;
             }
             if (auction.getStatus() != AuctionStatus.OPEN && auction.getStatus() != AuctionStatus.RUNNING) {
+                logger.info("Join auction rejected due to invalid state auctionId={} userId={} status={}",
+                        auctionId, userId, auction.getStatus());
                 return AuctionActionResult.INVALID_STATE;
             }
             Member bidder = userService.getMember(userId);
             if (bidder == null) {
+                logger.warn("Join auction rejected because user was not a member auctionId={} userId={}", auctionId, userId);
                 return AuctionActionResult.ERROR;
             }
             auctionParticipantsRepository.addParticipant(auctionId, userId);
             ClientSessionManager.getInstance().joinRoom(auctionId, client);
+            logger.info("User joined auction room auctionId={} userId={}", auctionId, userId);
             return AuctionActionResult.SUCCESS;
         }
     }
@@ -404,14 +483,17 @@ public class AuctionService implements IAuctionService {
         synchronized (lock) {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction == null) {
+                logger.warn("Leave auction rejected because auction was not found auctionId={} userId={}", auctionId, userId);
                 return AuctionActionResult.AUCTION_NOT_FOUND;
             }
             Member bidder = userService.getMember(userId);
             if (bidder == null) {
+                logger.warn("Leave auction rejected because user was not a member auctionId={} userId={}", auctionId, userId);
                 return AuctionActionResult.ERROR;
             }
             auctionParticipantsRepository.removeParticipant(auctionId, userId);
             ClientSessionManager.getInstance().leaveRoom(auctionId, client);
+            logger.info("User left auction room auctionId={} userId={}", auctionId, userId);
             return AuctionActionResult.SUCCESS;
         }
     }

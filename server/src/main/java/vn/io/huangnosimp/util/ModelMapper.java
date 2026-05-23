@@ -51,13 +51,16 @@ public class ModelMapper {
     public static AuctionAdminDTO toAuctionAdminDTO(Auction auction) {
         if (auction == null) return null;
 
-        LocalDateTime start = LocalDateTime.ofInstant(Instant.ofEpochMilli(auction.getStartTime()), ZoneId.systemDefault());
-        LocalDateTime end = LocalDateTime.ofInstant(Instant.ofEpochMilli(auction.getEndTime()), ZoneId.systemDefault());
+        DateTimeFormatter TimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        LocalDateTime startLocal = LocalDateTime.ofInstant(Instant.ofEpochMilli(auction.getStartTime()), ZoneId.systemDefault());
+        LocalDateTime endLocal = LocalDateTime.ofInstant(Instant.ofEpochMilli(auction.getEndTime()), ZoneId.systemDefault());
+
+        String startTimeStr = (startLocal != null) ? startLocal.format(TimeFormatter) : "N/A";
+        String endTimeStr = (endLocal != null) ? endLocal.format(TimeFormatter) : "N/A";
 
         String sellerName = (auction.getSeller() != null) ? auction.getSeller().getUsername() : "N/A";
 
         String statusStr = (auction.getStatus() != null) ? auction.getStatus().name() : "UNKNOWN";
-
 
         String winnerName = "None";
         String winnerId = auction.getCurrentWinnerId();
@@ -77,8 +80,8 @@ public class ModelMapper {
                 sellerName,
                 auction.getStartPrice(),
                 auction.getCurrentPrice(),
-                start,
-                end,
+                startTimeStr,
+                endTimeStr,
                 statusStr,
                 winnerName
         );

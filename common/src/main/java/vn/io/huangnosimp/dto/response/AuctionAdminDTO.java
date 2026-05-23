@@ -1,6 +1,5 @@
 package vn.io.huangnosimp.dto.response;
 
-import java.time.LocalDateTime;
 
 public class AuctionAdminDTO {
     private String id;
@@ -8,13 +7,13 @@ public class AuctionAdminDTO {
     private String sellerName;
     private double startingPrice;
     private double currentPrice;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private String startTime;
+    private String endTime;
     private String status;
     private String winnerName;
 
     public AuctionAdminDTO(String id, String itemName, String sellerName, double startingPrice,
-                           double currentPrice, LocalDateTime startTime, LocalDateTime endTime,
+                           double currentPrice, String startTime, String endTime,
                            String status, String winnerName) {
         this.id = id;
         this.itemName = itemName;
@@ -47,11 +46,11 @@ public class AuctionAdminDTO {
         return currentPrice;
     }
 
-    public LocalDateTime getStartTime() {
+    public String getStartTime() {
         return startTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public String getEndTime() {
         return endTime;
     }
 

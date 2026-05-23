@@ -19,6 +19,12 @@ public class DatabaseConnection {
         String DB_URL = System.getenv("DB_URL");
         String DB_USERNAME = System.getenv("DB_USERNAME");
         String DB_PASSWORD = System.getenv("DB_PASSWORD");
+        if (isBlank(DB_URL) || isBlank(DB_USERNAME) || isBlank(DB_PASSWORD)) {
+            logger.error(
+                    "Database environment variables are not fully configured dbUrlPresent={} dbUsernamePresent={} dbPasswordPresent={}",
+                    !isBlank(DB_URL), !isBlank(DB_USERNAME), !isBlank(DB_PASSWORD));
+        }
+
         HikariConfig config = new HikariConfig();
 
         config.setJdbcUrl(DB_URL);
@@ -34,7 +40,9 @@ public class DatabaseConnection {
         config.setConnectionTimeout(CONNECTION_TIMEOUT_MS);
 
         this.dataSource = new HikariDataSource(config);
-        logger.info("HikariCP connection pool initialized");
+        logger.info(
+                "HikariCP connection pool initialized maxPoolSize={} minIdle={} connectionTimeoutMs={}",
+                MAX_THREAD_POOL_SIZE, MIN_IDLE_CONNECTIONS, CONNECTION_TIMEOUT_MS);
     }
     public static DatabaseConnection getInstance() {
         if (instance == null) {
@@ -47,12 +55,19 @@ public class DatabaseConnection {
         return instance;
     }
     public Connection getConnection() throws SQLException {
+        logger.debug("Acquiring database connection from pool");
         return dataSource.getConnection();
     }
     public void closePool() {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
             logger.info("HikariCP connection pool closed");
+        } else {
+            logger.debug("HikariCP connection pool close skipped");
         }
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }
