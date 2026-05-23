@@ -63,46 +63,61 @@ public class AutoBidService implements IAutoBidService {
         AutoBidConfig config = new AutoBidConfig(bidder, auction, maxBid, increment, LocalDateTime.now());
         autoBidRepository.save(config);
 
+        processAutoBids(auctionId);
+
         logger.info("Registered autobid bidderId={} auctionId={}", bidderId, auctionId);
         return true;
     }
 
-    @Override
     public void processAutoBids(String auctionId) {
         List<AutoBidConfig> configs = autoBidRepository.findByAuctionId(auctionId);
         if (configs == null || configs.isEmpty()) {
-            logger.debug("No autobid configs found auctionId={}", auctionId);
             return;
         }
-
-        configs.sort(Comparator.comparing(AutoBidConfig::getRegisteredAt));
 
         Auction auction = auctionRepository.findById(auctionId);
         if (auction == null) {
-            logger.warn("Autobid processing skipped because auction was not found auctionId={}", auctionId);
             return;
         }
+
+        configs.sort(Comparator.comparing(AutoBidConfig::getMaxBid).reversed()
+                .thenComparing(AutoBidConfig::getRegisteredAt));
 
         double currentPrice = auction.getCurrentPrice();
         String currentWinnerId = auction.getCurrentWinnerId();
 
-        for (AutoBidConfig config : configs) {
-            if (config.getBidder().getId().equals(currentWinnerId)) continue;
+        if (configs.size() == 1) {
+            AutoBidConfig loneBot = configs.get(0);
 
-            double nextBid = currentPrice + config.getIncrement();
+            if (!loneBot.getBidder().getId().equals(currentWinnerId)) {
+                double nextBid = currentPrice + loneBot.getIncrement();
 
-            if (nextBid <= config.getMaxBid()) {
-                BidResult result = auctionService.placeBid(config.getBidder().getId(), auctionId, nextBid, false);
-
-                if (result == BidResult.SUCCESS) {
-                    logger.info("Autobid placed successfully bidderId={} auctionId={}", config.getBidder().getId(), auctionId);
-                    break;
-                } else {
-                    logger.info(
-                            "Autobid placement skipped bidderId={} auctionId={} result={}",
-                            config.getBidder().getId(), auctionId, result
-                    );
+                if (nextBid <= loneBot.getMaxBid()) {
+                    auctionService.placeBid(loneBot.getBidder().getId(), auctionId, nextBid, true);
                 }
+            }
+            return;
+        }
+
+        AutoBidConfig top1 = configs.get(0);
+        AutoBidConfig top2 = configs.get(1);
+
+        if (top1.getBidder().getId().equals(currentWinnerId) && currentPrice >= top2.getMaxBid()) {
+            return;
+        }
+
+        double basePriceToBeat = Math.max(currentPrice, top2.getMaxBid());
+        double jumpPrice = basePriceToBeat + top1.getIncrement();
+
+        if (jumpPrice > top1.getMaxBid()) {
+            jumpPrice = top1.getMaxBid();
+        }
+
+        if (jumpPrice > currentPrice && jumpPrice <= top1.getMaxBid()) {
+            BidResult result = auctionService.placeBid(top1.getBidder().getId(), auctionId, jumpPrice, true);
+
+            if (result == BidResult.SUCCESS) {
+                logger.info("Bot war resolved seamlessly. Top1 won at FinalPrice={}", jumpPrice);
             }
         }
     }
