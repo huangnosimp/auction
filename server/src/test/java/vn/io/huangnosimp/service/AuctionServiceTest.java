@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import vn.io.huangnosimp.dto.response.AuctionActionResult;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.BidResult;
+import vn.io.huangnosimp.dto.response.TransactionResult;
 import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 import vn.io.huangnosimp.enums.AuctionStatus;
 import vn.io.huangnosimp.enums.ItemCondition;
@@ -26,6 +27,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -84,6 +87,7 @@ class AuctionServiceTest {
                 eq(ItemCondition.NEW),
                 eq(List.of("https://example.com/item.png"))
         )).thenReturn(item);
+        when(auctionRepository.save(any(Auction.class))).thenReturn(true);
         auctionService.setScheduler(scheduler);
 
         AuctionCardDTO card = auctionService.createAuction(
@@ -141,6 +145,10 @@ class AuctionServiceTest {
         when(auctionRepository.findById("auction-1")).thenReturn(auction);
         when(auctionParticipantsRepository.isParticipant("auction-1", "bidder-1")).thenReturn(true);
         when(userService.getMember("bidder-1")).thenReturn(bidder);
+        when(userService.updateBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(userService.updateFrozenBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(auctionRepository.save(any(Auction.class))).thenReturn(true);
+        when(bidTransactionRepository.saveBidTransaction(any())).thenReturn(true);
 
         BidResult result = auctionService.placeBid("bidder-1", "auction-1", 150.0, false);
 
@@ -166,6 +174,10 @@ class AuctionServiceTest {
         when(auctionParticipantsRepository.isParticipant("auction-1", "bidder-1")).thenReturn(true);
         when(userService.getMember("bidder-1")).thenReturn(bidder);
         when(userService.getMember("winner-1")).thenReturn(previousWinner);
+        when(userService.updateBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(userService.updateFrozenBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(auctionRepository.save(any(Auction.class))).thenReturn(true);
+        when(bidTransactionRepository.saveBidTransaction(any())).thenReturn(true);
         auctionService.setAutoBidService(autoBidService);
 
         BidResult result = auctionService.placeBid("bidder-1", "auction-1", 200.0, true);
@@ -187,6 +199,10 @@ class AuctionServiceTest {
         when(auctionRepository.findById("auction-1")).thenReturn(auction);
         when(userService.getMember("buyer-1")).thenReturn(buyer);
         when(itemService.transferOwnership(auction.getItem(), "buyer-1")).thenReturn(true);
+        when(userService.updateBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(userService.updateFrozenBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(auctionRepository.save(any(Auction.class))).thenReturn(true);
+        when(transactionRepository.saveTransaction(any())).thenReturn(true);
         auctionService.setScheduler(scheduler);
 
         BidResult result = auctionService.buyNow("buyer-1", "auction-1");
@@ -202,6 +218,23 @@ class AuctionServiceTest {
     }
 
     @Test
+    void buyNowRejectsPriceBelowCurrentBid() {
+        Member seller = member("seller-1", "seller", 0.0, 0.0);
+        Member buyer = member("buyer-1", "buyer", 1_000.0, 0.0);
+        Auction auction = runningAuction("auction-1", art("seller-1"), seller);
+        auction.setCurrentWinnerId("winner-1");
+        auction.setCurrentPrice(600.0);
+        when(auctionRepository.findById("auction-1")).thenReturn(auction);
+        when(userService.getMember("buyer-1")).thenReturn(buyer);
+
+        BidResult result = auctionService.buyNow("buyer-1", "auction-1");
+
+        assertEquals(BidResult.BID_TOO_LOW, result);
+        verify(itemService, never()).transferOwnership(any(), anyString());
+        verify(auctionRepository, never()).save(any());
+    }
+
+    @Test
     void cancelAuctionUnfreezesCurrentWinnerAndCancelsTimers() {
         Member winner = member("winner-1", "winner", 50.0, 150.0);
         Auction auction = runningAuction("auction-1", art("seller-1"), member("seller-1", "seller", 0.0, 0.0));
@@ -209,9 +242,12 @@ class AuctionServiceTest {
         auction.setCurrentPrice(150.0);
         when(auctionRepository.findById("auction-1")).thenReturn(auction);
         when(userService.getMember("winner-1")).thenReturn(winner);
+        when(userService.updateBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(userService.updateFrozenBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(auctionRepository.save(any(Auction.class))).thenReturn(true);
         auctionService.setScheduler(scheduler);
 
-        AuctionActionResult result = auctionService.cancelAuction("auction-1");
+        AuctionActionResult result = auctionService.cancelAuction("seller-1", "auction-1");
 
         assertEquals(AuctionActionResult.SUCCESS, result);
         assertEquals(200.0, winner.getAccountBalance());
@@ -219,6 +255,17 @@ class AuctionServiceTest {
         assertEquals(AuctionStatus.CANCELED, auction.getStatus());
         verify(scheduler).cancelTimers("auction-1");
         verify(auctionRepository).save(auction);
+    }
+
+    @Test
+    void cancelAuctionRejectsNonSeller() {
+        Auction auction = runningAuction("auction-1", art("seller-1"), member("seller-1", "seller", 0.0, 0.0));
+        when(auctionRepository.findById("auction-1")).thenReturn(auction);
+
+        AuctionActionResult result = auctionService.cancelAuction("bidder-1", "auction-1");
+
+        assertEquals(AuctionActionResult.UNAUTHORIZED, result);
+        verify(auctionRepository, never()).save(any());
     }
 
     @Test

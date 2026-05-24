@@ -16,7 +16,7 @@ public class BidTransactionRepository implements IBidTransactionRepository {
     }
 
     @Override
-    public void saveBidTransaction(BidTransaction bidTransaction) {
+    public boolean saveBidTransaction(BidTransaction bidTransaction) {
         String sql = "INSERT INTO bidtransactions (id, bidder_id, auction_id, bid_amount, bid_time) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -25,12 +25,13 @@ public class BidTransactionRepository implements IBidTransactionRepository {
             stmt.setString(3, bidTransaction.getAuctionId());
             stmt.setDouble(4, bidTransaction.getAmount());
             stmt.setTimestamp(5, new Timestamp(bidTransaction.getCreatedAt()));
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             logger.error(
                     "DB error when saving bid transaction bidTransactionId={} auctionId={} bidderId={}",
                     bidTransaction.getId(), bidTransaction.getAuctionId(), bidTransaction.getBidderId(), e
             );
+            return false;
         }
     }
 }

@@ -101,15 +101,16 @@ public class ItemRepository implements IItemRepository {
     }
 
     @Override
-    public void updateOwner(String itemId, String ownerId) {
+    public boolean updateOwner(String itemId, String ownerId) {
         String sql = "UPDATE Items SET owner_id = ? WHERE id = ?";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, ownerId);
             stmt.setString(2, itemId);
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             logger.error("DB error when updating item owner itemId={} ownerId={}", itemId, ownerId, e);
+            return false;
         }
     }
 

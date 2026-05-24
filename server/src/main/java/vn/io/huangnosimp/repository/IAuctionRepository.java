@@ -5,7 +5,7 @@ import vn.io.huangnosimp.model.Auction;
 import java.util.List;
 
 public interface IAuctionRepository {
-    void save(Auction auction);
+    boolean save(Auction auction);
     Auction findById(String auctionId);
     boolean delete(String auctionId);
     List<Auction> findAll();

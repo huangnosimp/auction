@@ -44,8 +44,12 @@ public class ItemService implements IItemService {
                     item != null, newOwnerId != null);
             return false;
         }
+        if (!itemRepository.updateOwner(item.getId(), newOwnerId)) {
+            logger.error("Item ownership transfer failed while updating repository itemId={} newOwnerId={}",
+                    item.getId(), newOwnerId);
+            return false;
+        }
         item.setOwnerId(newOwnerId);
-        itemRepository.updateOwner(item.getId(), newOwnerId);
         logger.info("Item ownership transferred itemId={} newOwnerId={}", item.getId(), newOwnerId);
         return true;
     }

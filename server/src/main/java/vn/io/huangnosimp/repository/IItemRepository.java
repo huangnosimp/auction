@@ -7,6 +7,6 @@ import java.util.List;
 public interface IItemRepository {
     void save(Item item);
     Item findById(String itemId);
-    void updateOwner(String itemId, String ownerId);
+    boolean updateOwner(String itemId, String ownerId);
     boolean delete(String itemId);
 }

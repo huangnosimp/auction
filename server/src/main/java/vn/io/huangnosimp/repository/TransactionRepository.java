@@ -19,7 +19,7 @@ public class TransactionRepository implements ITransactionRepository {
     }
 
     @Override
-    public void saveTransaction(Transaction transaction) {
+    public boolean saveTransaction(Transaction transaction) {
         String sql = "INSERT INTO Transactions (id, user_id, amount, transaction_time, transaction_type) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -30,12 +30,13 @@ public class TransactionRepository implements ITransactionRepository {
             stmt.setTimestamp(4, new Timestamp(transaction.getCreatedAt()));
             stmt.setString(5, transaction.getTransactionType().name());
 
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             logger.error(
                     "DB error when saving transaction transactionId={} userId={} type={}",
                     transaction.getId(), transaction.getUserId(), transaction.getTransactionType(), e
             );
+            return false;
         }
     }
 }

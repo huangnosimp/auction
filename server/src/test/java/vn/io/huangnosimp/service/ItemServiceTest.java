@@ -69,6 +69,7 @@ class ItemServiceTest {
     @Test
     void transferOwnershipUpdatesItemAndRepository() {
         Item item = art("owner-1");
+        when(itemRepository.updateOwner(item.getId(), "owner-2")).thenReturn(true);
 
         boolean result = itemService.transferOwnership(item, "owner-2");
 
