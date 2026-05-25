@@ -1,11 +1,13 @@
 package vn.io.huangnosimp.controller;
 
+import client.info.User;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -101,6 +103,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     private Runnable currentAction;
     private String auctionId;
     private boolean isBuyNowDp;
+    private volatile double pendingBidAmount = 0;
 
     public void setUpPreviewImg(List<String> Img) {
         if (Img == null || Img.isEmpty()) return;
@@ -182,12 +185,22 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         if(DTO.getLeadBidder().equals(UserSession.getUsername()) && DTO.getLeadBidder() != null){//chặn người đứng đầu đặt bid
             btnPlaceBid.setDisable(true);
             statusLabel.setText("WINNING");
+            UserSession.setLatestBid(auctionId, DTO.getCurrentPrice());
         }
         else if (leadBidderLabel.getText().equals("No bids yet")) {
             statusLabel.setText("_____");
+            UserSession.setLatestBid(auctionId, 0.0);
         }
         else{
             statusLabel.setText("OUTBID");
+            UserSession.setLatestBid(auctionId, 0.0);
+        }
+        if (UserSession.hasAutoBid(auctionId)) {
+            updateAutoBidStatus(true);
+            AutoBidResponseDTO ab = UserSession.getAutoBid(auctionId);
+            if (ab != null) {
+                maxBidInput.setText(String.format("%.0f", ab.getMaxBid()));
+            }
         }
     }
     public void handleIncreaseButton(){
@@ -371,6 +384,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML
     public void handlePlaceBid(){
         double amount = parseNumber(myBidLabel.getText());
+        pendingBidAmount = amount;
         PlaceBidRequestDTO placeBidRequest = new PlaceBidRequestDTO(auctionId, amount);
         Request request = new Request(ActionType.PLACE_BID, placeBidRequest);
         SocketManager.getClient().sendRequest(request);
@@ -402,6 +416,8 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                     .thenAccept(response -> {
                         if(ResponseStatus.SUCCESS.equals(response.getStatus())){
                             updateAutoBidStatus(false);
+                            ControllerManager.getDashboardController().removeAutoBidItem(auctionId);
+                            UserSession.removeAutoBid(auctionId);
                         }
                         else{
                             ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
@@ -471,6 +487,20 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                     if(ResponseStatus.SUCCESS.equals(response.getStatus())){
                         AutoBid.setText("Cancel Auto Bid");
                         updateAutoBidStatus(true);
+
+                        double maxBid = 0;
+                        try {
+                            maxBid = Double.parseDouble(maxBidInput.getText());
+                        } catch (NumberFormatException e) {
+                            maxBid = 0;
+                        }
+
+                        AutoBidResponseDTO autoBidDTO = new AutoBidResponseDTO(
+                            "", maxBid, minCount, auctionId, java.time.LocalDateTime.now().toString()
+                        );
+                        UserSession.addAutoBid(autoBidDTO);
+
+                        ControllerManager.getDashboardController().addAutoBidItem(auctionId);
                         ControllerManager.getDashboardController().showToast("Active Auto Bid", response.getMessage(), true);
                     }
                     if(ResponseStatus.ERROR.equals(response.getStatus())){
@@ -497,9 +527,32 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         if (ControllerManager.getDashboardController() != null) {
                             ControllerManager.getDashboardController().removeOutbidItem(notificationDTO.getAuctionId());
                         }
+
+                        // Trừ chênh lệch (newBid - oldBid) khỏi balance hiển thị khi đặt bid của chính mình thành công
+                        double newBid = dto.getAmount();
+                        double oldBid = UserSession.getLatestBid(notificationDTO.getAuctionId());
+                        double diff = newBid - oldBid;
+                        if (diff > 0) {
+                            UserSession.minusBalance(diff);
+                            if (ControllerManager.getDashboardController() != null) {
+                                ControllerManager.getDashboardController().updateBalance(UserSession.getBalance(), diff, false);
+                            }
+                        }
+                        UserSession.setLatestBid(notificationDTO.getAuctionId(), newBid);
                     } else {
                         btnPlaceBid.setDisable(false);
                         statusLabel.setText("OUTBID");
+
+                        // Hoàn lại tiền bid cũ khi bị outbid (Server đã unfreeze)
+                        double previousBid = UserSession.getLatestBid(notificationDTO.getAuctionId());
+                        if (previousBid > 0) {
+                            UserSession.addBalance(previousBid);
+                            UserSession.setLatestBid(notificationDTO.getAuctionId(), 0);
+                            if (ControllerManager.getDashboardController() != null) {
+                                ControllerManager.getDashboardController().updateBalance(UserSession.getBalance(), previousBid, true);
+                            }
+                        }
+
                         if (ControllerManager.getDashboardController() != null) {
                             String productName = UserSession.getAuctionDetail() != null ? UserSession.getAuctionDetail().getProductName() : "Auction #" + notificationDTO.getAuctionId();
                             ControllerManager.getDashboardController().addOrUpdateOutbidItem(notificationDTO.getAuctionId(), productName, dto.getAmount());

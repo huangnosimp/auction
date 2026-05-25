@@ -370,6 +370,64 @@
     -fx-scale-y: 0.95;
 }
 
+/* ── Auto Bid styles ── */
+.side-title-autobid {
+    -fx-text-fill: #38bdf8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 0.5px;
+}
+
+.side-badge-autobid {
+    -fx-background-color: #0ea5e9;
+    -fx-text-fill: white;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+    -fx-padding: 1 5 1 5;
+}
+
+.autobid-item-row {
+    -fx-background-color: #111827;
+    -fx-padding: 8;
+    -fx-background-radius: 6;
+    -fx-border-color: rgba(56, 189, 248, 0.2);
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+}
+
+.autobid-item-row:hover {
+    -fx-background-color: #172033;
+    -fx-border-color: #38bdf8;
+}
+
+.side-item-value-autobid {
+    -fx-font-size: 11px;
+    -fx-text-fill: #38bdf8;
+}
+
+.side-cancel-autobid-btn {
+    -fx-background-color: #334155;
+    -fx-text-fill: #f87171;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+    -fx-padding: 4 8 4 8;
+    -fx-cursor: hand;
+}
+
+.side-cancel-autobid-btn:hover {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.side-cancel-autobid-btn:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
 /* Thanh ProgressBar mini hiển thị thời gian cạn dần */
 .side-progress-bar {
     -fx-accent: #ffcc44;
@@ -451,4 +509,21 @@
 
     /* Hiệu ứng đổ bóng phát sáng (Glow) lan tỏa mạnh hơn khi tương tác */
     -fx-effect: dropshadow(gaussian, #d946ef, 8, 0, 0, 0);
+}
+
+/* ==========================================================================
+   8. HIỆU ỨNG BIẾN ĐỘNG SỐ DƯ (BALANCE FLUCTUATION ANIMATION)
+   ========================================================================== */
+.balance-change {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.balance-deduct {
+    -fx-text-fill: #f87171; /* Màu đỏ hồng Coral ấm áp */
+}
+
+.balance-refund {
+    -fx-text-fill: #34d399; /* Màu xanh lá Mint tươi sáng */
 }

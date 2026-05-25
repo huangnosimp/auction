@@ -92,7 +92,7 @@ public class AccountViewController implements Initializable {
                                 Platform.runLater(()->{
                                     addBalance(amount);
                                     ControllerManager.getDashboardController().showToast("Deposit succesfully", null, true);
-                                    ControllerManager.getDashboardController().updateBalance(UserSession.getBalance());
+                                    ControllerManager.getDashboardController().updateBalance(UserSession.getBalance(), amount, true);
                                 });
                             }
                             case FAILED -> {
@@ -122,7 +122,7 @@ public class AccountViewController implements Initializable {
                                 Platform.runLater(()->{
                                     minusBalance(amount);
                                     ControllerManager.getDashboardController().showToast("Withdraw succesfully", null, true);
-                                    ControllerManager.getDashboardController().updateBalance(UserSession.getBalance());
+                                    ControllerManager.getDashboardController().updateBalance(UserSession.getBalance(), amount, false);
                                 });
                             }
                             case FAILED -> {
