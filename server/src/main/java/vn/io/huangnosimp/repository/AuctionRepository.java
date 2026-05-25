@@ -25,8 +25,8 @@ public class AuctionRepository implements IAuctionRepository {
     }
 
     @Override
-    public void save(Auction auction) {
-        if (auction == null || auction.getId() == null) return;
+    public boolean save(Auction auction) {
+        if (auction == null || auction.getId() == null) return false;
         //add save bidders
         String sql = "INSERT INTO Auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status, minimum_increment, buy_now_price) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
@@ -48,9 +48,10 @@ public class AuctionRepository implements IAuctionRepository {
             stmt.setDouble(10, auction.getMinimumIncrement());
             stmt.setDouble(11, auction.getBuyNowPrice());
 
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             logger.error("DB error when saving auction auctionId={}", auction.getId(), e);
+            return false;
         }
     }
 

@@ -34,6 +34,12 @@ public class ClientSessionManager {
     public void removeClient(ClientHandle client) {
         if (client != null) {
             activeClients.remove(client);
+            leaveAllRooms(client);
+        }
+    }
+
+    public void leaveAllRooms(ClientHandle client) {
+        if (client != null) {
             auctionRooms.values().removeIf(room -> {
                 room.remove(client);
                 return room.isEmpty();

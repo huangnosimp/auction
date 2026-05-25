@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import vn.io.huangnosimp.Manager.ControllerManager;
 import vn.io.huangnosimp.Manager.FormatUtil;
+import vn.io.huangnosimp.Manager.TimeSyncManager;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 
 import java.io.IOException;
@@ -59,7 +60,7 @@ public class InventoryController {
     }
 
     private void updateStatistics() {
-        long now = System.currentTimeMillis();
+        long now = TimeSyncManager.nowMillis();
         int totalListings = allListings.size();
         long liveCount = allListings.stream()
                 .filter(dto -> dto.getEndTime() > now && dto.getStartTime() <= now)
@@ -123,7 +124,7 @@ public class InventoryController {
 
     private void renderListings() {
         listingsContainer.getChildren().clear();
-        long now = System.currentTimeMillis();
+        long now = TimeSyncManager.nowMillis();
 
         List<AuctionCardDTO> filtered = allListings.stream().filter(dto -> {
             switch (currentListingFilter) {

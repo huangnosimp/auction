@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import vn.io.huangnosimp.Manager.SceneManager;
 import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.TimeSyncManager;
 import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.GetPostedAuctionDTO;
@@ -66,6 +67,7 @@ public class LoginController {
             SocketManager.getClient().sendRequestAsync(request)
                     .thenAccept(response -> {
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
+                            TimeSyncManager.syncAsync(SocketManager.getClient()).exceptionally(ex -> null);
                             Request activeAutobidRequest = new Request(ActionType.GET_USER_AUTO_BIDS, null);
                             Request getMineRequest = new Request(ActionType.GET_POSTED_AUCTION_CARD, new GetPostedAuctionDTO(30));
                             Request dashboardRequest = new Request(ActionType.GET_DASHBOARD_INFO, null);
@@ -126,6 +128,7 @@ public class LoginController {
             SocketManager.getClient().sendRequestAsync(request)
                     .thenAccept(response -> {
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
+                            TimeSyncManager.syncAsync(SocketManager.getClient()).exceptionally(ex -> null);
                             Platform.runLater(()-> changeMainStage("AdminDashboarđ.fxml"));
                         }
                         else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){

@@ -53,6 +53,7 @@ public class Main {
         router.registerHandler(ActionType.LOGIN, new UserHandler.LoginHandler(userService));
         router.registerHandler(ActionType.REGISTER, new UserHandler.RegisterHandler(userService));
         router.registerHandler(ActionType.LOGOUT, new UserHandler.LogoutHandler());
+        router.registerHandler(ActionType.GET_SERVER_TIME, new TimeHandler.GetServerTimeHandler());
         router.registerHandler(ActionType.DEPOSIT, new UserHandler.DepositHandler(userService));
         router.registerHandler(ActionType.WITHDRAW, new UserHandler.WithdrawHandler(userService));
         //Auction Handler

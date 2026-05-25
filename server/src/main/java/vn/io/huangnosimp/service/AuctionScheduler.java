@@ -62,20 +62,25 @@ public class AuctionScheduler {
         }
     }
 
-    public void extendTime(Auction auction, long newEndTime) {
+    public boolean extendTime(Auction auction, long newEndTime) {
         String auctionId = auction.getId();
-        auction.extendEndTime(newEndTime);
-        
         ScheduledFuture<?> oldTask = endTimer.remove(auctionId);
-        if (oldTask != null) {
-            if (!oldTask.isDone()) {
-                oldTask.cancel(false);
-            }
-            this.scheduleEnd(auction);
-            logger.info("Auction end time extended auctionId={} newEndTime={}", auctionId, newEndTime);
-        } else {
+        if (oldTask == null) {
             logger.warn("Auction end time extension skipped because end timer was not found auctionId={}", auctionId);
+            return false;
         }
+        if (!auction.extendEndTime(newEndTime)) {
+            logger.warn("Auction end time extension rejected auctionId={} newEndTime={}", auctionId, newEndTime);
+            endTimer.put(auctionId, oldTask);
+            return false;
+        }
+
+        if (!oldTask.isDone()) {
+            oldTask.cancel(false);
+        }
+        this.scheduleEnd(auction);
+        logger.info("Auction end time extended auctionId={} newEndTime={}", auctionId, newEndTime);
+        return true;
     }
 
     public void cancelTimers(String auctionId) {

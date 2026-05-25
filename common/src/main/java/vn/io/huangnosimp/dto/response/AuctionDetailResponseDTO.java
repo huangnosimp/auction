@@ -77,6 +77,28 @@ public class AuctionDetailResponseDTO {
     public double getBuyNowPrice() { return buyNowPrice; }
     public long getStartTime() { return startTime; }
     public long getEndTime() { return endTime; }
+    public AuctionDetailResponseDTO withEndTime(long newEndTime) {
+        return new AuctionDetailResponseDTO(
+                productName,
+                category,
+                condition,
+                description,
+                startPrice,
+                bidIncrement,
+                buyNowPrice,
+                0.0,
+                startTime,
+                newEndTime,
+                currentPrice,
+                minNextBid,
+                leadBidder,
+                lastBidTime,
+                participantCount,
+                bidCount,
+                bidHistory,
+                priceHistory
+        );
+    }
     public double getCurrentPrice() { return currentPrice; }
     public double getMinNextBid() { return minNextBid; }
     public String getLeadBidder() {

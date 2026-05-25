@@ -50,12 +50,12 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             CancelAuctionRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), CancelAuctionRequestDTO.class);
-            AuctionActionResult result = auctionService.cancelAuction(dto.getAuctionId());
+            AuctionActionResult result = auctionService.cancelAuction(client.getUserId(), dto.getAuctionId());
             logger.info("Cancel auction attempted userId={} auctionId={} result={}", client.getUserId(), dto.getAuctionId(), result);
             return switch (result) {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Cancel auction successfully");
                 case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
-                case INVALID_STATE -> new Response(ResponseStatus.FAILED, "Cannot cancel a running or completed auction");
+                case INVALID_STATE -> new Response(ResponseStatus.FAILED, "Cannot cancel a completed auction");
                 case UNAUTHORIZED -> new Response(ResponseStatus.FAILED, "Unauthorized to cancel this auction");
                 default -> new Response(ResponseStatus.FAILED, "Cancel auction failed");
             };

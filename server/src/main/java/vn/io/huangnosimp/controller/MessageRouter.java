@@ -38,7 +38,9 @@ public class MessageRouter {
                 logger.warn("Invalid request: missing action field");
                 return new Response(ResponseStatus.ERROR, "Invalid request: missing action field");
             }
-            if (action != ActionType.LOGIN && action != ActionType.REGISTER) {
+            if (action != ActionType.LOGIN
+                    && action != ActionType.REGISTER
+                    && action != ActionType.GET_SERVER_TIME) {
                 if (client.getUserId() == null) {
                     logger.warn("Rejected unauthorized request");
                     return new Response(ResponseStatus.UNAUTHORIZED, "Unauthorized: please login first");

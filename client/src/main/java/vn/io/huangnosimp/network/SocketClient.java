@@ -56,6 +56,10 @@ public class SocketClient {
         listenerThread.start();
     }
 
+    public boolean isConnected() {
+        return socket != null && socket.isConnected() && !socket.isClosed() && out != null;
+    }
+
     public CompletableFuture<Response> sendRequestAsync(Request request) {
         CompletableFuture<Response> future = new CompletableFuture<>();
         if (out != null && socket != null && !socket.isClosed()) {

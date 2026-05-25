@@ -56,6 +56,26 @@ public class UserSession {
     public static AuctionDetailResponseDTO getAuctionDetail(){
         return auctionDetail;
     }
+    public static void updateAuctionEndTime(String auctionId, long newEndTime) {
+        if (auctionId == null) {
+            return;
+        }
+        updateCardEndTime(listCard, auctionId, newEndTime);
+        updateCardEndTime(joiningListCard, auctionId, newEndTime);
+        updateCardEndTime(myListCard, auctionId, newEndTime);
+        updateCardEndTime(searchListCard, auctionId, newEndTime);
+        if (auctionId.equals(UserSession.auctionId) && auctionDetail != null) {
+            auctionDetail = auctionDetail.withEndTime(newEndTime);
+        }
+    }
+
+    private static void updateCardEndTime(List<AuctionCardDTO> cards, String auctionId, long newEndTime) {
+        for (AuctionCardDTO card : cards) {
+            if (auctionId.equals(card.getAuctionId())) {
+                card.setEndTime(newEndTime);
+            }
+        }
+    }
     //List open slots
     public static void addToList(List<AuctionCardDTO> list){
         listCard.clear();

@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
-import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 import vn.io.huangnosimp.dto.response.AuctionActionResult;
 import vn.io.huangnosimp.dto.response.BidResult;
+import vn.io.huangnosimp.dto.response.TransactionResult;
 import vn.io.huangnosimp.enums.AuctionStatus;
 import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
@@ -67,6 +67,29 @@ public class AuctionService implements IAuctionService {
         logger.info("Auto bid service attached to auction service");
     }
 
+    private boolean persistWallet(Member member) {
+        return userService.updateBalance(member.getId(), member.getAccountBalance()) == TransactionResult.SUCCESS
+                && userService.updateFrozenBalance(member.getId(), member.getFrozenBalance()) == TransactionResult.SUCCESS;
+    }
+
+    private boolean persistBalance(Member member) {
+        return userService.updateBalance(member.getId(), member.getAccountBalance()) == TransactionResult.SUCCESS;
+    }
+
+    private boolean savePaymentTransactions(String buyerId, String sellerId, double amount) {
+        if (transactionRepository == null) {
+            return true;
+        }
+        return transactionRepository.saveTransaction(new Transaction(buyerId, TransactionType.WITHDRAW, amount))
+                && transactionRepository.saveTransaction(new Transaction(sellerId, TransactionType.DEPOSIT, amount));
+    }
+
+    private void restoreWallet(Member member, double accountBalance, double frozenBalance) {
+        member.setAccountBalance(accountBalance);
+        member.setFrozenBalance(frozenBalance);
+        persistWallet(member);
+    }
+
     @Override
     public void shutdown() {
         if (scheduler != null) {
@@ -83,6 +106,8 @@ public class AuctionService implements IAuctionService {
                                             long endTime, ItemCondition condition, double minimumIncrement,
                                             double buyNowPrice, List<String> imageUrl) {
         if (!isValidOpenAuctionInput(sellerId, itemName, description, itemType, attributes, startPrice)
+                || minimumIncrement <= 0
+                || (buyNowPrice > 0 && buyNowPrice < startPrice)
                 || endTime <= startTime || startTime < System.currentTimeMillis()) {
             logger.warn(
                     "Auction creation rejected sellerId={} itemType={} startPrice={} startTime={} endTime={}",
@@ -96,7 +121,10 @@ public class AuctionService implements IAuctionService {
         }
         Item item = itemService.createItem(sellerId, itemName, description, itemType, attributes, condition, imageUrl);
         Auction auction = new Auction(item, seller, startPrice, startTime, endTime, minimumIncrement, buyNowPrice);
-        auctionRepository.save(auction);
+        if (!auctionRepository.save(auction)) {
+            logger.error("Auction creation failed while saving auction auctionId={} sellerId={}", auction.getId(), sellerId);
+            return null;
+        }
         if (scheduler != null) {
             scheduler.scheduleAuction(auction);
         } else {
@@ -119,8 +147,11 @@ public class AuctionService implements IAuctionService {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction != null && auction.getStatus() == AuctionStatus.OPEN) {
                 auction.setStatusRunning();
-                auctionRepository.save(auction);
-                logger.info("Auction started auctionId={}", auctionId);
+                if (auctionRepository.save(auction)) {
+                    logger.info("Auction started auctionId={}", auctionId);
+                } else {
+                    logger.error("Auction start failed while saving auctionId={}", auctionId);
+                }
             } else {
                 logger.warn("Auction start skipped auctionId={} found={} status={}",
                         auctionId, auction != null, auction != null ? auction.getStatus() : null);
@@ -134,8 +165,12 @@ public class AuctionService implements IAuctionService {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction != null && auction.getStatus() == AuctionStatus.RUNNING) {
                 auction.setStatusFinish();
-                auctionRepository.save(auction);
-                logger.info("Auction marked finished auctionId={}", auctionId);
+                if (auctionRepository.save(auction)) {
+                    logger.info("Auction marked finished auctionId={}", auctionId);
+                } else {
+                    logger.error("Auction finish failed while saving auctionId={}", auctionId);
+                    return;
+                }
             } else {
                 logger.warn("Auction finish skipped auctionId={} found={} status={}",
                         auctionId, auction != null, auction != null ? auction.getStatus() : null);
@@ -179,6 +214,7 @@ public class AuctionService implements IAuctionService {
 
             String previousWinnerId = auction.getCurrentWinnerId();
             double previousPrice = auction.getCurrentPrice();
+            Member previousWinner = null;
 
             if (previousWinnerId != null && previousWinnerId.equals(bidderId)) {
                 double delta = amount - previousPrice;
@@ -195,47 +231,66 @@ public class AuctionService implements IAuctionService {
                     return BidResult.INSUFFICIENT_FUNDS;
                 }
                 if (previousWinnerId != null) {
-                    Member previousWinner = userService.getMember(previousWinnerId);
+                    previousWinner = userService.getMember(previousWinnerId);
                     if (previousWinner == null) {
                         bidder.unfreezeMoney(amount);
-                        userService.updateBalance(bidder.getId(), bidder.getAccountBalance());
-                        userService.updateFrozenBalance(bidder.getId(), bidder.getFrozenBalance());
+                        persistWallet(bidder);
                         logger.error("Bid failed because previous winner was not found auctionId={} previousWinnerId={}",
                                 auctionId, previousWinnerId);
                         return BidResult.ERROR;
                     }
                     if (!previousWinner.unfreezeMoney(previousPrice)) {
                         bidder.unfreezeMoney(amount);
-                        userService.updateBalance(bidder.getId(), bidder.getAccountBalance());
-                        userService.updateFrozenBalance(bidder.getId(), bidder.getFrozenBalance());
+                        persistWallet(bidder);
                         logger.error("Bid failed because previous winner funds could not be unfrozen auctionId={} previousWinnerId={}",
                                 auctionId, previousWinnerId);
                         return BidResult.ERROR;
                     }
-                    userService.updateBalance(previousWinner.getId(), previousWinner.getAccountBalance());
-                    userService.updateFrozenBalance(previousWinner.getId(), previousWinner.getFrozenBalance());
                 }
                 auction.setCurrentWinnerId(bidderId);
                 auction.setCurrentPrice(amount);
             }
 
-            userService.updateBalance(bidder.getId(), bidder.getAccountBalance());
-            userService.updateFrozenBalance(bidder.getId(), bidder.getFrozenBalance());
+            if (!persistWallet(bidder) || (previousWinner != null && !persistWallet(previousWinner))) {
+                rollbackBidWallets(bidder, previousWinner, amount, previousPrice, previousWinnerId);
+                logger.error("Bid failed while persisting wallet changes auctionId={} bidderId={}", auctionId, bidderId);
+                return BidResult.ERROR;
+            }
 
             auction.setUpdatedAt(System.currentTimeMillis());
-            auctionRepository.save(auction);
-            bidTransactionRepository.saveBidTransaction(new BidTransaction(auctionId, bidderId, amount));
+            boolean auctionExtended = false;
+            long extendedEndTime = auction.getEndTime();
+            if (auction.needExtension() && scheduler != null) {
+                long newEndTime = System.currentTimeMillis() + 60 * 1000;
+                auctionExtended = scheduler.extendTime(auction, newEndTime);
+                if (auctionExtended) {
+                    extendedEndTime = auction.getEndTime();
+                }
+            }
+
+            if (!auctionRepository.save(auction)) {
+                rollbackBidWallets(bidder, previousWinner, amount, previousPrice, previousWinnerId);
+                logger.error("Bid failed while saving auction auctionId={} bidderId={}", auctionId, bidderId);
+                return BidResult.ERROR;
+            }
+
+            if (!bidTransactionRepository.saveBidTransaction(new BidTransaction(auctionId, bidderId, amount))) {
+                auction.setCurrentWinnerId(previousWinnerId);
+                auction.setCurrentPrice(previousPrice);
+                auctionRepository.save(auction);
+                rollbackBidWallets(bidder, previousWinner, amount, previousPrice, previousWinnerId);
+                logger.error("Bid failed while saving bid transaction auctionId={} bidderId={}", auctionId, bidderId);
+                return BidResult.ERROR;
+            }
 
             if (notificationService != null) {
                 notificationService.notifyBidPlaced(auctionId, amount, bidder.getUsername());
                 if (previousWinnerId != null && !previousWinnerId.equals(bidderId)) {
                     notificationService.notifyOutbid(auctionId, previousWinnerId, auction.getCurrentPrice());
                 }
-            }
-
-            if (auction.needExtension() && scheduler != null) {
-                long newEndTime = System.currentTimeMillis() + 60 * 1000;
-                scheduler.extendTime(auction, newEndTime);
+                if (auctionExtended) {
+                    notificationService.notifyAuctionExtended(auctionId, extendedEndTime);
+                }
             }
             logger.info("Bid placed auctionId={} bidderId={} amount={} previousWinnerId={}",
                     auctionId, bidderId, amount, previousWinnerId);
@@ -250,7 +305,36 @@ public class AuctionService implements IAuctionService {
         return bidSuccess;
     }
 
-    public AuctionActionResult cancelAuction(String auctionId) {
+    private void rollbackBidWallets(Member bidder, Member previousWinner, double amount, double previousPrice,
+            String previousWinnerId) {
+        if (previousWinnerId != null && previousWinnerId.equals(bidder.getId())) {
+            double delta = amount - previousPrice;
+            if (delta > 0) {
+                bidder.unfreezeMoney(delta);
+            }
+            persistWallet(bidder);
+            return;
+        }
+
+        bidder.unfreezeMoney(amount);
+        persistWallet(bidder);
+        if (previousWinner != null) {
+            previousWinner.freezeMoney(previousPrice);
+            persistWallet(previousWinner);
+        }
+    }
+
+    @Override
+    public AuctionActionResult cancelAuction(String userId, String auctionId) {
+        return cancelAuctionInternal(userId, auctionId, false);
+    }
+
+    @Override
+    public AuctionActionResult forceCancelAuction(String auctionId) {
+        return cancelAuctionInternal(null, auctionId, true);
+    }
+
+    private AuctionActionResult cancelAuctionInternal(String userId, String auctionId, boolean force) {
         AuctionActionResult success;
         Object lock = getAuctionLock(auctionId);
         synchronized (lock) {
@@ -259,28 +343,46 @@ public class AuctionService implements IAuctionService {
                 logger.warn("Auction cancel rejected because auction was not found auctionId={}", auctionId);
                 return AuctionActionResult.AUCTION_NOT_FOUND;
             }
+            if (!force && (userId == null || !userId.equals(auction.getSeller().getId()))) {
+                logger.warn("Auction cancel rejected because user is not seller auctionId={} userId={}", auctionId, userId);
+                return AuctionActionResult.UNAUTHORIZED;
+            }
             if (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
                 String currentWinnerId = auction.getCurrentWinnerId();
+                Member currentWinner = null;
                 if (currentWinnerId != null) {
-                    Member currentWinner = userService.getMember(currentWinnerId);
-                    if (currentWinner != null) {
-                        currentWinner.unfreezeMoney(auction.getCurrentPrice());
-                        userService.updateBalance(currentWinner.getId(), currentWinner.getAccountBalance());
-                        userService.updateFrozenBalance(currentWinner.getId(), currentWinner.getFrozenBalance());
+                    currentWinner = userService.getMember(currentWinnerId);
+                    if (currentWinner == null || !currentWinner.unfreezeMoney(auction.getCurrentPrice())
+                            || !persistWallet(currentWinner)) {
+                        logger.error("Auction cancel failed while unfreezing current winner auctionId={} currentWinnerId={}",
+                                auctionId, currentWinnerId);
+                        success = AuctionActionResult.ERROR;
+                    } else {
+                        auction.setStatusCanceled();
+                        if (!auctionRepository.save(auction)) {
+                            currentWinner.freezeMoney(auction.getCurrentPrice());
+                            persistWallet(currentWinner);
+                            logger.error("Auction cancel failed while saving auction auctionId={}", auctionId);
+                            success = AuctionActionResult.ERROR;
+                        } else {
+                            success = AuctionActionResult.SUCCESS;
+                        }
                     }
+                } else {
+                    auction.setStatusCanceled();
+                    success = auctionRepository.save(auction) ? AuctionActionResult.SUCCESS : AuctionActionResult.ERROR;
                 }
-                auction.setStatusCanceled();
-                auctionRepository.save(auction);
 
-                if (notificationService != null) {
+                if (success == AuctionActionResult.SUCCESS && notificationService != null) {
                     notificationService.notifyAuctionCanceled(auctionId);
                 }
 
-                if (scheduler != null) {
+                if (success == AuctionActionResult.SUCCESS && scheduler != null) {
                     scheduler.cancelTimers(auctionId);
                 }
-                logger.info("Auction canceled auctionId={}", auctionId);
-                success = AuctionActionResult.SUCCESS;
+                if (success == AuctionActionResult.SUCCESS) {
+                    logger.info("Auction canceled auctionId={} force={}", auctionId, force);
+                }
             } else {
                 logger.info("Auction cancel rejected due to invalid state auctionId={} status={}", auctionId, auction.getStatus());
                 success = AuctionActionResult.INVALID_STATE;
@@ -306,39 +408,42 @@ public class AuctionService implements IAuctionService {
                     Member seller = auction.getSeller();
 
                     if (winner != null && seller != null) {
-                        if (winner.deductFrozenMoney(auction.getCurrentPrice())) {
-                            seller.receivePayment(auction.getCurrentPrice());
-
-                            success = itemService.transferOwnership(auction.getItem(), winner.getId());
-
-                            if (success) {
-                                auction.setStatusPaid();
-                                auctionRepository.save(auction);
-                                userService.updateBalance(winner.getId(), winner.getAccountBalance());
-                                userService.updateFrozenBalance(winner.getId(), winner.getFrozenBalance());
-                                userService.updateBalance(seller.getId(), seller.getAccountBalance());
-
-                                if (transactionRepository != null) {
-                                    transactionRepository.saveTransaction(new Transaction(bidderId,
-                                            TransactionType.WITHDRAW, auction.getCurrentPrice()));
-                                    transactionRepository.saveTransaction(new Transaction(seller.getId(),
-                                            TransactionType.DEPOSIT, auction.getCurrentPrice()));
-                                }
-
-                                if (notificationService != null) {
-                                    notificationService.notifyAuctionEnded(auctionId, winner.getUsername(),
-                                            auction.getCurrentPrice());
-                                }
-                                logger.info("Auction payment processed auctionId={} winnerId={} sellerId={} amount={}",
-                                        auctionId, winner.getId(), seller.getId(), auction.getCurrentPrice());
-                            } else {
-                                winner.unfreezeMoney(auction.getCurrentPrice());
-                                seller.withdraw(auction.getCurrentPrice());
-                                logger.error("Auction payment failed because ownership transfer failed auctionId={}", auctionId);
-                            }
-                        } else {
+                        double amount = auction.getCurrentPrice();
+                        if (!winner.deductFrozenMoney(amount)) {
                             logger.error("Auction payment failed because frozen money could not be deducted auctionId={} winnerId={}",
                                     auctionId, winner.getId());
+                        } else {
+                            seller.receivePayment(amount);
+                            boolean transferSuccess = itemService.transferOwnership(auction.getItem(), winner.getId());
+
+                            if (!transferSuccess) {
+                                winner.deposit(amount);
+                                seller.withdraw(amount);
+                                logger.error("Auction payment failed because ownership transfer failed auctionId={}", auctionId);
+                            } else {
+                                auction.setStatusPaid();
+                                success = auctionRepository.save(auction)
+                                        && persistWallet(winner)
+                                        && persistBalance(seller)
+                                        && savePaymentTransactions(bidderId, seller.getId(), amount);
+
+                                if (!success) {
+                                    itemService.transferOwnership(auction.getItem(), seller.getId());
+                                    auction.setStatus(AuctionStatus.FINISHED);
+                                    auctionRepository.save(auction);
+                                    winner.deposit(amount);
+                                    seller.withdraw(amount);
+                                    persistWallet(winner);
+                                    persistBalance(seller);
+                                    logger.error("Auction payment failed while persisting payment state auctionId={}", auctionId);
+                                } else {
+                                    if (notificationService != null) {
+                                        notificationService.notifyAuctionEnded(auctionId, winner.getUsername(), amount);
+                                    }
+                                    logger.info("Auction payment processed auctionId={} winnerId={} sellerId={} amount={}",
+                                            auctionId, winner.getId(), seller.getId(), amount);
+                                }
+                            }
                         }
                     } else {
                         logger.error("Auction payment skipped because winner or seller was missing auctionId={} winnerFound={} sellerFound={}",
@@ -384,6 +489,31 @@ public class AuctionService implements IAuctionService {
             double buyNowPrice = auction.getBuyNowPrice();
             String previousWinnerId = auction.getCurrentWinnerId();
             double previousPrice = auction.getCurrentPrice();
+            AuctionStatus originalStatus = auction.getStatus();
+            if (buyNowPrice < previousPrice) {
+                logger.warn("Buy now rejected because buy now price is below current price auctionId={} userId={} buyNowPrice={} currentPrice={}",
+                        auctionId, userId, buyNowPrice, previousPrice);
+                return BidResult.BID_TOO_LOW;
+            }
+
+            Member seller = auction.getSeller();
+            Member previousWinner = null;
+            if (previousWinnerId != null && !previousWinnerId.equals(userId)) {
+                previousWinner = userService.getMember(previousWinnerId);
+                if (previousWinner == null) {
+                    logger.error("Buy now failed because previous winner was not found auctionId={} previousWinnerId={}",
+                            auctionId, previousWinnerId);
+                    return BidResult.ERROR;
+                }
+            }
+
+            double buyerBalanceBefore = buyer.getAccountBalance();
+            double buyerFrozenBefore = buyer.getFrozenBalance();
+            double sellerBalanceBefore = seller.getAccountBalance();
+            double sellerFrozenBefore = seller.getFrozenBalance();
+            double previousWinnerBalanceBefore = previousWinner != null ? previousWinner.getAccountBalance() : 0;
+            double previousWinnerFrozenBefore = previousWinner != null ? previousWinner.getFrozenBalance() : 0;
+            String originalOwnerId = auction.getItem().getOwnerId();
 
             if (previousWinnerId != null && previousWinnerId.equals(userId)) {
                 double delta = buyNowPrice - previousPrice;
@@ -402,40 +532,54 @@ public class AuctionService implements IAuctionService {
 
             boolean transferSuccess = itemService.transferOwnership(auction.getItem(), buyer.getId());
             if (!transferSuccess) {
-                if (previousWinnerId != null && previousWinnerId.equals(userId)) {
-                    buyer.unfreezeMoney(buyNowPrice - previousPrice);
-                } else {
-                    buyer.unfreezeMoney(buyNowPrice);
-                }
+                restoreWallet(buyer, buyerBalanceBefore, buyerFrozenBefore);
                 logger.error("Buy now failed because ownership transfer failed auctionId={} userId={}", auctionId, userId);
                 return BidResult.ERROR;
             }
 
-            if (previousWinnerId != null && !previousWinnerId.equals(userId)) {
-                Member previousWinner = userService.getMember(previousWinnerId);
-                if (previousWinner != null) {
-                    previousWinner.unfreezeMoney(previousPrice);
-                    userService.updateBalance(previousWinner.getId(), previousWinner.getAccountBalance());
-                    userService.updateFrozenBalance(previousWinner.getId(), previousWinner.getFrozenBalance());
-                }
+            if (previousWinner != null && !previousWinner.unfreezeMoney(previousPrice)) {
+                itemService.transferOwnership(auction.getItem(), originalOwnerId);
+                restoreWallet(buyer, buyerBalanceBefore, buyerFrozenBefore);
+                logger.error("Buy now failed because previous winner funds could not be unfrozen auctionId={} previousWinnerId={}",
+                        auctionId, previousWinnerId);
+                return BidResult.ERROR;
             }
 
-            buyer.deductFrozenMoney(buyNowPrice);
-            userService.updateBalance(buyer.getId(), buyer.getAccountBalance());
-            userService.updateFrozenBalance(buyer.getId(), buyer.getFrozenBalance());
+            if (!buyer.deductFrozenMoney(buyNowPrice)) {
+                itemService.transferOwnership(auction.getItem(), originalOwnerId);
+                restoreWallet(buyer, buyerBalanceBefore, buyerFrozenBefore);
+                if (previousWinner != null) {
+                    restoreWallet(previousWinner, previousWinnerBalanceBefore, previousWinnerFrozenBefore);
+                }
+                logger.error("Buy now failed because buyer frozen money could not be deducted auctionId={} userId={}",
+                        auctionId, userId);
+                return BidResult.ERROR;
+            }
 
             auction.setCurrentWinnerId(userId);
             auction.setCurrentPrice(buyNowPrice);
             auction.setStatus(AuctionStatus.PAID);
-            auctionRepository.save(auction);
-
-            Member seller = auction.getSeller();
             seller.receivePayment(buyNowPrice);
-            userService.updateBalance(seller.getId(), seller.getAccountBalance());
 
-            if (transactionRepository != null) {
-                transactionRepository.saveTransaction(new Transaction(userId, TransactionType.WITHDRAW, buyNowPrice));
-                transactionRepository.saveTransaction(new Transaction(seller.getId(), TransactionType.DEPOSIT, buyNowPrice));
+            boolean persisted = auctionRepository.save(auction)
+                    && persistWallet(buyer)
+                    && (previousWinner == null || persistWallet(previousWinner))
+                    && persistBalance(seller)
+                    && savePaymentTransactions(userId, seller.getId(), buyNowPrice);
+
+            if (!persisted) {
+                itemService.transferOwnership(auction.getItem(), originalOwnerId);
+                auction.setCurrentWinnerId(previousWinnerId);
+                auction.setCurrentPrice(previousPrice);
+                auction.setStatus(originalStatus);
+                auctionRepository.save(auction);
+                restoreWallet(buyer, buyerBalanceBefore, buyerFrozenBefore);
+                restoreWallet(seller, sellerBalanceBefore, sellerFrozenBefore);
+                if (previousWinner != null) {
+                    restoreWallet(previousWinner, previousWinnerBalanceBefore, previousWinnerFrozenBefore);
+                }
+                logger.error("Buy now failed while persisting payment state auctionId={} userId={}", auctionId, userId);
+                return BidResult.ERROR;
             }
 
             if (notificationService != null) {

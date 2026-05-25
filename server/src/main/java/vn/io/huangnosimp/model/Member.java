@@ -32,6 +32,14 @@ public class Member extends User {
         return frozenBalance;
     }
 
+    public synchronized void setAccountBalance(double accountBalance) {
+        this.accountBalance = accountBalance;
+    }
+
+    public synchronized void setFrozenBalance(double frozenBalance) {
+        this.frozenBalance = frozenBalance;
+    }
+
     public boolean isBanned() {
         return isBanned;
     }

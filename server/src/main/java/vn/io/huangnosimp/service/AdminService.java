@@ -135,7 +135,7 @@ public class AdminService implements IAdminService {
 
     @Override
     public boolean forceCancelAuction(String auctionId) {
-        AuctionActionResult result = auctionService.cancelAuction(auctionId);
+        AuctionActionResult result = auctionService.forceCancelAuction(auctionId);
         boolean isSuccess = switch (result) {
             case SUCCESS -> true;
             case AUCTION_NOT_FOUND, UNAUTHORIZED, INVALID_STATE, ERROR -> false;

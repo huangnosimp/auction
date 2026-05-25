@@ -27,6 +27,7 @@ import javafx.event.ActionEvent;
 import vn.io.huangnosimp.Manager.*;
 import vn.io.huangnosimp.dto.request.*;
 import vn.io.huangnosimp.dto.response.*;
+import vn.io.huangnosimp.dto.shared.AuctionExtendedDTO;
 import vn.io.huangnosimp.dto.shared.NotificationDTO;
 import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.IServerMessageListener;
@@ -104,6 +105,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     private String auctionId;
     private boolean isBuyNowDp;
     private volatile double pendingBidAmount = 0;
+    private AuctionCountdownUtil clock;
 
     public void setUpPreviewImg(List<String> Img) {
         if (Img == null || Img.isEmpty()) return;
@@ -162,7 +164,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         }
         minNextBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid()));//giá kế tiếp tối thiểu
         myBidLabel.setText(FormatUtil.formatNumber(DTO.getMinNextBid()));//bảng chọn giá
-        AuctionCountdownUtil clock = new AuctionCountdownUtil(timeLabel, DTO.getStartTime(), DTO.getEndTime());//đồng hồ đếm ngược
+        clock = new AuctionCountdownUtil(timeLabel, DTO.getStartTime(), DTO.getEndTime());//đồng hồ đếm ngược
         clock.start();//bắt đầu đếm ngược
         bidStepLabel.setText(caculateBidIncreament(DTO.getBidIncrement()));//bước giá
         minCount=DTO.getBidIncrement();//lưu bước giá
@@ -587,6 +589,22 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         e.printStackTrace();
                     }
                 });
+            }
+            case AUCTION_EXTENDED -> {
+                if (notificationDTO.getAuctionId() != null && notificationDTO.getAuctionId().equals(auctionId)) {
+                    AuctionExtendedDTO dto = GsonParser.GSON.fromJson(
+                            GsonParser.GSON.toJsonTree(notificationDTO.getData()),
+                            AuctionExtendedDTO.class
+                    );
+                    if (dto != null) {
+                        Platform.runLater(() -> {
+                            UserSession.updateAuctionEndTime(auctionId, dto.getNewEndTime());
+                            if (clock != null) {
+                                clock.updateEndTime(dto.getNewEndTime());
+                            }
+                        });
+                    }
+                }
             }
             case AUCTION_CANCELED -> {
                 Platform.runLater(()->{

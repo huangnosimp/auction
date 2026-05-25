@@ -129,7 +129,7 @@ public class StatisticRepository implements IStatisticRepository {
                 double currentPrice = finalPrice > 0 ? finalPrice : startPrice;
                 double bidIncrement = rsAuction.getDouble("minimum_increment");
                 double buyNowPrice = rsAuction.getDouble("buy_now_price");
-                double minNextBid = currentPrice + bidIncrement;
+                double minNextBid = leadBidder == null ? currentPrice : currentPrice + bidIncrement;
 
                 List<BidHistoryDTO> bidHistory = new ArrayList<>();
                 List<PricePointDTO> priceHistory = new ArrayList<>();

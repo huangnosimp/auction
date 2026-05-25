@@ -17,7 +17,8 @@ public interface IAuctionService {
                                  long endTime, ItemCondition condition, double minimumIncrement,
                                  double buyNowPrice, List<String> imageUrl);
     BidResult placeBid(String bidderId, String auctionId, double amount, boolean triggerAutoBid);
-    AuctionActionResult cancelAuction(String auctionId);
+    AuctionActionResult cancelAuction(String userId, String auctionId);
+    AuctionActionResult forceCancelAuction(String auctionId);
     BidResult buyNow(String userId, String auctionId);
     AuctionActionResult joinAuction(String userId, String auctionId, ClientHandle client);
     AuctionActionResult leaveAuction(String userId, String auctionId, ClientHandle client);
