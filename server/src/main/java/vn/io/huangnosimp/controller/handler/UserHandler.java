@@ -43,6 +43,7 @@ public class UserHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             String userId = client.getUserId();
+            ClientSessionManager.getInstance().leaveAllRooms(client);
             client.setUserId(null);
             client.setUserType(null);
             logger.info("Logout successful userId={}", userId);
