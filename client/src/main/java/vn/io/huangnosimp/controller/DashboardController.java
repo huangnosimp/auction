@@ -309,8 +309,9 @@ public class DashboardController implements Initializable, IServerMessageListene
                     Parent node = loader.load();
                     OutbidItemController controller = loader.getController();
                     controller.setUp(dto);
-                    outbidAlertsList.getChildren().add(node);
                     node.setUserData(dto.getAuctionId());
+                    outbidAlertsList.getChildren().add(node);
+
                 }
                 catch (IOException e){
                     e.printStackTrace();
@@ -339,6 +340,12 @@ public class DashboardController implements Initializable, IServerMessageListene
             }
         });
     }
+    public void updateOutbidBadge() {
+        int count = outbidAlertsList.getChildren().size();
+        outbidBadge.setText(String.valueOf(count));
+        outbidBadge.setVisible(count > 0);
+        outbidBadge.setManaged(count > 0);
+    }
 
     private double parsePriceFromMessage(String msg, double defaultValue) {
         if (msg == null) return defaultValue;
@@ -366,13 +373,6 @@ public class DashboardController implements Initializable, IServerMessageListene
         addAutoBidCardToUI();
         updateAutoBidBadge();
         isInitialized = true;
-    }
-
-    public void updateOutbidBadge() {
-        int count = outbidAlertsList.getChildren().size();
-        outbidBadge.setText(String.valueOf(count));
-        outbidBadge.setVisible(count > 0);
-        outbidBadge.setManaged(count > 0);
     }
 
     public void updateBalance(double amount, double diffAmount, boolean isRefund){
@@ -492,6 +492,7 @@ public class DashboardController implements Initializable, IServerMessageListene
         NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
         NotificationType type = notificationDTO.getNotificationType();
         switch (type){
+
             case OUTBID -> {
                 Platform.runLater(() -> {
                     String auctionId = notificationDTO.getAuctionId();

@@ -65,8 +65,17 @@ public class ItemCardController implements Initializable, IServerMessageListener
         bidCount = dto.getBidCount();
         bidderCount = dto.getBidderCount();
         this.auctionId = dto.getAuctionId();
-        if(dto.getCurrentPrice() == dto.getYourBid()){
-            lblBidStatus.setText("WINNING");
+        if (lblBidStatus != null) {
+            if(dto.getCurrentPrice() == dto.getYourBid()){
+                lblBidStatus.setText("WINNING");
+                lblBidStatus.getStyleClass().removeAll("s-outbid");
+                lblBidStatus.getStyleClass().add("s-winning");
+            }
+            else{
+                lblBidStatus.setText("OUTBID");
+                lblBidStatus.getStyleClass().removeAll("s-winning");
+                lblBidStatus.getStyleClass().add("s-outbid");
+            }
         }
         if (displayImg != null && !displayImg.isEmpty()) {
             imgProduct.setImage(new Image(displayImg.get(0), 0, 0, true, true));
