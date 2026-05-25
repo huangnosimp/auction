@@ -28,8 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -56,6 +58,8 @@ class AuctionServiceTest {
     private AuctionScheduler scheduler;
     @Mock
     private IAutoBidService autoBidService;
+    @Mock
+    private NotificationService notificationService;
     @Mock
     private ClientHandle client;
 
@@ -189,6 +193,42 @@ class AuctionServiceTest {
         assertEquals(200.0, bidder.getFrozenBalance());
         assertEquals("bidder-1", auction.getCurrentWinnerId());
         verify(autoBidService).processAutoBids("auction-1");
+    }
+
+    @Test
+    void placeBidInFinalSecondsExtendsAuctionAndNotifiesClients() {
+        Member bidder = member("bidder-1", "bidder", 1_000.0, 0.0);
+        Auction auction = new Auction(
+                art("seller-1"),
+                member("seller-1", "seller", 0.0, 0.0),
+                100.0,
+                System.currentTimeMillis() - 1_000,
+                System.currentTimeMillis() + 5_000,
+                10.0,
+                500.0
+        );
+        auction.setId("auction-1");
+        auction.setStatus(AuctionStatus.RUNNING);
+        when(auctionRepository.findById("auction-1")).thenReturn(auction);
+        when(auctionParticipantsRepository.isParticipant("auction-1", "bidder-1")).thenReturn(true);
+        when(userService.getMember("bidder-1")).thenReturn(bidder);
+        when(userService.updateBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(userService.updateFrozenBalance(anyString(), anyDouble())).thenReturn(TransactionResult.SUCCESS);
+        when(auctionRepository.save(any(Auction.class))).thenReturn(true);
+        when(bidTransactionRepository.saveBidTransaction(any())).thenReturn(true);
+        doAnswer(invocation -> {
+            Auction extendedAuction = invocation.getArgument(0);
+            long newEndTime = invocation.getArgument(1);
+            return extendedAuction.extendEndTime(newEndTime);
+        }).when(scheduler).extendTime(eq(auction), anyLong());
+        auctionService.setScheduler(scheduler);
+        auctionService.setNotificationService(notificationService);
+
+        BidResult result = auctionService.placeBid("bidder-1", "auction-1", 150.0, false);
+
+        assertEquals(BidResult.SUCCESS, result);
+        verify(scheduler).extendTime(eq(auction), anyLong());
+        verify(notificationService).notifyAuctionExtended("auction-1", auction.getEndTime());
     }
 
     @Test

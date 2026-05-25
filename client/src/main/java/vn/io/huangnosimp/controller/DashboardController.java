@@ -22,6 +22,7 @@ import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import vn.io.huangnosimp.Manager.ControllerManager;
 import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.TimeSyncManager;
 import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
@@ -31,6 +32,7 @@ import vn.io.huangnosimp.dto.request.GetWonAuctionDTO;
 import vn.io.huangnosimp.dto.response.GetPostedAuctionCardResponseDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
+import vn.io.huangnosimp.dto.shared.AuctionExtendedDTO;
 import vn.io.huangnosimp.dto.shared.NotificationDTO;
 import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.IServerMessageListener;
@@ -44,7 +46,6 @@ import vn.io.huangnosimp.dto.response.AutoBidResponseDTO;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.time.Instant;
 import java.util.*;
 
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
@@ -247,7 +248,7 @@ public class DashboardController implements Initializable, IServerMessageListene
                     result.forEach(c -> excludeIds.add(c.getAuctionId()));
 
                     for (AuctionCardDTO card : responseList) {
-                        long now = Instant.now().toEpochMilli();
+                        long now = TimeSyncManager.nowMillis();
                         if (!excludeIds.contains(card.getAuctionId()) && now <= card.getEndTime()) {
                             result.add(card);
                             excludeIds.add(card.getAuctionId());
@@ -521,6 +522,17 @@ public class DashboardController implements Initializable, IServerMessageListene
             case AUCTION_ENDED -> {
                 Platform.runLater(() -> {
                     removeOutbidItem(notificationDTO.getAuctionId());
+                });
+            }
+            case AUCTION_EXTENDED -> {
+                Platform.runLater(() -> {
+                    AuctionExtendedDTO dto = GsonParser.GSON.fromJson(
+                            GsonParser.GSON.toJsonTree(notificationDTO.getData()),
+                            AuctionExtendedDTO.class
+                    );
+                    if (dto != null) {
+                        UserSession.updateAuctionEndTime(notificationDTO.getAuctionId(), dto.getNewEndTime());
+                    }
                 });
             }
             case AUCTION_CANCELED -> {

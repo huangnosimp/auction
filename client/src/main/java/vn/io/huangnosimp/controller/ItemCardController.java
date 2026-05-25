@@ -17,6 +17,7 @@ import vn.io.huangnosimp.dto.request.JoinRoomRequestDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
 import vn.io.huangnosimp.dto.response.PlaceBidResponseDTO;
+import vn.io.huangnosimp.dto.shared.AuctionExtendedDTO;
 import vn.io.huangnosimp.dto.shared.NotificationDTO;
 import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.IServerMessageListener;
@@ -28,7 +29,6 @@ import vn.io.huangnosimp.util.GsonParser;
 
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.time.Instant;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
@@ -58,6 +58,7 @@ public class ItemCardController implements Initializable, IServerMessageListener
 
     private String auctionId;
     private List<String> displayImg;
+    private AuctionCountdownUtil countdownUtil;
 
     public void addInfo(AuctionCardDTO dto, String type){
         displayImg = dto.getImageUrl();
@@ -73,14 +74,14 @@ public class ItemCardController implements Initializable, IServerMessageListener
             imgProduct.setImage(null);
         }
         lblProductName.setText(dto.getProductName());
-        long now = Instant.now().toEpochMilli();
+        long now = TimeSyncManager.nowMillis();
         if(now < dto.getStartTime()){
             statuslbl.setText("Start in: ");
         }
         else {
             statuslbl.setText("End in: ");
         }
-        AuctionCountdownUtil countdownUtil = new AuctionCountdownUtil(lblTimeRemaining, dto.getStartTime(), dto.getEndTime());
+        countdownUtil = new AuctionCountdownUtil(lblTimeRemaining, dto.getStartTime(), dto.getEndTime());
         countdownUtil.start();
         lblCurrentBid.setText(caculateCurrentBid(dto.getCurrentPrice()));
         if(type.equals("Joining")){
@@ -221,6 +222,26 @@ public class ItemCardController implements Initializable, IServerMessageListener
                             }
                         }
                     });
+                }
+            }
+
+            case AUCTION_EXTENDED -> {
+                if (notificationDTO.getAuctionId() != null && notificationDTO.getAuctionId().equals(auctionId)) {
+                    AuctionExtendedDTO dto = GsonParser.GSON.fromJson(
+                            GsonParser.GSON.toJsonTree(notificationDTO.getData()),
+                            AuctionExtendedDTO.class
+                    );
+                    if (dto != null) {
+                        Platform.runLater(() -> {
+                            UserSession.updateAuctionEndTime(auctionId, dto.getNewEndTime());
+                            if (countdownUtil != null) {
+                                countdownUtil.updateEndTime(dto.getNewEndTime());
+                            }
+                            if (statuslbl != null) {
+                                statuslbl.setText("End in: ");
+                            }
+                        });
+                    }
                 }
             }
 

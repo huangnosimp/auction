@@ -58,6 +58,10 @@ public class AuctionCardDTO {
         return endTime;
     }
 
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
     public int getBidCount() {
         return bidCount;
     }

@@ -33,7 +33,7 @@ public class AuctionCountdownUtil {
     }
 
     private void update() {
-        long now = Instant.now().toEpochMilli();
+        long now = TimeSyncManager.nowMillis();
 
         if (now < startTime) {
             long diffMilli = startTime - now;
@@ -77,6 +77,14 @@ public class AuctionCountdownUtil {
 
     public void start() {
         timeline.play();
+    }
+
+    public void updateEndTime(long endTime) {
+        this.endTime = endTime;
+        update();
+        if (timeline.getStatus() != Animation.Status.RUNNING) {
+            timeline.play();
+        }
     }
 
     public void stop() {

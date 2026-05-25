@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import vn.io.huangnosimp.Manager.SceneManager;
 import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.TimeSyncManager;
 import vn.io.huangnosimp.network.SocketClient;
 
 import java.lang.reflect.Method;
@@ -34,6 +35,7 @@ public class Main extends Application {
                     SocketClient socketClient = new SocketClient("20.255.57.143", 26676);
                     socketClient.connect();
                     SocketManager.setClient(socketClient);
+                    TimeSyncManager.startPeriodicSync(socketClient);
                     System.out.println("Kết nối server thành công!");
                 } catch (Exception e) {
                     System.err.println("Lỗi kết nối Server: " + e.getMessage());

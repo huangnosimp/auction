@@ -258,9 +258,14 @@ public class AuctionService implements IAuctionService {
             }
 
             auction.setUpdatedAt(System.currentTimeMillis());
+            boolean auctionExtended = false;
+            long extendedEndTime = auction.getEndTime();
             if (auction.needExtension() && scheduler != null) {
                 long newEndTime = System.currentTimeMillis() + 60 * 1000;
-                scheduler.extendTime(auction, newEndTime);
+                auctionExtended = scheduler.extendTime(auction, newEndTime);
+                if (auctionExtended) {
+                    extendedEndTime = auction.getEndTime();
+                }
             }
 
             if (!auctionRepository.save(auction)) {
@@ -282,6 +287,9 @@ public class AuctionService implements IAuctionService {
                 notificationService.notifyBidPlaced(auctionId, amount, bidder.getUsername());
                 if (previousWinnerId != null && !previousWinnerId.equals(bidderId)) {
                     notificationService.notifyOutbid(auctionId, previousWinnerId, auction.getCurrentPrice());
+                }
+                if (auctionExtended) {
+                    notificationService.notifyAuctionExtended(auctionId, extendedEndTime);
                 }
             }
             logger.info("Bid placed auctionId={} bidderId={} amount={} previousWinnerId={}",

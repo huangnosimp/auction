@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import vn.io.huangnosimp.dto.response.PlaceBidResponseDTO;
+import vn.io.huangnosimp.dto.shared.AuctionExtendedDTO;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.ClientSessionManager;
@@ -23,6 +24,11 @@ public class NotificationService {
         PlaceBidResponseDTO dto = new PlaceBidResponseDTO(winnerUsername, amount, System.currentTimeMillis());
         sendNotification(auctionId, NotificationType.NEW_BID, dto);
         logger.info("Bid notification sent auctionId={} amount={}", auctionId, amount);
+    }
+    public void notifyAuctionExtended(String auctionId, long newEndTime) {
+        AuctionExtendedDTO dto = new AuctionExtendedDTO(newEndTime, System.currentTimeMillis());
+        sendNotification(auctionId, NotificationType.AUCTION_EXTENDED, dto);
+        logger.info("Auction extension notification sent auctionId={} newEndTime={}", auctionId, newEndTime);
     }
     public void notifyAuctionEnded(String auctionId, String winnerUsername, double finalPrice) {
         String msg = String.format("Auction ended! Winner: %s with price %.2f", winnerUsername != null ? winnerUsername : "None", finalPrice);

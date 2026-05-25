@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import vn.io.huangnosimp.Manager.AuctionCountdownUtil;
 import vn.io.huangnosimp.Manager.FormatUtil;
 import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.TimeSyncManager;
 import vn.io.huangnosimp.Manager.UserSession;
 import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.Manager.ControllerManager;
@@ -96,7 +97,7 @@ public class RowItemController {
         }
 
         if (btnAction != null) {
-            boolean active = System.currentTimeMillis() < dto.getEndTime();
+            boolean active = TimeSyncManager.nowMillis() < dto.getEndTime();
             btnAction.setVisible(active);
             btnAction.setManaged(active);
             btnAction.setOnAction(e -> handleEnterRoomAsManager(dto));
