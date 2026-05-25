@@ -26,7 +26,7 @@ Phạm vi hiện tại tập trung vào:
 
 ## Môi trường chạy và yêu cầu cài đặt
 - JDK 25 hoặc tương thích với cấu hình JavaFX/Dockerfile hiện tại.
-- MySQL server đã tạo database/schema phù hợp với các bảng `Users`, `Items`, `ItemImages`, `Auctions`, `AuctionParticipants`, `BidTransactions`, `Transactions`, `auto_bids`.
+- MySQL server đã tạo database/schema phù hợp với các bảng `users`, `items`, `itemimages`, `auctions`, `auctionparticipants`, `bidtransactions`, `transactions`, `auto_bids`. Lưu ý code hiện có query trộn tên bảng chữ hoa/thường, nên môi trường MySQL nên dùng cấu hình không phân biệt hoa/thường tên bảng hoặc đồng bộ lại casing giữa code và schema trước khi chạy.
 - Cloudinary account nếu dùng chức năng upload ảnh sản phẩm.
 - Docker/Docker Compose nếu chạy server bằng container.
 
@@ -92,6 +92,164 @@ Lệnh build:
 
 ### 1. Chuẩn bị database và biến môi trường
 Tạo database MySQL và đảm bảo schema có các bảng mà server đang sử dụng. Sau đó cấu hình biến môi trường theo hệ điều hành đang dùng.
+
+Cấu hình bảng cho MySQL:
+
+```mysql
+create database if not exists auction
+    character set utf8mb4
+    collate utf8mb4_unicode_ci;
+
+use auction;
+
+create table if not exists users
+(
+    id              char(36)                            not null,
+    username        varchar(50)                         not null,
+    password        char(60)                            not null,
+    email           varchar(50)                         not null,
+    role            varchar(20)                         not null,
+    account_balance decimal(15, 2) default 0.00         not null,
+    frozen_balance  decimal(15, 2) default 0.00         not null,
+    created_at      timestamp null default current_timestamp,
+    is_banned       tinyint(1)     default 0            not null,
+    ban_until       timestamp(3)                        null,
+    primary key (id),
+    unique key uk_users_username (username),
+    unique key uk_users_email (email)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+create table if not exists items
+(
+    id              char(36)                            not null,
+    created_at      timestamp null default current_timestamp,
+    updated_at      timestamp null default current_timestamp on update current_timestamp,
+    owner_id        char(36)                            not null,
+    name            varchar(100)                        not null,
+    description     text                                null,
+    item_type       varchar(30)                         not null,
+    artist          varchar(100)                        null,
+    creation_year   int                                 null,
+    brand           varchar(100)                        null,
+    warranty_period int                                 null,
+    engine_type     varchar(50)                         null,
+    mileage         int                                 null,
+    conditions      varchar(20)                         not null,
+    image_url       varchar(255)                        null,
+    primary key (id),
+    key idx_items_owner_id (owner_id),
+    constraint fk_items_owner
+        foreign key (owner_id) references users (id)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+create table if not exists auctions
+(
+    id                char(36)                            not null,
+    item_id           char(36)                            not null,
+    seller_id         char(36)                            not null,
+    winner_id         char(36)                            null,
+    start_time        timestamp(3)                        null,
+    end_time          timestamp(3)                        null,
+    starting_price    decimal(15, 2)                      not null,
+    final_price       decimal(15, 2)                      null,
+    status            varchar(20)                         not null,
+    created_at        timestamp null default current_timestamp,
+    minimum_increment decimal(15, 2) default 0.00         not null,
+    buy_now_price     decimal(15, 2) default 0.00         not null,
+    primary key (id),
+    key idx_auctions_item_id (item_id),
+    key idx_auctions_seller_id (seller_id),
+    key idx_auctions_winner_id (winner_id),
+    constraint fk_auctions_item
+        foreign key (item_id) references items (id),
+    constraint fk_auctions_seller
+        foreign key (seller_id) references users (id),
+    constraint fk_auctions_winner
+        foreign key (winner_id) references users (id)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+create table if not exists auctionparticipants
+(
+    auction_id char(36) not null,
+    user_id    char(36) not null,
+    primary key (auction_id, user_id),
+    key idx_auctionparticipants_user_id (user_id),
+    constraint fk_auctionparticipants_auction
+        foreign key (auction_id) references auctions (id)
+            on delete cascade,
+    constraint fk_auctionparticipants_user
+        foreign key (user_id) references users (id)
+            on delete cascade
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+create table if not exists bidtransactions
+(
+    id         char(36)                            not null,
+    auction_id char(36)                            not null,
+    bidder_id  char(36)                            not null,
+    bid_amount decimal(15, 2)                      not null,
+    bid_time   timestamp null default current_timestamp,
+    primary key (id),
+    key idx_bidtransactions_auction_id (auction_id),
+    key idx_bidtransactions_bidder_id (bidder_id),
+    constraint fk_bidtransactions_auction
+        foreign key (auction_id) references auctions (id),
+    constraint fk_bidtransactions_bidder
+        foreign key (bidder_id) references users (id)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+create table if not exists itemimages
+(
+    my_row_id bigint unsigned not null auto_increment,
+    item_id   char(36)        not null,
+    image_url text            not null,
+    primary key (my_row_id),
+    key idx_itemimages_item_id (item_id),
+    constraint fk_itemimages_item
+        foreign key (item_id) references items (id)
+            on delete cascade
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+create table if not exists transactions
+(
+    id               char(36)                            not null,
+    user_id          char(36)                            not null,
+    amount           decimal(15, 2)                      not null,
+    transaction_time timestamp null default current_timestamp,
+    transaction_type varchar(20)                         not null,
+    primary key (id),
+    key idx_transactions_user_id (user_id),
+    constraint fk_transactions_user
+        foreign key (user_id) references users (id)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+create table if not exists auto_bids
+(
+    bidder_id     varchar(36)                        not null,
+    auction_id    varchar(36)                        not null,
+    max_bid       decimal(15, 2)                     not null,
+    increment     decimal(15, 2)                     not null,
+    registered_at datetime default current_timestamp not null,
+    primary key (bidder_id, auction_id),
+    key idx_auto_bids_auction_id (auction_id)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+```
 
 Linux/macOS, cấu hình tạm thời cho terminal hiện tại:
 
