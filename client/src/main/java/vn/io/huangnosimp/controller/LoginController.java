@@ -11,13 +11,17 @@ import vn.io.huangnosimp.Manager.ViewManager;
 import vn.io.huangnosimp.dto.request.GetPostedAuctionDTO;
 import vn.io.huangnosimp.dto.request.LoginRequestDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
+import vn.io.huangnosimp.dto.response.AutoBidResponseDTO;
 import vn.io.huangnosimp.dto.response.GetPostedAuctionCardResponseDTO;
 import vn.io.huangnosimp.enums.UserType;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -33,9 +37,6 @@ public class LoginController {
     @FXML private Button loginButton;
     private UserType userType;
 
-    /**
-     * Khi ấn Enter tại ô Email, tiêu điểm (focus) sẽ tự động chuyển sang ô Password
-     */
     @FXML
     public void handleEmailEnter(ActionEvent event) {
         passwordField.requestFocus();
@@ -65,21 +66,33 @@ public class LoginController {
             SocketManager.getClient().sendRequestAsync(request)
                     .thenAccept(response -> {
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
+                            Request activeAutobidRequest = new Request(ActionType.GET_USER_AUTO_BIDS, null);
                             Request getMineRequest = new Request(ActionType.GET_POSTED_AUCTION_CARD, new GetPostedAuctionDTO(30));
                             Request dashboardRequest = new Request(ActionType.GET_DASHBOARD_INFO, null);
 
                             SocketManager.getClient().sendRequestAsync(getMineRequest)
                                     .thenCombine(SocketManager.getClient().sendRequestAsync(dashboardRequest), (getPostedResponse, dashboardResponse) -> {
+                                        return new Response[]{getPostedResponse, dashboardResponse};
+                                    })
+                                    .thenCombine(SocketManager.getClient().sendRequestAsync(activeAutobidRequest), (responses, autoBidResponse) -> {
+                                        Response getPostedResponse = responses[0];
+                                        Response dashboardResponse = responses[1];
+
                                         GetPostedAuctionCardResponseDTO postedDto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(getPostedResponse.getData()), GetPostedAuctionCardResponseDTO.class);
                                         UserSession.addMyCard(postedDto.getAuctionCards());
 
                                         DashboardResponseDTO dashboardDto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(dashboardResponse.getData()), DashboardResponseDTO.class);
+
+                                        Type autoBidListType = new TypeToken<List<AutoBidResponseDTO>>(){}.getType();
+                                        List<AutoBidResponseDTO> autoBids = GsonParser.GSON.fromJson(
+                                                GsonParser.GSON.toJsonTree(autoBidResponse.getData()), autoBidListType);
 
                                         Platform.runLater(() -> {
                                             UserSession.setDashboardInfo(dashboardDto);
                                             UserSession.setUsername(dashboardDto.getUsername());
                                             UserSession.setEmail(dashboardDto.getEmail());
                                             UserSession.setBalance(dashboardDto.getBalance());
+                                            UserSession.setActiveAutoBids(autoBids);
 
                                             List<AuctionCardDTO> joinedRooms = new ArrayList<>();
                                             if (dashboardDto.getAuctionCardInfo() != null) {

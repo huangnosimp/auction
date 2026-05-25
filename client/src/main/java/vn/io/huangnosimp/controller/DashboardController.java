@@ -3,6 +3,8 @@ package vn.io.huangnosimp.controller;
 import com.google.gson.reflect.TypeToken;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -37,6 +39,7 @@ import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
+import vn.io.huangnosimp.dto.response.AutoBidResponseDTO;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -45,8 +48,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
-import static vn.io.huangnosimp.Manager.UserSession.getDashboardInfo;
-import static vn.io.huangnosimp.Manager.UserSession.getJoiningListCard;
+import static vn.io.huangnosimp.Manager.UserSession.*;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 
@@ -58,6 +60,8 @@ public class DashboardController implements Initializable, IServerMessageListene
     @FXML private HBox menuHbox;
     @FXML private VBox sideVbox;
     @FXML private Label lblBalance;
+    @FXML private Label lblBalanceChange;
+    private boolean isInitialized = false;
 
     @FXML private HBox toastBox;
     @FXML private Label toastTitle, toastSub, toastIconLabel;
@@ -65,6 +69,8 @@ public class DashboardController implements Initializable, IServerMessageListene
     @FXML private ScrollPane outBidScrollPane;
     @FXML private VBox outbidAlertsList;
     @FXML private Label outbidBadge;
+    @FXML private VBox autoBidList;
+    @FXML private Label autoBidBadge;
 
     public static DashboardController instance;
 
@@ -356,6 +362,9 @@ public class DashboardController implements Initializable, IServerMessageListene
         ControllerManager.getDashboardHomeController().setupDashboardHome();
         addOutbidCardToUI();
         updateOutbidBadge();
+        addAutoBidCardToUI();
+        updateAutoBidBadge();
+        isInitialized = true;
     }
 
     public void updateOutbidBadge() {
@@ -365,13 +374,116 @@ public class DashboardController implements Initializable, IServerMessageListene
         outbidBadge.setManaged(count > 0);
     }
 
-    public void updateBalance(double amount){
+    public void updateBalance(double amount, double diffAmount, boolean isRefund){
         lblBalance.setText(formatNumber(calculateBalance(amount))+" VND");
+        animateBalanceChange(diffAmount, isRefund);
+    }
+
+    public void animateBalanceChange(double amount, boolean isRefund) {
+        lblBalanceChange.getStyleClass().removeAll("balance-deduct", "balance-refund");
+        if (isRefund) {
+            lblBalanceChange.setText("+" + formatNumber(amount) + " VND");
+            lblBalanceChange.getStyleClass().add("balance-refund");
+        } else {
+            lblBalanceChange.setText("-" + formatNumber(amount) + " VND");
+            lblBalanceChange.getStyleClass().add("balance-deduct");
+        }
+
+        lblBalanceChange.setVisible(true);
+        lblBalanceChange.setManaged(true);
+        lblBalanceChange.setOpacity(0.0);
+        lblBalanceChange.setTranslateY(-10.0);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(250), lblBalanceChange);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+
+        TranslateTransition slideDown = new TranslateTransition(Duration.millis(300), lblBalanceChange);
+        slideDown.setFromY(-10.0);
+        slideDown.setToY(10.0);
+
+        ParallelTransition showTransition = new ParallelTransition(fadeIn, slideDown);
+
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(350), lblBalanceChange);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        fadeOut.setDelay(Duration.seconds(1.2));
+        fadeOut.setOnFinished(e -> {
+            lblBalanceChange.setVisible(false);
+            lblBalanceChange.setManaged(false);
+        });
+
+        showTransition.setOnFinished(e -> fadeOut.play());
+        showTransition.play();
     }
     private double calculateBalance(double value) {
         return Double.parseDouble(BigDecimal.valueOf(value).toPlainString());
     }
 
+    private void addAutoBidCardToUI() {
+        autoBidList.getChildren().clear();
+        for (AutoBidResponseDTO dto : UserSession.getActiveAutoBidList()) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/autobid_item.fxml"));
+                Parent node = loader.load();
+                AutoBidItemController controller = loader.getController();
+                String productName = findProductName(dto.getAuctionId());
+                controller.setUp(dto, productName);
+                node.setUserData(dto.getAuctionId());
+                autoBidList.getChildren().add(node);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void removeAutoBidItem(String auctionId) {
+        autoBidList.getChildren().removeIf(node -> auctionId.equals(node.getUserData()));
+        updateAutoBidBadge();
+    }
+
+    public void addAutoBidItem(String auctionId){
+        for (AutoBidResponseDTO dto : UserSession.getActiveAutoBidList()) {
+            if(dto.getAuctionId().equals(auctionId)){
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/autobid_item.fxml"));
+                    Parent node = loader.load();
+                    AutoBidItemController controller = loader.getController();
+                    String productName = findProductName(dto.getAuctionId());
+                    controller.setUp(dto, productName);
+                    node.setUserData(dto.getAuctionId());
+                    autoBidList.getChildren().add(node);
+                    updateAutoBidBadge();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    public void updateAutoBidBadge() {
+        int count = autoBidList.getChildren().size();
+        autoBidBadge.setText(String.valueOf(count));
+        autoBidBadge.setVisible(count > 0);
+        autoBidBadge.setManaged(count > 0);
+    }
+
+    private String findProductName(String auctionId) {
+        for (AuctionCardDTO dto : getJoiningListCard()) {
+            if (auctionId.equals(dto.getAuctionId())) {
+                return dto.getProductName();
+            }
+        }
+        for (AuctionCardDTO dto : UserSession.getMyListCard()) {
+            if (auctionId.equals(dto.getAuctionId())) {
+                return dto.getProductName();
+            }
+        }
+        return null;
+    }
+
+    public VBox getAutoBidList(){
+        return autoBidList;
+    }
     @Override
     public void onResponseReceived(Response response){}
     public void onResponseReceived(Response response, ActionType actionType){}
@@ -396,6 +508,14 @@ public class DashboardController implements Initializable, IServerMessageListene
                         }
                     }
                     addOrUpdateOutbidItem(auctionId, productName, currentPrice);
+
+                    // Hoàn lại tiền bid cũ khi bị outbid (Server đã unfreeze)
+                    double previousBid = UserSession.getLatestBid(auctionId);
+                    if (previousBid > 0) {
+                        UserSession.addBalance(previousBid);
+                        UserSession.setLatestBid(auctionId, 0);
+                        updateBalance(UserSession.getBalance(), previousBid, true);
+                    }
                 });
             }
             case AUCTION_ENDED -> {
@@ -414,8 +534,10 @@ public class DashboardController implements Initializable, IServerMessageListene
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         setMainBorderPane(mainBorderPane);
         ControllerManager.setDashboardController(this);
+        SocketManager.getClient().addListener(this);
         setupDashboard();
         changeView("dashboard_home.fxml", 1);
     }

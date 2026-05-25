@@ -3,6 +3,7 @@ package vn.io.huangnosimp.controller;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
@@ -26,8 +27,10 @@ import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.util.GsonParser;
 
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.time.Instant;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +38,7 @@ import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 import static vn.io.huangnosimp.Manager.UserSession.getUsername;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
-public class ItemCardController implements IServerMessageListener {
+public class ItemCardController implements Initializable, IServerMessageListener {
     @FXML private Label lblProductName;
     @FXML private Label lblTimeRemaining;
     @FXML private Label lblCurrentBid;
@@ -60,6 +63,7 @@ public class ItemCardController implements IServerMessageListener {
         displayImg = dto.getImageUrl();
         bidCount = dto.getBidCount();
         bidderCount = dto.getBidderCount();
+        this.auctionId = dto.getAuctionId();
         if(dto.getCurrentPrice() == dto.getYourBid()){
             lblBidStatus.setText("WINNING");
         }
@@ -79,7 +83,6 @@ public class ItemCardController implements IServerMessageListener {
         AuctionCountdownUtil countdownUtil = new AuctionCountdownUtil(lblTimeRemaining, dto.getStartTime(), dto.getEndTime());
         countdownUtil.start();
         lblCurrentBid.setText(caculateCurrentBid(dto.getCurrentPrice()));
-        this.auctionId = dto.getAuctionId();
         if(type.equals("Joining")){
             lblYourBid.setText(caculateCurrentBid(dto.getYourBid()));
         }
@@ -166,7 +169,7 @@ public class ItemCardController implements IServerMessageListener {
                                             UserSession.setAuctionId(auctionId);
                                             liveAuctionController controller = changeViewWithController("liveAuction.fxml");
                                             controller.setUpPreviewImg(displayImg);
-                                            if (btnManage.getText().equals("Manage")) {
+                                            if (btnManage != null && btnManage.getText().equals("Manage")) {
                                                 controller.setInvisible();
                                             }
                                         });
@@ -187,31 +190,65 @@ public class ItemCardController implements IServerMessageListener {
     public void onRequestReceived(Request notification){
         NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
         NotificationType notificationType = notificationDTO.getNotificationType();
+
         switch (notificationType){
             case NEW_BID -> {
-                PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
-                Platform.runLater(()->{
-                    lblBidCount.setText(String.valueOf(bidCount+1) + " bids");
-                    lblCurrentBid.setText(formatNumber(dto.getAmount()));
-                    if(dto.getUsername().equals(getUsername())){
-                        lblYourBid.setText(formatNumber(dto.getAmount()));
-                        lblBidStatus.setText("WINNING");
-                    }
-                    else{
-                        lblBidStatus.setText("OUTBID");
-                    }
-                });
+                if (notificationDTO.getAuctionId() != null && notificationDTO.getAuctionId().equals(auctionId)) {
+
+                    PlaceBidResponseDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notificationDTO.getData()), PlaceBidResponseDTO.class);
+                    Platform.runLater(()->{
+                        bidCount++;
+                        if (lblBidCount != null) {
+                            lblBidCount.setText(String.valueOf(bidCount) + " bids");
+                        }
+                        if (lblCurrentBid != null) {
+                            lblCurrentBid.setText(caculateCurrentBid(dto.getAmount()));
+                        }
+                        if (dto.getUsername() != null && dto.getUsername().equals(getUsername())) {
+                            if (lblYourBid != null) {
+                                lblYourBid.setText(caculateCurrentBid(dto.getAmount()));
+                            }
+                            if (lblBidStatus != null) {
+                                lblBidStatus.setText("WINNING");
+                                lblBidStatus.getStyleClass().removeAll("s-outbid");
+                                lblBidStatus.getStyleClass().add("s-winning");
+                            }
+                        } else {
+                            if (lblBidStatus != null) {
+                                lblBidStatus.setText("OUTBID");
+                                lblBidStatus.getStyleClass().removeAll("s-winning");
+                                lblBidStatus.getStyleClass().add("s-outbid");
+                            }
+                        }
+                    });
+                }
             }
+
             case OUTBID -> {
                 if(notificationDTO.getAuctionId().equals(auctionId)){
+
                     String msg = (String) notificationDTO.getData();
-                    lblCurrentBid.setText(formatNumber(extractPrice(msg)));
-                    lblBidStatus.setText("OUTBID");
+                    double price = extractPrice(msg);
+                    Platform.runLater(() -> {
+                        if (lblCurrentBid != null) {
+                            lblCurrentBid.setText(caculateCurrentBid(price));
+                        }
+                        if (lblBidStatus != null) {
+                            lblBidStatus.setText("OUTBID");
+                            lblBidStatus.getStyleClass().removeAll("s-winning");
+                            lblBidStatus.getStyleClass().add("s-outbid");
+                        }
+                    });
                 }
             }
         }
     }
     public void onDisconnected(String reason){}
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        SocketManager.getClient().addListener(this);
+    }
     private double extractPrice(String message) {
         Pattern pattern = Pattern.compile("Current price is ([\\d.]+) in room");
         Matcher matcher = pattern.matcher(message);

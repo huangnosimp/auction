@@ -11,7 +11,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.animation.FadeTransition;
 import javafx.util.Duration;
-import javafx.event.ActionEvent; // đúng loại sự kiện
+import javafx.event.ActionEvent;
 import vn.io.huangnosimp.Manager.ControllerManager;
 import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.Manager.ViewManager;

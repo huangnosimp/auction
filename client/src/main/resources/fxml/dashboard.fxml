@@ -48,10 +48,10 @@
                         <VBox spacing="4" styleClass="stat-card">
                             <Label styleClass="stat-label" text="YOUR BALANCE" />
                             <Label fx:id="lblBalance" styleClass="stat-value" text="1,550" />
-                            <Label styleClass="stat-link" text="+ Top Up" />
+                            <Label fx:id="lblBalanceChange" managed="false" styleClass="balance-change" text="" visible="false" />
                         </VBox>
 
-                        <SplitPane orientation="VERTICAL" dividerPositions="0.4" styleClass="sidebar-split-pane" VBox.vgrow="ALWAYS">
+                        <SplitPane dividerPositions="0.4" orientation="VERTICAL" styleClass="sidebar-split-pane" VBox.vgrow="ALWAYS">
                             <items>
 
                                 <VBox prefHeight="230.0" spacing="8" styleClass="side-card, side-card-outbid">
@@ -109,61 +109,15 @@
                                     </ScrollPane>
                                 </VBox>
 
-                                <VBox spacing="8" styleClass="side-card">
+                                <VBox spacing="8" styleClass="side-card, side-card-autobid">
                                     <HBox alignment="CENTER_LEFT" spacing="6">
-                                        <Label styleClass="side-title-closing" text="⏳ CLOSING SOON" />
+                                        <Label styleClass="side-title-autobid" text="🤖 AUTO BID ACTIVE" />
+                                        <Label fx:id="autoBidBadge" styleClass="side-badge-autobid" text="0" />
                                     </HBox>
 
                                     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="side-scroll" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
                                         <content>
-                                            <VBox fx:id="closingSoonList" spacing="8" styleClass="side-list-container">
-
-                                                <VBox spacing="4" styleClass="closing-item-row">
-                                                    <HBox alignment="CENTER_LEFT">
-                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="Vincent van Gogh Art" HBox.hgrow="ALWAYS" />
-                                                        <Region HBox.hgrow="ALWAYS" />
-                                                        <Label styleClass="side-item-time-val" text="01m 45s" />
-                                                    </HBox>
-                                                    <ProgressBar maxWidth="Infinity" progress="0.15" styleClass="side-progress-bar" />
-                                                </VBox>
-
-                                                <VBox spacing="4" styleClass="closing-item-row">
-                                                    <HBox alignment="CENTER_LEFT">
-                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="Mechanical Keyboard" HBox.hgrow="ALWAYS" />
-                                                        <Region HBox.hgrow="ALWAYS" />
-                                                        <Label styleClass="side-item-time-val" text="03m 12s" />
-                                                    </HBox>
-                                                    <ProgressBar maxWidth="Infinity" progress="0.32" styleClass="side-progress-bar" />
-                                                </VBox>
-
-                                                <VBox spacing="4" styleClass="closing-item-row">
-                                                    <HBox alignment="CENTER_LEFT">
-                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="MacBook Pro M3 Max" HBox.hgrow="ALWAYS" />
-                                                        <Region HBox.hgrow="ALWAYS" />
-                                                        <Label styleClass="side-item-time-val" text="05m 50s" />
-                                                    </HBox>
-                                                    <ProgressBar maxWidth="Infinity" progress="0.55" styleClass="side-progress-bar" />
-                                                </VBox>
-
-                                                <VBox spacing="4" styleClass="closing-item-row">
-                                                    <HBox alignment="CENTER_LEFT">
-                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="Leica M11 Camera" HBox.hgrow="ALWAYS" />
-                                                        <Region HBox.hgrow="ALWAYS" />
-                                                        <Label styleClass="side-item-time-val" text="08m 20s" />
-                                                    </HBox>
-                                                    <ProgressBar maxWidth="Infinity" progress="0.78" styleClass="side-progress-bar" />
-                                                </VBox>
-
-                                                <VBox spacing="4" styleClass="closing-item-row">
-                                                    <HBox alignment="CENTER_LEFT">
-                                                        <Label styleClass="side-item-title, side-item-title-ellipsis" text="Sony WH-1000XM5" HBox.hgrow="ALWAYS" />
-                                                        <Region HBox.hgrow="ALWAYS" />
-                                                        <Label styleClass="side-item-time-val" text="11m 05s" />
-                                                    </HBox>
-                                                    <ProgressBar maxWidth="Infinity" progress="0.91" styleClass="side-progress-bar" />
-                                                </VBox>
-
-                                            </VBox>
+                                            <VBox fx:id="autoBidList" spacing="8" styleClass="side-list-container" />
                                         </content>
                                     </ScrollPane>
                                 </VBox>
