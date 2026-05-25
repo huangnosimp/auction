@@ -18,6 +18,7 @@ import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 
 public class AutoBidItemController {
     @FXML private Label lblProductTitle;
+    @FXML private Label lblAuctionSubtitle;
     @FXML private Label lblMaxBid;
     @FXML private Button btnCancel;
 
@@ -26,6 +27,8 @@ public class AutoBidItemController {
     public void setUp(AutoBidResponseDTO dto, String productName) {
         this.auctionId = dto.getAuctionId();
         lblProductTitle.setText(productName != null ? productName : "Auction #" + auctionId);
+        String shortId = auctionId != null ? auctionId.substring(0, Math.min(8, auctionId.length())) : "N/A";
+        lblAuctionSubtitle.setText("Mã phiên: #" + shortId);
         lblMaxBid.setText("Max: " + formatNumber(dto.getMaxBid()) + " VND");
     }
 
@@ -43,6 +46,13 @@ public class AutoBidItemController {
                     if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
                         UserSession.removeAutoBid(auctionId);
                         ControllerManager.getDashboardController().removeAutoBidItem(auctionId);
+                        
+                        // Đồng bộ trạng thái Auto Bid ở màn hình live room nếu đang xem cùng phòng
+                        liveAuctionController liveController = ControllerManager.getLiveAuctionController();
+                        if (liveController != null && auctionId.equals(liveController.getAuctionId())) {
+                            liveController.updateAutoBidStatus(false);
+                        }
+                        
                         ControllerManager.getDashboardController().showToast("Auto Bid", "Cancelled for this auction", true);
                     } else {
                         ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);

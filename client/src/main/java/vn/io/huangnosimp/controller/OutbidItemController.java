@@ -25,6 +25,7 @@ import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
 
 public class OutbidItemController {
     @FXML private Label lblProductTitle;
+    @FXML private Label lblAuctionSubtitle;
     @FXML private Label lblTopBid;
     @FXML private Button btnQuickBid;
 
@@ -33,12 +34,16 @@ public class OutbidItemController {
     public void setUp(AuctionCardDTO dto){
         this.auctionId = dto.getAuctionId();
         lblProductTitle.setText(dto.getProductName());
+        String shortId = auctionId != null ? auctionId.substring(0, Math.min(8, auctionId.length())) : "N/A";
+        lblAuctionSubtitle.setText("Mã phiên: #" + shortId);
         lblTopBid.setText(formatNumber(calculatePrice(dto.getCurrentPrice()))+" VND");
     }
 
     public void setUpManual(String auctionId, String productName, double currentPrice){
         this.auctionId = auctionId;
         lblProductTitle.setText(productName);
+        String shortId = auctionId != null ? auctionId.substring(0, Math.min(8, auctionId.length())) : "N/A";
+        lblAuctionSubtitle.setText("Mã phiên: #" + shortId);
         lblTopBid.setText(formatNumber(calculatePrice(currentPrice))+" VND");
     }
 
@@ -64,7 +69,7 @@ public class OutbidItemController {
                                 Platform.runLater(() -> {
                                     UserSession.setAuctionDetail(auctionDetail);
                                     UserSession.setAuctionId(auctionId);
-                                    ControllerManager.getDashboardController().removeOutbidItem(auctionId);
+
                                     ViewManager.changeViewWithController("liveAuction.fxml");
                                     btnQuickBid.setDisable(false);
                                 });

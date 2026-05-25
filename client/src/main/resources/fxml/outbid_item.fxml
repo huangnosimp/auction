@@ -8,6 +8,7 @@
         <VBox spacing="2" HBox.hgrow="ALWAYS">
             <children>
                 <Label fx:id="lblProductTitle" styleClass="side-item-title" text="Product Name" />
+                <Label fx:id="lblAuctionSubtitle" style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="#ID-Phien" />
                 <Label fx:id="lblTopBid" styleClass="side-item-value-outbid" text="Top: $0" />
             </children>
         </VBox>

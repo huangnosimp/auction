@@ -44,7 +44,7 @@ public class ControllerManager {
     public static void setLiveAuctionController(liveAuctionController c){
         liveAuctionController = c;
     }
-    public liveAuctionController getLiveAuctionController(){
+    public static liveAuctionController getLiveAuctionController(){
         return liveAuctionController;
     }
 
