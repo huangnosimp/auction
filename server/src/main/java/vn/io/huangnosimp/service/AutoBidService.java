@@ -96,7 +96,7 @@ public class AutoBidService implements IAutoBidService {
                 double nextBid = currentPrice + loneBot.getIncrement();
 
                 if (nextBid <= loneBot.getMaxBid()) {
-                    auctionService.placeBid(loneBot.getBidder().getId(), auctionId, nextBid, true);
+                    auctionService.placeBid(loneBot.getBidder().getId(), auctionId, nextBid, false);
                 }
             }
             return;
@@ -117,7 +117,7 @@ public class AutoBidService implements IAutoBidService {
         }
 
         if (jumpPrice > currentPrice && jumpPrice <= top1.getMaxBid()) {
-            BidResult result = auctionService.placeBid(top1.getBidder().getId(), auctionId, jumpPrice, true);
+            BidResult result = auctionService.placeBid(top1.getBidder().getId(), auctionId, jumpPrice, false);
 
             if (result == BidResult.SUCCESS) {
                 logger.info("Bot war resolved seamlessly. Top1 won at FinalPrice={}", jumpPrice);
