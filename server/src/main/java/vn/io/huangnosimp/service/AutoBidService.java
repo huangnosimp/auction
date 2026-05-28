@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.service;
 
+import vn.io.huangnosimp.dto.response.AutoBidResponseDTO;
 import vn.io.huangnosimp.dto.response.BidResult;
 import vn.io.huangnosimp.model.AutoBidConfig;
 import vn.io.huangnosimp.model.Auction;
@@ -10,10 +11,15 @@ import vn.io.huangnosimp.repository.IAuctionRepository;
 import vn.io.huangnosimp.repository.IUserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vn.io.huangnosimp.util.ModelMapper;
 
 public class AutoBidService implements IAutoBidService {
+    private static final Logger logger = LoggerFactory.getLogger(AutoBidService.class);
     private final IAutoBidRepository autoBidRepository;
     private final IUserRepository userRepository;
     private final IAuctionRepository auctionRepository;
@@ -34,49 +40,87 @@ public class AutoBidService implements IAutoBidService {
     @Override
     public boolean registerAutoBid(String bidderId, String auctionId, double maxBid, double increment) {
         User user = userRepository.findById(bidderId);
-        if (!(user instanceof Member bidder)) return false;
+        if (!(user instanceof Member bidder)) {
+            logger.warn("Autobid registration rejected because bidder was not found bidderId={} auctionId={}", bidderId, auctionId);
+            return false;
+        }
 
         Auction auction = auctionRepository.findById(auctionId);
 
-        if (bidder == null || auction == null) return false;
-        if (increment <= 0) return false;
+        if (auction == null) {
+            logger.warn("Autobid registration rejected because auction was not found bidderId={} auctionId={}", bidderId, auctionId);
+            return false;
+        }
+        if (increment <= 0) {
+            logger.warn("Autobid registration rejected due to invalid increment bidderId={} auctionId={} increment={}",
+                    bidderId, auctionId, increment);
+            return false;
+        }
 
-        if (maxBid <= auction.getCurrentPrice()) return false;
+        if (maxBid <= auction.getCurrentPrice()) {
+            logger.info("Autobid registration rejected because max bid is too low bidderId={} auctionId={} maxBid={} currentPrice={}",
+                    bidderId, auctionId, maxBid, auction.getCurrentPrice());
+            return false;
+        }
 
         AutoBidConfig config = new AutoBidConfig(bidder, auction, maxBid, increment, LocalDateTime.now());
         autoBidRepository.save(config);
 
-        System.out.println("[AutoBid] User " + bidder.getUsername() + " set AutoBid for Auction " + auctionId);
+        processAutoBids(auctionId);
+
+        logger.info("Registered autobid bidderId={} auctionId={}", bidderId, auctionId);
         return true;
     }
 
-    @Override
     public void processAutoBids(String auctionId) {
         List<AutoBidConfig> configs = autoBidRepository.findByAuctionId(auctionId);
-        if (configs == null || configs.isEmpty()) return;
-
-        configs.sort(Comparator.comparing(AutoBidConfig::getRegisteredAt));
+        if (configs == null || configs.isEmpty()) {
+            return;
+        }
 
         Auction auction = auctionRepository.findById(auctionId);
-        if (auction == null) return;
+        if (auction == null) {
+            return;
+        }
+
+        configs.sort(Comparator.comparing(AutoBidConfig::getMaxBid).reversed()
+                .thenComparing(AutoBidConfig::getRegisteredAt));
 
         double currentPrice = auction.getCurrentPrice();
         String currentWinnerId = auction.getCurrentWinnerId();
 
-        for (AutoBidConfig config : configs) {
-            if (config.getBidder().getId().equals(currentWinnerId)) continue;
+        if (configs.size() == 1) {
+            AutoBidConfig loneBot = configs.get(0);
 
-            double nextBid = currentPrice + config.getIncrement();
+            if (!loneBot.getBidder().getId().equals(currentWinnerId)) {
+                double nextBid = currentPrice + loneBot.getIncrement();
 
-            if (nextBid <= config.getMaxBid()) {
-                BidResult result = auctionService.placeBid(config.getBidder().getId(), auctionId, nextBid, false);
-
-                if (result == BidResult.SUCCESS) {
-                    System.out.println("[AutoBid] Success for " + config.getBidder().getUsername());
-                    break;
-                } else {
-                    System.out.println("[AutoBid] Failed for " + config.getBidder().getUsername() + " (e.g., Not enough money)");
+                if (nextBid <= loneBot.getMaxBid()) {
+                    auctionService.placeBid(loneBot.getBidder().getId(), auctionId, nextBid, false);
                 }
+            }
+            return;
+        }
+
+        AutoBidConfig top1 = configs.get(0);
+        AutoBidConfig top2 = configs.get(1);
+
+        if (top1.getBidder().getId().equals(currentWinnerId) && currentPrice >= top2.getMaxBid()) {
+            return;
+        }
+
+        double basePriceToBeat = Math.max(currentPrice, top2.getMaxBid());
+        double jumpPrice = basePriceToBeat + top1.getIncrement();
+
+        if (jumpPrice > top1.getMaxBid()) {
+            jumpPrice = top1.getMaxBid();
+        }
+
+        if (jumpPrice > currentPrice && jumpPrice <= top1.getMaxBid()) {
+            BidResult result = auctionService.placeBid(top1.getBidder().getId(), auctionId, jumpPrice, false);
+
+            if (result == BidResult.SUCCESS) {
+                logger.info("Bot war resolved seamlessly. Top1 won at FinalPrice={}", jumpPrice);
             }
         }
     }
@@ -87,7 +131,23 @@ public class AutoBidService implements IAutoBidService {
 
         if (existing != null) {
             autoBidRepository.delete(bidderId, auctionId);
-            System.out.println("[AutoBid] Unregistered for user: " + bidderId + " on auction: " + auctionId);
+            logger.info("Unregistered autobid bidderId={} auctionId={}", bidderId, auctionId);
+        } else {
+            logger.debug("Autobid unregister skipped because config was not found bidderId={} auctionId={}", bidderId, auctionId);
         }
     }
+
+    @Override
+    public List<AutoBidResponseDTO> getAutoBidsByUserId(String userId) {
+        List<AutoBidConfig> configs = autoBidRepository.findByUserId(userId);
+
+        if (configs != null && !configs.isEmpty()) {
+            logger.info("Fetched {} autobid configs for userId={}", configs.size(), userId);
+            return ModelMapper.toAutoBidResponseDTOList(configs);
+        } else {
+            logger.debug("No autobid configs found for userId={}", userId);
+            return new ArrayList<>();
+        }
+    }
+
 }

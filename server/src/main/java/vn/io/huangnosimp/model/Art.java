@@ -2,14 +2,16 @@ package vn.io.huangnosimp.model;
 
 import vn.io.huangnosimp.enums.ItemCondition;
 
+import java.util.List;
+
 public class Art extends Item {
 
     private final String artist;
 
     private final int creationYear;
 
-    public Art(String ownerId, String name, String description, String artist, int creationYear, ItemCondition condition) {
-        super(ownerId, name, description, condition);
+    public Art(String ownerId, String name, String description, String artist, int creationYear, ItemCondition condition, List<String> imageUrl) {
+        super(ownerId, name, description, condition,  imageUrl);
         this.artist = artist;
         this.creationYear = creationYear;
     }

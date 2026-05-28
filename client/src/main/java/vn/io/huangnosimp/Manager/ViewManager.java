@@ -18,6 +18,10 @@ public class ViewManager {
         mainBorderPane = area;
     }
 
+    public static Map<String, Parent> getCache(){
+        return cache;
+    }
+
     public static void changeView(String fxmlFile, int mode){
         try {
 
@@ -39,6 +43,7 @@ public class ViewManager {
             e.printStackTrace();
         }
     }
+
     public static <T> T changeViewWithController(String fxmlFile){
         try{
             FXMLLoader loader = new FXMLLoader(ViewManager.class.getResource("/fxml/" + fxmlFile));

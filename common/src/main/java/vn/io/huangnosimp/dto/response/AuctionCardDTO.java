@@ -1,5 +1,7 @@
 package vn.io.huangnosimp.dto.response;
 
+import java.util.List;
+
 public class AuctionCardDTO {
     private String auctionId;
     private String productName;
@@ -7,6 +9,9 @@ public class AuctionCardDTO {
     private double yourBid;
     private long startTime;
     private long endTime;
+    private int bidCount;
+    private int bidderCount;
+    private List<String> imageUrl;
 
     public AuctionCardDTO(
             String auctionId,
@@ -14,13 +19,19 @@ public class AuctionCardDTO {
             double currentPrice,
             double yourBid,
             long startTime,
-            long endTime) {
+            long endTime,
+            int bidCount,
+            int bidderCount,
+            List<String> imageUrl) {
         this.auctionId = auctionId;
         this.productName = productName;
         this.currentPrice = currentPrice;
         this.yourBid = yourBid;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.bidCount = bidCount;
+        this.bidderCount = bidderCount;
+        this.imageUrl = imageUrl;
     }
 
     public String getAuctionId() {
@@ -47,4 +58,19 @@ public class AuctionCardDTO {
         return endTime;
     }
 
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public int getBidCount() {
+        return bidCount;
+    }
+
+    public int getBidderCount() {
+        return bidderCount;
+    }
+
+    public List<String> getImageUrl() {
+        return imageUrl;
+    }
 }

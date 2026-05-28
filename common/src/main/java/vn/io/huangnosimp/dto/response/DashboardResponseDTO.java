@@ -3,12 +3,14 @@ package vn.io.huangnosimp.dto.response;
 import java.util.List;
 
 public class DashboardResponseDTO {
-    private double balance;
-    private int joinedRooms;
-    private int winningBids;
-    private int outBids;
-    private int wonTotal;
-    private List<AuctionCardDTO> auctionCardInfo;
+    private final double balance;
+    private final int joinedRooms;
+    private final int winningBids;
+    private final int outBids;
+    private final int wonTotal;
+    private final List<AuctionCardDTO> auctionCardInfo;
+    private final String username;
+    private final String email;
 
     public DashboardResponseDTO(
             double balance,
@@ -16,13 +18,17 @@ public class DashboardResponseDTO {
             int winningBids,
             int outBids,
             int wonTotal,
-            List<AuctionCardDTO> auctionCardInfo) {
+            List<AuctionCardDTO> auctionCardInfo,
+            String username,
+            String email) {
         this.balance = balance;
         this.joinedRooms = activeBids;
         this.winningBids = winningBids;
         this.outBids = outBids;
         this.wonTotal = wonTotal;
         this.auctionCardInfo = auctionCardInfo;
+        this.username = username;
+        this.email = email;
     }
 
 
@@ -50,4 +56,11 @@ public class DashboardResponseDTO {
         return auctionCardInfo;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 }

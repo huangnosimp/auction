@@ -1,0 +1,151 @@
+@import url("auction_theme.css");
+@import url("dashboard.css");
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #334155;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 2;
+}
+
+.table-view .show-hide-columns-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #1e293b;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #334155 transparent;
+    -fx-size: 45;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #1e293b transparent;
+    -fx-cell-size: 50;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #1e293b33;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #334155;
+}
+
+.table-view .cell {
+    -fx-text-fill: #f8fafc;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #1e293b;
+    -fx-background-radius: 8 8 0 0;
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #4ade80;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #0f172a;
+}
+
+.sidebar {
+    -fx-background-color: #1e293b;
+    -fx-border-color: transparent #334155 transparent transparent;
+}
+
+/* 2. Đổi màu chữ tiêu đề "ADMIN PANEL" */
+.sidebar-title {
+    -fx-text-fill: #f8fafc; /* Chữ trắng sáng */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.sidebar-sep {
+    -fx-background-color: #334155;
+}
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #94a3b8; /* Chữ màu xám nhạt */
+    -fx-font-size: 16px;
+    -fx-alignment: CENTER_LEFT; /* Căn lề trái cho chữ */
+    -fx-padding: 10 15;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.nav-btn:hover {
+    -fx-background-color: #334155;
+    -fx-text-fill: #ffffff; /* Sáng chữ lên */
+}
+
+.card-subtitle {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 14px;
+}
+
+.card-value {
+    -fx-text-fill: #4ade80;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell .table-cell {
+    -fx-text-fill: white;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #3498db;
+    -fx-background-insets: 0;
+}
+
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #ccf3fc;
+}
+.table-view .table-row-cell:hover .table-cell {
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell:selected:hover {
+    -fx-background-color: #2980b9;
+}
+
+.table-view {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}

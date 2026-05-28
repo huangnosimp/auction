@@ -1,189 +1,184 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
-<?import javafx.geometry.Insets?>
 
-<ScrollPane fitToWidth="true" styleClass="account-scroll"
-            stylesheets="@../css/AccountView.css"
-            xmlns="http://javafx.com/javafx/17.0.12"
-            xmlns:fx="http://javafx.com/fxml/1"
-            >
+<ScrollPane fitToWidth="true" prefHeight="799.0" prefWidth="814.0" styleClass="account-scroll" stylesheets="@../css/AccountView.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.AccountViewController">
 
     <VBox spacing="16" styleClass="center-content">
-        <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+        <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
         <!-- ═══════════════ PAGE HEADER ═══════════════ -->
         <HBox alignment="CENTER_LEFT" spacing="0">
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label styleClass="page-title" text="Account Management"/>
-                <Label styleClass="page-sub" text="Manage your profile, wallet and security settings"/>
+                <Label styleClass="page-title" text="Account Management" />
+                <Label styleClass="page-sub" text="Manage your profile, wallet and security settings" />
             </VBox>
-            <Label styleClass="online-badge" text="ONLINE"/>
+            <Label styleClass="online-badge" text="ONLINE" />
         </HBox>
 
         <!-- ═══════════════ STAT CARDS ROW ═══════════════ -->
         <HBox spacing="12">
             <!-- Total Deposited -->
             <VBox spacing="6" styleClass="stat-card" HBox.hgrow="ALWAYS">
-                <Label styleClass="sc-label" text="TOTAL DEPOSITED"/>
-                <Label styleClass="sc-val, c-green" text="8,250"/>
-                <Label styleClass="sc-sub" text="Lifetime deposits"/>
+                <Label styleClass="sc-label" text="TOTAL DEPOSITED" />
+                <Label styleClass="sc-val, c-green" text="8,250" />
+                <Label styleClass="sc-sub" text="Lifetime deposits" />
             </VBox>
             <!-- Total Withdrawn -->
             <VBox spacing="6" styleClass="stat-card" HBox.hgrow="ALWAYS">
-                <Label styleClass="sc-label" text="TOTAL WITHDRAWN"/>
-                <Label styleClass="sc-val, c-blue" text="6,700"/>
-                <Label styleClass="sc-sub" text="Lifetime withdrawals"/>
+                <Label styleClass="sc-label" text="TOTAL WITHDRAWN" />
+                <Label styleClass="sc-val, c-blue" text="6,700" />
+                <Label styleClass="sc-sub" text="Lifetime withdrawals" />
             </VBox>
             <!-- Win Rate -->
             <VBox spacing="6" styleClass="stat-card" HBox.hgrow="ALWAYS">
-                <Label styleClass="sc-label" text="WIN RATE"/>
-                <Label styleClass="sc-val, c-amber" text="68%"/>
-                <Label styleClass="sc-sub" text="Based on 12 auctions won"/>
+                <Label styleClass="sc-label" text="WIN RATE" />
+                <Label styleClass="sc-val, c-amber" text="68%" />
+                <Label styleClass="sc-sub" text="Based on 12 auctions won" />
             </VBox>
         </HBox>
 
         <!-- ═══════════════ PROFILE + WALLET ROW ═══════════════ -->
-        <HBox spacing="16" alignment="TOP_LEFT">
+        <HBox alignment="TOP_LEFT" spacing="16">
 
             <!-- ── PROFILE CARD ── -->
-            <VBox spacing="0" styleClass="sec-card" minWidth="240" maxWidth="260">
+            <VBox maxWidth="410.0" minWidth="240" prefHeight="413.0" prefWidth="410.0" spacing="0" styleClass="sec-card">
 
-                <Label styleClass="sec-title" text="● Profile"/>
-                <VBox spacing="6" alignment="CENTER" styleClass="avatar-section">
-                    <padding><Insets bottom="10"/></padding>
-                    <Label styleClass="avatar-circle" text="👤"/>
-                    <Label styleClass="uname" text="HoangChim88"/>
-                    <Label styleClass="uid" text="ID: #HC-00142"/>
-                    <Label styleClass="verified-badge" text="VERIFIED"/>
+                <Label styleClass="sec-title" text="● Profile" />
+                <VBox alignment="CENTER" prefHeight="199.0" prefWidth="329.0" spacing="6" styleClass="avatar-section">
+                    <padding><Insets bottom="10" /></padding>
+                    <Label styleClass="avatar-circle" text="👤" />
+                    <Label fx:id="usernameLabel" styleClass="uname" text="HoangChim88" />
+                    <Label styleClass="verified-badge" text="VERIFIED" />
+               <Button mnemonicParsing="false" onAction="#handleLogOut" prefHeight="25.0" prefWidth="76.0" styleClass="btn-dep" text="Log Out" />
                 </VBox>
 
-                <Separator styleClass="sec-divider"/>
+                <Separator styleClass="sec-divider" />
 
                 <VBox spacing="0" styleClass="info-table">
                     <HBox styleClass="info-row">
-                        <Label styleClass="ir-key" text="Email" HBox.hgrow="ALWAYS"/>
-                        <Label styleClass="ir-val" text="user@gmail.com"/>
+                        <Label styleClass="ir-key" text="Email" HBox.hgrow="ALWAYS" />
+                        <Label fx:id="emailLabel" styleClass="ir-val" text="user@gmail.com" />
                     </HBox>
                     <HBox styleClass="info-row">
-                        <Label styleClass="ir-key" text="Phone" HBox.hgrow="ALWAYS"/>
-                        <Label styleClass="ir-val" text="+84 9xx xxx xxx"/>
+                        <Label styleClass="ir-key" text="Member since" HBox.hgrow="ALWAYS" />
+                        <Label styleClass="ir-val" />
                     </HBox>
                     <HBox styleClass="info-row">
-                        <Label styleClass="ir-key" text="Member since" HBox.hgrow="ALWAYS"/>
-                        <Label styleClass="ir-val" text="Jan 2024"/>
-                    </HBox>
-                    <HBox styleClass="info-row">
-                        <Label styleClass="ir-key" text="KYC Status" HBox.hgrow="ALWAYS"/>
-                        <Label styleClass="ir-green" text="Verified"/>
+                        <Label styleClass="ir-key" text="KYC Status" HBox.hgrow="ALWAYS" />
+                        <Label styleClass="ir-green" text="Verified" />
                     </HBox>
                 </VBox>
 
-                <Separator styleClass="sec-divider"/>
+                <Separator styleClass="sec-divider" />
 
                 <HBox spacing="8" styleClass="action-row">
-                    <Button fx:id="btnDeposit"
-                            styleClass="btn-dep" text="Deposit" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                    <Button fx:id="btnWithdraw"
-                            styleClass="btn-wit" text="Withdraw" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Button fx:id="btnDeposit" maxWidth="Infinity" onAction="#handleEnterDeposit" text="Deposit" HBox.hgrow="ALWAYS">
+                  <styleClass>
+                     <String fx:value="btn-dep" />
+                     <String fx:value="btn-wit" />
+                  </styleClass></Button>
+                    <Button fx:id="btnWithdraw" maxWidth="Infinity" onAction="#handleEnterWithDraw" styleClass="btn-wit" text="Withdraw" HBox.hgrow="ALWAYS" />
                 </HBox>
             </VBox>
 
             <!-- ── WALLET CARD ── -->
-            <VBox spacing="0" styleClass="sec-card" HBox.hgrow="ALWAYS">
+            <VBox prefHeight="413.0" prefWidth="432.0" spacing="0" styleClass="sec-card" HBox.hgrow="ALWAYS">
 
-                <Label styleClass="sec-title" text="● Wallet"/>
+                <Label styleClass="sec-title" text="● Wallet" />
 
                 <!-- Wallet Tab Bar -->
-                <HBox styleClass="wallet-tabs" spacing="0">
-                    <Button fx:id="tabTxn"      styleClass="wtab, wtab-active" text="Transactions" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                    <Button fx:id="tabDeposit"  styleClass="wtab"              text="Deposit"      HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                    <Button fx:id="tabWithdraw" styleClass="wtab"              text="Withdraw"     HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <HBox fx:id="menuBar" spacing="0" styleClass="wallet-tabs">
+                    <Button fx:id="tabTxn" maxWidth="Infinity" styleClass="wtab, wtab-active" text="Transactions" HBox.hgrow="ALWAYS" />
+                    <Button fx:id="tabDeposit" maxWidth="Infinity" styleClass="wtab" text="Deposit" HBox.hgrow="ALWAYS" />
+                    <Button fx:id="tabWithdraw" maxWidth="Infinity" styleClass="wtab" text="Withdraw" HBox.hgrow="ALWAYS" />
                 </HBox>
 
                 <!-- Pane: Transactions -->
                 <VBox fx:id="paneTransactions" spacing="0" styleClass="tx-pane">
-                    <HBox styleClass="tx-item" alignment="CENTER_LEFT" spacing="10">
-                        <Circle styleClass="dot-green" radius="4"/>
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tx-item">
+                        <Circle radius="4" styleClass="dot-green" />
                         <VBox HBox.hgrow="ALWAYS">
-                            <Label styleClass="tx-name" text="Deposit via Bank Transfer"/>
-                            <Label styleClass="tx-date" text="19 Apr 2026 · 14:32"/>
+                            <Label styleClass="tx-name" text="Deposit via Bank Transfer" />
+                            <Label styleClass="tx-date" text="19 Apr 2026 · 14:32" />
                         </VBox>
-                        <Label styleClass="tx-amt, pos" text="+$500"/>
+                        <Label styleClass="tx-amt, pos" text="+$500" />
                     </HBox>
-                    <HBox styleClass="tx-item" alignment="CENTER_LEFT" spacing="10">
-                        <Circle styleClass="dot-red" radius="4"/>
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tx-item">
+                        <Circle radius="4" styleClass="dot-red" />
                         <VBox HBox.hgrow="ALWAYS">
-                            <Label styleClass="tx-name" text="Bid placed — Lot #4471"/>
-                            <Label styleClass="tx-date" text="18 Apr 2026 · 09:11"/>
+                            <Label styleClass="tx-name" text="Bid placed — Lot #4471" />
+                            <Label styleClass="tx-date" text="18 Apr 2026 · 09:11" />
                         </VBox>
-                        <Label styleClass="tx-amt, neg" text="-$250"/>
+                        <Label styleClass="tx-amt, neg" text="-$250" />
                     </HBox>
-                    <HBox styleClass="tx-item" alignment="CENTER_LEFT" spacing="10">
-                        <Circle styleClass="dot-blue" radius="4"/>
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tx-item">
+                        <Circle radius="4" styleClass="dot-blue" />
                         <VBox HBox.hgrow="ALWAYS">
-                            <Label styleClass="tx-name" text="Won Auction — Lot #4390"/>
-                            <Label styleClass="tx-date" text="17 Apr 2026 · 18:55"/>
+                            <Label styleClass="tx-name" text="Won Auction — Lot #4390" />
+                            <Label styleClass="tx-date" text="17 Apr 2026 · 18:55" />
                         </VBox>
-                        <Label styleClass="tx-amt, neg" text="-$800"/>
+                        <Label styleClass="tx-amt, neg" text="-$800" />
                     </HBox>
-                    <HBox styleClass="tx-item" alignment="CENTER_LEFT" spacing="10">
-                        <Circle styleClass="dot-green" radius="4"/>
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tx-item">
+                        <Circle radius="4" styleClass="dot-green" />
                         <VBox HBox.hgrow="ALWAYS">
-                            <Label styleClass="tx-name" text="Deposit via Momo"/>
-                            <Label styleClass="tx-date" text="15 Apr 2026 · 11:00"/>
+                            <Label styleClass="tx-name" text="Deposit via Momo" />
+                            <Label styleClass="tx-date" text="15 Apr 2026 · 11:00" />
                         </VBox>
-                        <Label styleClass="tx-amt, pos" text="+$1,000"/>
+                        <Label styleClass="tx-amt, pos" text="+$1,000" />
                     </HBox>
-                    <HBox styleClass="tx-item" alignment="CENTER_LEFT" spacing="10">
-                        <Circle styleClass="dot-amber" radius="4"/>
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tx-item">
+                        <Circle radius="4" styleClass="dot-amber" />
                         <VBox HBox.hgrow="ALWAYS">
-                            <Label styleClass="tx-name" text="Withdrawal to Bank"/>
-                            <Label styleClass="tx-date" text="10 Apr 2026 · 08:20"/>
+                            <Label styleClass="tx-name" text="Withdrawal to Bank" />
+                            <Label styleClass="tx-date" text="10 Apr 2026 · 08:20" />
                         </VBox>
-                        <Label styleClass="tx-amt, neg" text="-$300"/>
+                        <Label styleClass="tx-amt, neg" text="-$300" />
                     </HBox>
                 </VBox>
 
                 <!-- Pane: Deposit -->
-                <VBox fx:id="paneDeposit" spacing="10" styleClass="fund-pane" managed="false" visible="false">
-                    <Label styleClass="fl" text="PAYMENT METHOD"/>
+                <VBox fx:id="paneDeposit" managed="false" spacing="10" styleClass="fund-pane" visible="false">
+                    <Label styleClass="fl" text="PAYMENT METHOD" />
                     <HBox spacing="6">
-                        <Button fx:id="mDepBank"  styleClass="meth, meth-sel" text="Bank Transfer" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                        <Button fx:id="mDepMomo"  styleClass="meth"           text="Momo"          HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                        <Button fx:id="mDepUsdt"  styleClass="meth"           text="USDT"          HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <Button fx:id="mDepBank" maxWidth="Infinity" styleClass="meth, meth-sel" text="Bank Transfer" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="mDepMomo" maxWidth="Infinity" styleClass="meth" text="Momo" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="mDepUsdt" maxWidth="Infinity" styleClass="meth" text="USDT" HBox.hgrow="ALWAYS" />
                     </HBox>
-                    <Label styleClass="fl" text="AMOUNT (USD)"/>
-                    <TextField fx:id="depAmount" styleClass="fund-input" promptText="Enter amount..."/>
+                    <Label styleClass="fl" text="AMOUNT (VND)" />
+                    <TextField fx:id="depAmount" promptText="Enter amount..." styleClass="fund-input" />
                     <HBox spacing="6">
-                        <Button  styleClass="qa-btn" text="50"/>
-                        <Button  styleClass="qa-btn" text="100"/>
-                        <Button  styleClass="qa-btn" text="500"/>
-                        <Button  styleClass="qa-btn" text="1,000"/>
+                        <Button styleClass="qa-btn" text="50" />
+                        <Button styleClass="qa-btn" text="100" />
+                        <Button styleClass="qa-btn" text="500" />
+                        <Button styleClass="qa-btn" text="1,000" />
                     </HBox>
-                    <Button styleClass="submit-dep" text="Confirm Deposit" maxWidth="Infinity"/>
+                    <Button fx:id="confirmDep" onAction="#handleDeposit" styleClass="submit-dep" text="Confirm Deposit" />
                 </VBox>
 
                 <!-- Pane: Withdraw -->
-                <VBox fx:id="paneWithdraw" spacing="10" styleClass="fund-pane" managed="false" visible="false">
-                    <Label styleClass="fl" text="WITHDRAW TO"/>
+                <VBox fx:id="paneWithdraw" managed="false" spacing="10" styleClass="fund-pane" visible="false">
+                    <Label styleClass="fl" text="WITHDRAW TO" />
                     <HBox spacing="6">
-                        <Button fx:id="mWitBank"   styleClass="meth, meth-sel" text="Bank Account" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                        <Button fx:id="mWitMomo"   styleClass="meth"           text="Momo"         HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                        <Button fx:id="mWitUsdt"   styleClass="meth"           text="USDT"         HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <Button fx:id="mWitBank" maxWidth="Infinity" styleClass="meth, meth-sel" text="Bank Account" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="mWitMomo" maxWidth="Infinity" styleClass="meth" text="Momo" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="mWitUsdt" maxWidth="Infinity" styleClass="meth" text="USDT" HBox.hgrow="ALWAYS" />
                     </HBox>
-                    <Label styleClass="fl" text="AMOUNT (USD)"/>
-                    <TextField fx:id="witAmount" styleClass="fund-input" promptText="Enter amount..."/>
+                    <Label styleClass="fl" text="AMOUNT (USD)" />
+                    <TextField fx:id="witAmount" promptText="Enter amount..." styleClass="fund-input" />
                     <HBox spacing="6">
-                        <Button styleClass="qa-btn" text="50"/>
-                        <Button styleClass="qa-btn" text="100"/>
-                        <Button styleClass="qa-btn" text="300"/>
-                        <Button styleClass="qa-btn" text="500"/>
+                        <Button styleClass="qa-btn" text="50" />
+                        <Button styleClass="qa-btn" text="100" />
+                        <Button styleClass="qa-btn" text="300" />
+                        <Button styleClass="qa-btn" text="500" />
                     </HBox>
-                    <Label styleClass="avail-note" text="Available: $1,550  ·  Min withdrawal: $10"/>
-                    <Button styleClass="submit-wit" text="Confirm Withdrawal" maxWidth="Infinity"/>
+                    <Label styleClass="avail-note" text="Available: $1,550  ·  Min withdrawal: $10" />
+                    <Button fx:id="confirmWit" maxWidth="Infinity" onAction="#handleWithDraw" styleClass="submit-wit" text="Confirm Withdrawal" />
                 </VBox>
 
             </VBox>
@@ -191,49 +186,49 @@
 
         <!-- ═══════════════ SECURITY SETTINGS ═══════════════ -->
         <VBox spacing="0" styleClass="sec-card">
-            <Label styleClass="sec-title" text="● Security Settings"/>
+            <Label styleClass="sec-title" text="● Security Settings" />
 
             <GridPane hgap="24" vgap="0">
                 <columnConstraints>
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
+                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
+                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
                 </columnConstraints>
 
                 <!-- Row 0 -->
-                <HBox styleClass="sec-row" alignment="CENTER_LEFT" spacing="0"
-                      GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <HBox alignment="CENTER_LEFT" spacing="0" styleClass="sec-row" GridPane.columnIndex="0" GridPane.rowIndex="0">
                     <VBox HBox.hgrow="ALWAYS">
-                        <Label styleClass="sec-label" text="Two-Factor Authentication"/>
-                        <Label styleClass="sec-desc"  text="Authenticator app (Google/Authy)"/>
+                        <Label styleClass="sec-label" text="Two-Factor Authentication" />
+                        <Label styleClass="sec-desc" text="Authenticator app (Google/Authy)" />
                     </VBox>
-                    <Button fx:id="toggle2FA" styleClass="toggle-on" text=""/>
+                    <Button fx:id="toggle2FA" styleClass="toggle-on" text="" />
                 </HBox>
-                <HBox styleClass="sec-row" alignment="CENTER_LEFT" spacing="0"
-                      GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <HBox alignment="CENTER_LEFT" spacing="0" styleClass="sec-row" GridPane.columnIndex="1" GridPane.rowIndex="0">
                     <VBox HBox.hgrow="ALWAYS">
-                        <Label styleClass="sec-label" text="Login Notifications"/>
-                        <Label styleClass="sec-desc"  text="Email alert on new login"/>
+                        <Label styleClass="sec-label" text="Login Notifications" />
+                        <Label styleClass="sec-desc" text="Email alert on new login" />
                     </VBox>
-                    <Button fx:id="toggleNotif" styleClass="toggle-on" text=""/>
+                    <Button fx:id="toggleNotif" styleClass="toggle-on" text="" />
                 </HBox>
 
                 <!-- Row 1 -->
-                <HBox styleClass="sec-row, sec-row-last" alignment="CENTER_LEFT" spacing="0"
-                      GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <HBox alignment="CENTER_LEFT" spacing="0" styleClass="sec-row, sec-row-last" GridPane.columnIndex="0" GridPane.rowIndex="1">
                     <VBox HBox.hgrow="ALWAYS">
-                        <Label styleClass="sec-label" text="Password Strength"/>
-                        <Label styleClass="sec-desc"  text="Last changed 30 days ago"/>
+                        <Label styleClass="sec-label" text="Password Strength" />
+                        <Label styleClass="sec-desc" text="Last changed 30 days ago" />
                     </VBox>
-                    <Label styleClass="sbadge, sb-ok" text="STRONG"/>
+                    <Label styleClass="sbadge, sb-ok" text="STRONG" />
                 </HBox>
-                <HBox styleClass="sec-row, sec-row-last" alignment="CENTER_LEFT" spacing="0"
-                      GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <HBox alignment="CENTER_LEFT" spacing="0" styleClass="sec-row, sec-row-last" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <VBox HBox.hgrow="ALWAYS">
-                        <Label styleClass="sec-label" text="Withdrawal PIN"/>
-                        <Label styleClass="sec-desc"  text="6-digit PIN for withdrawals"/>
+                        <Label styleClass="sec-label" text="Withdrawal PIN" />
+                        <Label styleClass="sec-desc" text="6-digit PIN for withdrawals" />
                     </VBox>
-                    <Label styleClass="sbadge, sb-warn" text="NOT SET"/>
+                    <Label styleClass="sbadge, sb-warn" text="NOT SET" />
                 </HBox>
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
             </GridPane>
         </VBox>
 

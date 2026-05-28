@@ -10,8 +10,12 @@ import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.controller.RequestHandler;
 import vn.io.huangnosimp.protocol.ResponseStatus;
 import vn.io.huangnosimp.service.IAuctionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuctionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(AuctionHandler.class);
+
     public static class CreateAuctionHandler implements RequestHandler {
         private final IAuctionService auctionService;
 
@@ -26,10 +30,12 @@ public class AuctionHandler {
                     client.getUserId(), dto.getItemName(), dto.getDescription(),
                     dto.getItemType(), dto.getAttributes(), dto.getStartPrice(),
                     dto.getStartTime(), dto.getEndTime(), dto.getCondition(),
-                    dto.getMinimumIncrement(), dto.getBuyNowPrice());
+                    dto.getMinimumIncrement(), dto.getBuyNowPrice(), dto.getImageUrl());
             if (auctionCardDTO == null) {
+                logger.warn("Create auction failed sellerId={} itemType={}", client.getUserId(), dto.getItemType());
                 return new Response(ResponseStatus.FAILED, "Create auction failed");
             }
+            logger.info("Created auction sellerId={} auctionId={}", client.getUserId(), auctionCardDTO.getAuctionId());
             return new Response(ResponseStatus.SUCCESS, "Create auction successfully", auctionCardDTO);
         }
     }
@@ -44,11 +50,12 @@ public class AuctionHandler {
         @Override
         public Response handle(Request request, ClientHandle client) {
             CancelAuctionRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), CancelAuctionRequestDTO.class);
-            AuctionActionResult result = auctionService.cancelAuction(dto.getAuctionId());
+            AuctionActionResult result = auctionService.cancelAuction(client.getUserId(), dto.getAuctionId());
+            logger.info("Cancel auction attempted userId={} auctionId={} result={}", client.getUserId(), dto.getAuctionId(), result);
             return switch (result) {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Cancel auction successfully");
                 case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
-                case INVALID_STATE -> new Response(ResponseStatus.FAILED, "Cannot cancel a running or completed auction");
+                case INVALID_STATE -> new Response(ResponseStatus.FAILED, "Cannot cancel a completed auction");
                 case UNAUTHORIZED -> new Response(ResponseStatus.FAILED, "Unauthorized to cancel this auction");
                 default -> new Response(ResponseStatus.FAILED, "Cancel auction failed");
             };
@@ -57,20 +64,21 @@ public class AuctionHandler {
 
     public static class PlaceBidHandler implements RequestHandler {
         private final IAuctionService auctionService;
-        private final IUserService userService;
 
-        public PlaceBidHandler(IAuctionService auctionService, IUserService userService) {
+        public PlaceBidHandler(IAuctionService auctionService) {
             this.auctionService = auctionService;
-            this.userService = userService;
         }
 
         @Override
         public Response handle(Request request, ClientHandle client) {
             PlaceBidRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), PlaceBidRequestDTO.class);
-            BidResult result = auctionService.placeBid(client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), false);
-            PlaceBidResponseDTO responseDTO = new PlaceBidResponseDTO(userService.getMember(client.getUserId()).getUsername(), dto.getBidAmount(), System.currentTimeMillis());
+            BidResult result = auctionService.placeBid(client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), true);
+            logger.info(
+                    "Place bid attempted bidderId={} auctionId={} amount={} result={}",
+                    client.getUserId(), dto.getAuctionId(), dto.getBidAmount(), result
+            );
             return switch (result) {
-                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Place bid successfully", responseDTO);
+                case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Place bid successfully");
                 case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
                 case AUCTION_ENDED -> new Response(ResponseStatus.FAILED, "Auction has already ended");
                 case INSUFFICIENT_FUNDS -> new Response(ResponseStatus.FAILED, "Insufficient funds");
@@ -90,6 +98,7 @@ public class AuctionHandler {
         public Response handle(Request request, ClientHandle client) {
             JoinRoomRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), JoinRoomRequestDTO.class);
             AuctionActionResult result = auctionService.joinAuction(client.getUserId(), dto.getAuctionId(), client);
+            logger.info("Join room attempted userId={} auctionId={} result={}", client.getUserId(), dto.getAuctionId(), result);
             return switch (result) {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Join room successfully");
                 case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
@@ -109,6 +118,7 @@ public class AuctionHandler {
         public Response handle(Request request, ClientHandle client) {
             LeaveRoomRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), LeaveRoomRequestDTO.class);
             AuctionActionResult result = auctionService.leaveAuction(client.getUserId(), dto.getAuctionId(), client);
+            logger.info("Leave room attempted userId={} auctionId={} result={}", client.getUserId(), dto.getAuctionId(), result);
             return switch (result) {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Leave room successfully");
                 case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");
@@ -127,6 +137,7 @@ public class AuctionHandler {
         public Response handle(Request request, ClientHandle client) {
             BuyNowRequestDTO dto = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(request.getData()), BuyNowRequestDTO.class);
             BidResult result = auctionService.buyNow(client.getUserId(), dto.getAuctionId());
+            logger.info("Buy now attempted buyerId={} auctionId={} result={}", client.getUserId(), dto.getAuctionId(), result);
             return switch (result) {
                 case SUCCESS -> new Response(ResponseStatus.SUCCESS, "Buy now successfully");
                 case AUCTION_NOT_FOUND -> new Response(ResponseStatus.FAILED, "Auction not found");

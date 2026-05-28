@@ -1,6 +1,6 @@
 package vn.io.huangnosimp.repository;
 
-import vn.io.huangnosimp.database.DatabaseConnection;
+import vn.io.huangnosimp.connection.DatabaseConnection;
 import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.model.Art;
 import vn.io.huangnosimp.model.Electronics;
@@ -8,8 +8,13 @@ import vn.io.huangnosimp.model.Item;
 import vn.io.huangnosimp.model.Vehicle;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ItemRepository implements IItemRepository {
+    private static final Logger logger = LoggerFactory.getLogger(ItemRepository.class);
     private final DatabaseConnection databaseConnection;
 
     public ItemRepository(DatabaseConnection databaseConnection) {
@@ -24,46 +29,58 @@ public class ItemRepository implements IItemRepository {
                 +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = databaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = databaseConnection.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, item.getId());
-            stmt.setTimestamp(2, new Timestamp(item.getCreatedAt()));
-            stmt.setString(3, item.getOwnerId());
-            stmt.setString(4, item.getName());
-            stmt.setString(5, item.getDescription());
+                    stmt.setString(1, item.getId());
+                    stmt.setTimestamp(2, new Timestamp(item.getCreatedAt()));
+                    stmt.setString(3, item.getOwnerId());
+                    stmt.setString(4, item.getName());
+                    stmt.setString(5, item.getDescription());
 
-            String itemType = item.getClass().getSimpleName().toUpperCase();
-            stmt.setString(6, itemType);
+                    String itemType = item.getClass().getSimpleName().toUpperCase();
+                    stmt.setString(6, itemType);
 
-            stmt.setNull(7, Types.VARCHAR);
-            stmt.setNull(8, Types.INTEGER);
-            stmt.setNull(9, Types.VARCHAR);
-            stmt.setNull(10, Types.INTEGER);
-            stmt.setNull(11, Types.VARCHAR);
-            stmt.setNull(12, Types.INTEGER);
+                    stmt.setNull(7, Types.VARCHAR);
+                    stmt.setNull(8, Types.INTEGER);
+                    stmt.setNull(9, Types.VARCHAR);
+                    stmt.setNull(10, Types.INTEGER);
+                    stmt.setNull(11, Types.VARCHAR);
+                    stmt.setNull(12, Types.INTEGER);
 
-            stmt.setString(13, item.getCondition().name());
+                    stmt.setString(13, item.getCondition().name());
 
-            switch (item) {
-                case Art art -> {
-                    stmt.setString(7, art.getArtist());
-                    stmt.setInt(8, art.getCreationYear());
+                    switch (item) {
+                        case Art art -> {
+                            stmt.setString(7, art.getArtist());
+                            stmt.setInt(8, art.getCreationYear());
+                        }
+                        case Electronics electronics -> {
+                            stmt.setString(9, electronics.getBrand());
+                            stmt.setInt(10, electronics.getWarrantyMonths());
+                        }
+                        case Vehicle vehicle -> {
+                            stmt.setString(11, vehicle.getEngineType());
+                            stmt.setInt(12, (int) vehicle.getMileage());
+                        }
+                        default -> {
+                        }
+                    }
+                    stmt.executeUpdate();
                 }
-                case Electronics electronics -> {
-                    stmt.setString(9, electronics.getBrand());
-                    stmt.setInt(10, electronics.getWarrantyMonths());
-                }
-                case Vehicle vehicle -> {
-                    stmt.setString(11, vehicle.getEngineType());
-                    stmt.setInt(12, (int) vehicle.getMileage());
-                }
-                default -> {
-                }
+                saveImageUrls(conn, item);
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
             }
-            stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("DB error when saving item: " + e.getMessage());
+            logger.error("DB error when saving item itemId={}", item.getId(), e);
         }
     }
     @Override
@@ -74,25 +91,26 @@ public class ItemRepository implements IItemRepository {
             stmt.setString(1, itemId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return mapRowToItem(rs);
+                    return mapRowToItem(conn, rs);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("DB error in findById: " + e.getMessage());
+            logger.error("DB error when finding item by id itemId={}", itemId, e);
         }
         return null;
     }
 
     @Override
-    public void updateOwner(String itemId, String ownerId) {
+    public boolean updateOwner(String itemId, String ownerId) {
         String sql = "UPDATE Items SET owner_id = ? WHERE id = ?";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, ownerId);
             stmt.setString(2, itemId);
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("DB error when updating item owner: " + e.getMessage());
+            logger.error("DB error when updating item owner itemId={} ownerId={}", itemId, ownerId, e);
+            return false;
         }
     }
 
@@ -104,12 +122,46 @@ public class ItemRepository implements IItemRepository {
             stmt.setString(1, itemId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("DB error when deleting item: " + e.getMessage());
+            logger.error("DB error when deleting item itemId={}", itemId, e);
         }
         return false;
     }
 
-    private Item mapRowToItem(ResultSet rs) throws SQLException {
+    private void saveImageUrls(Connection conn, Item item) throws SQLException {
+        List<String> imageUrls = item.getImageUrl();
+        if (imageUrls == null || imageUrls.isEmpty()) {
+            return;
+        }
+
+        String sql = "INSERT INTO ItemImages (item_id, image_url) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            for (String imageUrl : imageUrls) {
+                if (imageUrl == null || imageUrl.isBlank()) {
+                    continue;
+                }
+                stmt.setString(1, item.getId());
+                stmt.setString(2, imageUrl);
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+        }
+    }
+
+    private List<String> findImageUrlsByItemId(Connection conn, String itemId) throws SQLException {
+        List<String> imageUrls = new ArrayList<>();
+        String sql = "SELECT image_url FROM ItemImages WHERE item_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, itemId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    imageUrls.add(rs.getString("image_url"));
+                }
+            }
+        }
+        return imageUrls;
+    }
+
+    private Item mapRowToItem(Connection conn, ResultSet rs) throws SQLException {
         String id = rs.getString("id");
         long createdAt = rs.getTimestamp("created_at").getTime();
         String ownerId = rs.getString("owner_id");
@@ -117,20 +169,21 @@ public class ItemRepository implements IItemRepository {
         String description = rs.getString("description");
         String itemType = rs.getString("item_type");
         ItemCondition conditions = ItemCondition.valueOf(rs.getString("conditions"));
+        List<String> imageUrls = findImageUrlsByItemId(conn, id);
 
         Item item = null;
         if ("ART".equals(itemType)) {
             String artist = rs.getString("artist");
             int creationYear = rs.getInt("creation_year");
-            item = new Art(ownerId, name, description, artist, creationYear, conditions);
+            item = new Art(ownerId, name, description, artist, creationYear, conditions, imageUrls);
         } else if ("ELECTRONICS".equals(itemType)) {
             String brand = rs.getString("brand");
             int warrantyPeriod = rs.getInt("warranty_period");
-            item = new Electronics(ownerId, name, description, brand, warrantyPeriod, conditions);
+            item = new Electronics(ownerId, name, description, brand, warrantyPeriod, conditions, imageUrls);
         } else if ("VEHICLE".equals(itemType)) {
             String engineType = rs.getString("engine_type");
             int mileage = rs.getInt("mileage");
-            item = new Vehicle(ownerId, name, description, engineType, mileage, conditions);
+            item = new Vehicle(ownerId, name, description, engineType, mileage, conditions, imageUrls);
         }
 
 

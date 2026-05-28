@@ -1,5 +1,8 @@
 package vn.io.huangnosimp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 import vn.io.huangnosimp.factory.ItemFactory;
@@ -10,6 +13,7 @@ import vn.io.huangnosimp.repository.IItemRepository;
 import java.util.List;
 
 public class ItemService implements IItemService {
+    private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
     private final IItemRepository itemRepository;
 
     public ItemService(IItemRepository iItemRepository) {
@@ -17,24 +21,36 @@ public class ItemService implements IItemService {
     }
 
     @Override
-    public Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes, ItemCondition condition) {
-        Item item = ItemFactory.createItem(ownerId, name, description, type, attributes, condition);
+    public Item createItem(String ownerId, String name, String description, ItemType type, ItemAttributesDTO attributes, ItemCondition condition, List<String> imageUrl) {
+        Item item = ItemFactory.createItem(ownerId, name, description, type, attributes, condition, imageUrl);
         itemRepository.save(item);
+        logger.info("Item created itemId={} ownerId={} type={}", item.getId(), ownerId, type);
         return item;
     }
 
     @Override
     public Item getItemById(String id) {
-        return itemRepository.findById(id);
+        Item item = itemRepository.findById(id);
+        if (item == null) {
+            logger.debug("Item lookup returned no item itemId={}", id);
+        }
+        return item;
     }
 
     @Override
     public boolean transferOwnership(Item item, String newOwnerId) {
         if (item == null || newOwnerId == null) {
+            logger.warn("Item ownership transfer rejected itemPresent={} newOwnerIdPresent={}",
+                    item != null, newOwnerId != null);
+            return false;
+        }
+        if (!itemRepository.updateOwner(item.getId(), newOwnerId)) {
+            logger.error("Item ownership transfer failed while updating repository itemId={} newOwnerId={}",
+                    item.getId(), newOwnerId);
             return false;
         }
         item.setOwnerId(newOwnerId);
-        itemRepository.updateOwner(item.getId(), newOwnerId);
+        logger.info("Item ownership transferred itemId={} newOwnerId={}", item.getId(), newOwnerId);
         return true;
     }
 

@@ -1,0 +1,363 @@
+/* ═══════════════════════════════════════════════════════
+   Inventory.css — đồng bộ với dashboard.css / liveAuction.css
+   Palette:
+     bg chính   : #1a1c22
+     bg card    : #23262f
+     bg darker  : #12141f
+     border     : #2e3245
+     green      : #00e676 / #4fc97e
+     purple     : #c084f5
+     amber      : #f0a500
+     blue       : #3daef5
+     text white : #f0f2f8
+     text muted : #8b8fa8
+══════════════════════════════════════════════════════════ */
+
+/* ── Root ────────────────────────────────────────────── */
+
+.inventory-root {
+    -fx-background-color: #1a1c22;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+
+.inv-header {
+    -fx-background-color: #1a1c22;
+    -fx-border-color: transparent transparent #2e3245 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.inv-title {
+    -fx-text-fill: #f0f2f8;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.inv-sub {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 12px;
+}
+
+.inv-count-badge {
+    -fx-background-color: #2e3245;
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 100;
+}
+
+/* ── Stat Bar ─────────────────────────────────────────── */
+
+.inv-stat-bar {
+    -fx-background-color: #1a1c22;
+    -fx-padding: 16 24 16 24;
+}
+
+.inv-stat-card {
+    -fx-background-color: #23262f;
+    -fx-background-radius: 10;
+    -fx-padding: 12 16 12 16;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+.inv-sc-label {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.inv-sc-val {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.inv-sc-sub {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 11px;
+}
+
+.inv-c-purple { -fx-text-fill: #c084f5; }
+.inv-c-green  { -fx-text-fill: #00e676; }
+.inv-c-amber  { -fx-text-fill: #f0a500; }
+.inv-c-blue   { -fx-text-fill: #3daef5; }
+
+/* ── Panels ──────────────────────────────────────────── */
+
+.inv-panel {
+    -fx-background-color: #23262f;
+    -fx-background-radius: 12;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.inv-panel-header {
+    -fx-background-color: transparent;
+}
+
+.inv-panel-title {
+    -fx-text-fill: #f0f2f8;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.inv-sep {
+    -fx-background-color: #2e3245;
+    -fx-padding: 0;
+}
+
+/* ── Column Headers ──────────────────────────────────── */
+
+.inv-col-header {
+    -fx-background-color: #1e2130;
+}
+
+.inv-col-lbl {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+/* ── Filter Bar ──────────────────────────────────────── */
+
+.inv-filter-bar {
+    -fx-background-color: #1a1c22;
+    -fx-background-radius: 8;
+    -fx-padding: 3;
+}
+
+.inv-filter-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 6;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+
+.inv-filter-btn:hover {
+    -fx-background-color: #2e3245;
+    -fx-text-fill: #f0f2f8;
+}
+
+.inv-filter-active {
+    -fx-background-color: #2e3245;
+    -fx-text-fill: #f0f2f8;
+}
+
+/* ── Scroll ──────────────────────────────────────────── */
+
+.inv-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.inv-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.inv-scroll .scroll-bar:vertical .track {
+    -fx-background-color: #2e3245;
+    -fx-background-radius: 4;
+}
+
+.inv-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #4a2a6a;
+    -fx-background-radius: 4;
+}
+
+.inv-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #6a3a8a;
+}
+
+.inv-scroll .scroll-bar:vertical .increment-button,
+.inv-scroll .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* ── List Container ──────────────────────────────────── */
+
+.inv-list-container {
+    -fx-background-color: transparent;
+}
+
+/* ── Row Item ────────────────────────────────────────── */
+
+.inv-row {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #2e3245 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 10 16 10 16;
+    -fx-cursor: hand;
+}
+
+.inv-row:hover {
+    -fx-background-color: #1e2130;
+}
+
+.inv-row-name {
+    -fx-text-fill: #f0f2f8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-wrap-text: true;
+}
+
+.inv-row-sub {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 10px;
+}
+
+.inv-row-val {
+    -fx-text-fill: #f0f2f8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.inv-row-muted {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 11px;
+}
+
+.inv-row-price {
+    -fx-text-fill: #00e676;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.inv-row-time {
+    -fx-text-fill: #f0a500;
+    -fx-font-size: 11px;
+}
+
+/* ── Status Badges ───────────────────────────────────── */
+
+.inv-badge {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 100;
+}
+
+.inv-badge-live {
+    -fx-background-color: #0a1f13;
+    -fx-text-fill: #00e676;
+    -fx-border-color: #00e676;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+}
+
+.inv-badge-ended {
+    -fx-background-color: #1e2130;
+    -fx-text-fill: #8b8fa8;
+    -fx-border-color: #2e3245;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+}
+
+.inv-badge-cancelled {
+    -fx-background-color: #2d0f0f;
+    -fx-text-fill: #ff6b6b;
+    -fx-border-color: #ff3333;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+}
+
+.inv-badge-pending {
+    -fx-background-color: #1f1500;
+    -fx-text-fill: #ffcc44;
+    -fx-border-color: #cc9900;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+}
+
+.inv-badge-received {
+    -fx-background-color: #0a1f13;
+    -fx-text-fill: #00e676;
+    -fx-border-color: #00e676;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+}
+
+.inv-badge-scheduled {
+    -fx-background-color: #1e0f2d;
+    -fx-text-fill: #cc66ff;
+    -fx-border-color: #aa00ff;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+}
+
+/* ── Action Buttons ──────────────────────────────────── */
+
+.inv-btn-manage {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c084f5;
+    -fx-border-color: #3a2d5a;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-width: 1;
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+    -fx-padding: 4 10 4 10;
+}
+
+.inv-btn-manage:hover {
+    -fx-background-color: #2e2245;
+    -fx-text-fill: #f0f2f8;
+}
+
+.inv-btn-detail {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b8fa8;
+    -fx-border-color: #2e3245;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-width: 1;
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+    -fx-padding: 4 10 4 10;
+}
+
+.inv-btn-detail:hover {
+    -fx-background-color: #2e3245;
+    -fx-text-fill: #f0f2f8;
+}
+
+/* ── Empty State ─────────────────────────────────────── */
+
+.inv-empty {
+    -fx-padding: 40 20 40 20;
+}
+
+.inv-empty-icon {
+    -fx-font-size: 32px;
+}
+
+.inv-empty-text {
+    -fx-text-fill: #f0f2f8;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.inv-empty-sub {
+    -fx-text-fill: #8b8fa8;
+    -fx-font-size: 12px;
+}
+
+/* ── Row background override ─────────────────────────── */
+/* Override transparent → màu card để row không trong suốt */
+
+.inv-row {
+    -fx-background-color: #23262f;
+}
+
+.inv-row:hover {
+    -fx-background-color: #2a2d3e;
+}

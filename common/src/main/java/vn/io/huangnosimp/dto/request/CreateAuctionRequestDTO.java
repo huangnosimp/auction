@@ -4,6 +4,8 @@ import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 
+import java.util.List;
+
 public class CreateAuctionRequestDTO {
     private final String itemName;
     private final String description;
@@ -15,6 +17,7 @@ public class CreateAuctionRequestDTO {
     private final ItemCondition condition;
     private final double minimumIncrement;
     private final double buyNowPrice;
+    private final List<String> imageUrl;
 
     public CreateAuctionRequestDTO(String itemName,
                                    String description,
@@ -26,6 +29,21 @@ public class CreateAuctionRequestDTO {
                                    ItemCondition condition,
                                    double minimumIncrement,
                                    double buyNowPrice) {
+        this(itemName, description, itemType, attributes, startPrice, startTime, endTime, condition,
+                minimumIncrement, buyNowPrice, null);
+    }
+
+    public CreateAuctionRequestDTO(String itemName,
+                                   String description,
+                                   ItemType itemType,
+                                   ItemAttributesDTO attributes,
+                                   double startPrice,
+                                   long startTime,
+                                   long endTime,
+                                   ItemCondition condition,
+                                   double minimumIncrement,
+                                   double buyNowPrice,
+                                   List<String> imageUrl) {
         this.itemName = itemName;
         this.description = description;
         this.itemType = itemType;
@@ -36,6 +54,7 @@ public class CreateAuctionRequestDTO {
         this.condition = condition;
         this.minimumIncrement = minimumIncrement;
         this.buyNowPrice = buyNowPrice;
+        this.imageUrl = imageUrl;
     }
 
     public String getItemName() {
@@ -76,5 +95,9 @@ public class CreateAuctionRequestDTO {
 
     public double getBuyNowPrice() {
         return buyNowPrice;
+    }
+
+    public List<String> getImageUrl() {
+        return imageUrl;
     }
 }

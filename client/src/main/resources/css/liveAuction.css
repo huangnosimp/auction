@@ -1,5 +1,18 @@
+/* ═══════════════════════════════════════════════════════
+   liveAuction.css — màu đồng bộ với Dashboard
+   Dashboard palette:
+     bg chính    : #1a1d2e  (navy dark)
+     bg card     : #12141f  (darker navy)
+     border      : #2a1a4a  (tím nhạt, giống dashboard border)
+     accent xanh : #1CC953 / #4fc97e
+     accent tím  : #c084f5
+     accent cam  : #f0a500
+     text muted  : #aaaaaa
+     text white  : #f0f0f0
+══════════════════════════════════════════════════════════ */
+
 Pane {
-    -fx-background-color: #1e2029;
+    -fx-background-color: #1a1d2e;
     -fx-background-radius: 15;
     -fx-border-color: #270830;
     -fx-border-width: 7;
@@ -7,31 +20,44 @@ Pane {
 }
 
 #mainHbox {
-    -fx-border-color: #1e2029;
+    -fx-border-color: #1a1d2e;
     -fx-border-width: 15;
 }
 
+
 .chart {
     -fx-padding: 10px;
+    -fx-background-color: #12141f;
+}
+
+.chart-title {
+    -fx-text-fill: white;
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
 }
 
 .chart-plot-background {
-    -fx-background-color: #2B2222;
+    -fx-background-color: #12141f;
 }
 
 .chart-vertical-grid-lines,
 .chart-horizontal-grid-lines {
-    -fx-stroke: #323544;
+    -fx-stroke: #2a2d3e;
 }
 
-.axis {
-    -fx-tick-label-fill: #ffffff;
-    -fx-axis-label-fill: #ffffff;
+.axis-label {
     -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.axis {
+    -fx-tick-label-fill: #aaaaaa;
+    -fx-axis-label-fill: #aaaaaa;
+    -fx-text-fill: #aaaaaa;
 }
 
 .axis-axis-label {
-    -fx-text-fill: white;
+    -fx-text-fill: #aaaaaa;
 }
 
 .default-color0.chart-series-line {
@@ -43,29 +69,30 @@ Pane {
     -fx-background-color: #f0a500, #270830;
 }
 
+/* ── ScrollPane (product info) ──────────────────────── */
 .product-scroll {
     -fx-background-color: transparent;
-    -fx-background: #1d0f27;
+    -fx-background: #1a1d2e;
     -fx-border-color: transparent;
     -fx-padding: 0;
 }
 
 .product-scroll > .viewport {
-    -fx-background-color: #1d0f27;
+    -fx-background-color: #1a1d2e;
 }
 
 .product-scroll .scroll-bar:vertical .track {
-    -fx-background-color: #2a1a3a;
+    -fx-background-color: #22263a;
     -fx-background-radius: 4;
 }
 
 .product-scroll .scroll-bar:vertical .thumb {
-    -fx-background-color: #5a2a7a;
+    -fx-background-color: #4a2a6a;
     -fx-background-radius: 4;
 }
 
 .product-scroll .scroll-bar:vertical .thumb:hover {
-    -fx-background-color: #7a3a9a;
+    -fx-background-color: #6a3a8a;
 }
 
 .product-scroll .scroll-bar:vertical .increment-button,
@@ -75,9 +102,10 @@ Pane {
 }
 
 .product-info-container {
-    -fx-background-color: #1d0f27;
+    -fx-background-color: #1a1d2e;
 }
 
+/* ── Typography ─────────────────────────────────────── */
 .section-title {
     -fx-text-fill: #c084f5;
     -fx-font-size: 10px;
@@ -85,8 +113,9 @@ Pane {
     -fx-padding: 4 0 2 0;
 }
 
+/* ── Cards ──────────────────────────────────────────── */
 .info-card {
-    -fx-background-color: #16181f;
+    -fx-background-color: #12141f;
     -fx-background-radius: 8;
 }
 
@@ -133,9 +162,10 @@ Pane {
     -fx-padding: 2 6 2 6;
 }
 
+/* ── Badges ─────────────────────────────────────────── */
 .badge-optional {
     -fx-text-fill: #888888;
-    -fx-background-color: #2a2d38;
+    -fx-background-color: #22263a;
     -fx-background-radius: 4;
     -fx-font-size: 9px;
     -fx-padding: 1 5 1 5;
@@ -149,19 +179,21 @@ Pane {
     -fx-padding: 1 5 1 5;
 }
 
+/* ── Image placeholder ──────────────────────────────── */
 .image-placeholder {
-    -fx-background-color: #261535;
+    -fx-background-color: #1e2235;
     -fx-background-radius: 6;
-    -fx-border-color: #3a1a4a;
+    -fx-border-color: #2a2d4a;
     -fx-border-radius: 6;
     -fx-border-style: dashed;
 }
 
 .image-placeholder-text {
-    -fx-text-fill: #5a3a6a;
+    -fx-text-fill: #4a4d6a;
     -fx-font-size: 10px;
 }
 
+/* ── Auto extend chip ───────────────────────────────── */
 .auto-extend-chip {
     -fx-background-color: #0d2212;
     -fx-background-radius: 8;
@@ -180,23 +212,24 @@ Pane {
     -fx-font-size: 9px;
 }
 
+/* ── Buttons ─────────────────────────────────────────── */
 .allbtn {
-    -fx-background-color: #3a1a4a;
+    -fx-background-color: #22263a;
     -fx-text-fill: #ffffff;
-    -fx-border-color: #5a2a6a;
-    -fx-border-radius:6;
-    -fx-background-radius:6;
+    -fx-border-color: #3a2d5a;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
     -fx-font-size: 16px;
     -fx-cursor: hand;
 }
 
 .allbtn:hover {
-    -fx-background-color: #662C82;
+    -fx-background-color: #2e3450;
     -fx-text-fill: #f0f2f8;
-    -fx-border-color: #7E4491;
-    -fx-text-fill: #F2F2F2;
+    -fx-border-color: #5a4a7a;
 }
-.bidbtn{
+
+.bidbtn {
     -fx-background-color: #1CC953;
     -fx-text-fill: #0a2a18;
     -fx-font-size: 13px;
@@ -204,21 +237,101 @@ Pane {
     -fx-background-radius: 8;
     -fx-border-radius: 8;
 }
+
 .bidbtn:hover {
     -fx-background-color: #4fc97e;
-    -fx-cursor:hand;
-
+    -fx-cursor: hand;
 }
-.quitbtn{
+
+.quitbtn {
     -fx-background-color: transparent;
-    -fx-text-fill: #d09af0;
-    -fx-border-color: #5a2a6a;
+    -fx-text-fill: #c084f5;
+    -fx-border-color: #3a2d5a;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
     -fx-font-size: 11px;
-    -fx-cursor:hand;
+    -fx-cursor: hand;
 }
-.quitbtn:hover{
-    -fx-border-color: #7B4A8F;
+
+.quitbtn:hover {
+    -fx-border-color: #5a4a7a;
     -fx-text-fill: #e8e6f0;
+}
+/* ── Auto Bid Status ─────────────────────────────────── */
+
+/* Trạng thái chưa kích hoạt (mặc định) */
+.autobid-inactive {
+    -fx-background-color: #2d1a1a;
+    -fx-background-radius: 8;
+}
+
+.autobid-status-inactive {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 10px;
+}
+
+/* Trạng thái đã kích hoạt */
+.autobid-active {
+    -fx-background-color: #1a2d1a;
+    -fx-background-radius: 8;
+    -fx-border-color: #00e676;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.autobid-status-active {
+    -fx-text-fill: #00e676;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+/* TextField giá tối đa */
+.autobid-input {
+    -fx-background-color: #1a1a2a;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #3a3d4a;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+    -fx-padding: 5 8 5 8;
+}
+
+/* Nút Cancel khi đang active */
+.autobid-cancel-btn {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-max-width: Infinity;
+    -fx-pref-height: 26;
+}
+
+.autobid-cancel-btn:hover {
+    -fx-background-color: #c0392b;
+}
+#myBidLabel{
+    -fx-background-color:  #211429;
+    -fx-font-size:  15px;
+    -fx-font-weight:  bold;
+    -fx-text-fill: white;
+}
+/* 1. Đổi màu nền của tất cả các ô dữ liệu trong ListView */
+.list-view .list-cell {
+    -fx-background-color: #16181f; /* Cùng màu tối với sidebar */
+    -fx-text-fill: #ffffff;        /* Đổi màu chữ thành trắng để dễ nhìn */
+    -fx-padding: 6px 10px;         /* Tạo khoảng cách cho đẹp dòng */
+}
+
+/* 2. Đổi màu nền khi dòng đó được chọn (Selected) hoặc di chuột qua (Hover) để tránh bị lem màu trắng */
+.list-view .list-cell:filled:hover {
+    -fx-background-color: #2a2d3a;
+}
+
+.list-view .list-cell:filled:selected {
+    -fx-background-color: #3a1a4a; /* Màu tím tối giống như màu chủ đạo của bạn */
+    -fx-text-fill: #f0a500;        /* Chữ biến thành màu vàng để làm nổi bật */
 }

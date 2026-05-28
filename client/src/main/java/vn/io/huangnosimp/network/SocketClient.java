@@ -2,6 +2,7 @@ package vn.io.huangnosimp.network;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
 import vn.io.huangnosimp.util.GsonParser;
@@ -9,7 +10,6 @@ import vn.io.huangnosimp.util.GsonParser;
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -24,7 +24,10 @@ public class SocketClient {
     private Thread listenerThread;
 
     private final List<IServerMessageListener> listeners = new CopyOnWriteArrayList<>();
-    private final Map<String, CompletableFuture<Response>> pendingRequests = new ConcurrentHashMap<>();
+
+    // Lưu future + ActionType enum trong cùng 1 entry
+    private record PendingEntry(CompletableFuture<Response> future, ActionType action) {}
+    private final ConcurrentHashMap<String, PendingEntry> pendingRequests = new ConcurrentHashMap<>();
 
     public SocketClient(String host, int port) {
         this.host = host;
@@ -53,10 +56,17 @@ public class SocketClient {
         listenerThread.start();
     }
 
+    public boolean isConnected() {
+        return socket != null && socket.isConnected() && !socket.isClosed() && out != null;
+    }
+
     public CompletableFuture<Response> sendRequestAsync(Request request) {
         CompletableFuture<Response> future = new CompletableFuture<>();
         if (out != null && socket != null && !socket.isClosed()) {
-            pendingRequests.put(request.getRequestId(), future);
+            pendingRequests.put(
+                    request.getRequestId(),
+                    new PendingEntry(future, request.getAction()) // ActionType enum
+            );
             String jsonStr = GsonParser.GSON.toJson(request);
             synchronized (out) {
                 out.println(jsonStr);
@@ -74,11 +84,15 @@ public class SocketClient {
 
     public void sendRequest(Request request) {
         if (out != null && socket != null && !socket.isClosed()) {
+            pendingRequests.put(
+                    request.getRequestId(),
+                    new PendingEntry(new CompletableFuture<>(), request.getAction())
+            );
             String jsonStr = GsonParser.GSON.toJson(request);
             synchronized (out) {
                 out.println(jsonStr);
             }
-            System.out.println("[SocketClient] Sent (Fire & Forget): " + jsonStr);
+            System.out.println("[SocketClient] Sent (Fire & Forget with Tracking): " + jsonStr);
         } else {
             System.err.println("[SocketClient] Cannot send message, not connected to server.");
         }
@@ -116,17 +130,20 @@ public class SocketClient {
 
     private void handleResponse(Response response) {
         if (response.getRequestId() != null) {
-            CompletableFuture<Response> future = pendingRequests.remove(response.getRequestId());
-            if (future != null) {
-                future.complete(response);
-            }
-        }
+            PendingEntry entry = pendingRequests.remove(response.getRequestId());
+            if (entry != null) {
+                ActionType action = entry.action();
+                System.out.println("[SocketClient] Response for action: " + action);
 
-        for (IServerMessageListener listener : listeners) {
-            try {
-                listener.onResponseReceived(response);
-            } catch (Exception e) {
-                System.err.println("[SocketClient] Error in Response listener: " + e.getMessage());
+                for (IServerMessageListener listener : listeners) {
+                    try {
+                        listener.onResponseReceived(response, action);
+                    } catch (Exception e) {
+                        System.err.println("[SocketClient] Error in Response listener: " + e.getMessage());
+                    }
+                }
+
+                entry.future().complete(response);
             }
         }
     }
@@ -142,8 +159,8 @@ public class SocketClient {
     }
 
     private void notifyDisconnect(String reason) {
-        for (CompletableFuture<Response> future : pendingRequests.values()) {
-            future.completeExceptionally(new IOException("Connection lost: " + reason));
+        for (PendingEntry entry : pendingRequests.values()) {
+            entry.future().completeExceptionally(new IOException("Connection lost: " + reason));
         }
         pendingRequests.clear();
 
@@ -165,9 +182,9 @@ public class SocketClient {
         } catch (IOException e) {
             System.err.println("[SocketClient] Error closing input stream: " + e.getMessage());
         }
-        
+
         if (out != null) out.close();
-        
+
         try {
             if (socket != null && !socket.isClosed()) {
                 socket.close();

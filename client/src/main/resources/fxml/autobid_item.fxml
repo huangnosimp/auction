@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox alignment="CENTER_LEFT" spacing="8" styleClass="autobid-item-row" stylesheets="@../css/dashboard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.AutoBidItemController">
+    <children>
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <children>
+                <Label fx:id="lblProductTitle" styleClass="side-item-title" text="Product Name" />
+                <Label fx:id="lblAuctionSubtitle" style="-fx-text-fill: #aaaaaa; -fx-font-size: 10px;" text="#ID-Phien" />
+                <Label fx:id="lblMaxBid" styleClass="side-item-value-autobid" text="Max: $0" />
+            </children>
+        </VBox>
+        <Button fx:id="btnCancel" onAction="#handleCancel" styleClass="side-cancel-autobid-btn" text="Cancel" />
+    </children>
+</HBox>

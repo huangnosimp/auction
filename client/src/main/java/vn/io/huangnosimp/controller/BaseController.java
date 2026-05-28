@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import vn.io.huangnosimp.Manager.SocketManager;
 import vn.io.huangnosimp.network.IServerMessageListener;
+import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.protocol.Request;
 import vn.io.huangnosimp.protocol.Response;
 
@@ -18,6 +19,8 @@ public abstract class BaseController implements Initializable {
             Platform.runLater(() -> handleServerNotification(request));
         }
 
+        @Override
+        public void onResponseReceived(Response response, ActionType actionType){}
         @Override
         public void onResponseReceived(Response response) {
             Platform.runLater(() -> handleServerResponse(response));

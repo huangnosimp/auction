@@ -1,14 +1,17 @@
 package vn.io.huangnosimp.repository;
 
-import vn.io.huangnosimp.database.DatabaseConnection;
+import vn.io.huangnosimp.connection.DatabaseConnection;
 import vn.io.huangnosimp.model.Transaction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransactionRepository implements ITransactionRepository {
+    private static final Logger logger = LoggerFactory.getLogger(TransactionRepository.class);
     private final DatabaseConnection databaseConnection;
 
     public TransactionRepository(DatabaseConnection databaseConnection) {
@@ -16,7 +19,7 @@ public class TransactionRepository implements ITransactionRepository {
     }
 
     @Override
-    public void saveTransaction(Transaction transaction) {
+    public boolean saveTransaction(Transaction transaction) {
         String sql = "INSERT INTO Transactions (id, user_id, amount, transaction_time, transaction_type) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -24,12 +27,16 @@ public class TransactionRepository implements ITransactionRepository {
             stmt.setString(1, transaction.getId());
             stmt.setString(2, transaction.getUserId());
             stmt.setDouble(3, transaction.getAmount());
-            stmt.setTimestamp(6, new Timestamp(transaction.getCreatedAt()));
-            stmt.setString(4, transaction.getTransactionType().name());
+            stmt.setTimestamp(4, new Timestamp(transaction.getCreatedAt()));
+            stmt.setString(5, transaction.getTransactionType().name());
 
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("DB error when saving transaction: " + e.getMessage());
+            logger.error(
+                    "DB error when saving transaction transactionId={} userId={} type={}",
+                    transaction.getId(), transaction.getUserId(), transaction.getTransactionType(), e
+            );
+            return false;
         }
     }
 }

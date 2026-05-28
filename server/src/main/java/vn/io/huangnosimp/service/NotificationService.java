@@ -1,5 +1,10 @@
 package vn.io.huangnosimp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import vn.io.huangnosimp.dto.response.PlaceBidResponseDTO;
+import vn.io.huangnosimp.dto.shared.AuctionExtendedDTO;
 import vn.io.huangnosimp.protocol.ActionType;
 import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.ClientSessionManager;
@@ -7,21 +12,32 @@ import vn.io.huangnosimp.dto.shared.NotificationDTO;
 import vn.io.huangnosimp.protocol.Request;
 
 public class NotificationService {
-    private void sendNotification(String auctionId, NotificationType type, String messageText) {
-         NotificationDTO dto = new NotificationDTO(type, auctionId, messageText);
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+
+    private void sendNotification(String auctionId, NotificationType type, Object data) {
+         NotificationDTO dto = new NotificationDTO(type, auctionId, data);
          Request request = new Request(ActionType.NOTIFICATION, dto);
          ClientSessionManager.getInstance().broadcastToRoom(auctionId, request);
+         logger.debug("Notification broadcast auctionId={} type={}", auctionId, type);
     }
-    public void notifyBidPlaced(String auctionId, double currentPrice, String winnerUsername) {
-        String msg = String.format("A new bid of %.2f was placed! Current top bidder: %s", currentPrice, winnerUsername);
-        sendNotification(auctionId, NotificationType.NEW_BID, msg);
+    public void notifyBidPlaced(String auctionId, double amount, String winnerUsername) {
+        PlaceBidResponseDTO dto = new PlaceBidResponseDTO(winnerUsername, amount, System.currentTimeMillis());
+        sendNotification(auctionId, NotificationType.NEW_BID, dto);
+        logger.info("Bid notification sent auctionId={} amount={}", auctionId, amount);
+    }
+    public void notifyAuctionExtended(String auctionId, long newEndTime) {
+        AuctionExtendedDTO dto = new AuctionExtendedDTO(newEndTime, System.currentTimeMillis());
+        sendNotification(auctionId, NotificationType.AUCTION_EXTENDED, dto);
+        logger.info("Auction extension notification sent auctionId={} newEndTime={}", auctionId, newEndTime);
     }
     public void notifyAuctionEnded(String auctionId, String winnerUsername, double finalPrice) {
         String msg = String.format("Auction ended! Winner: %s with price %.2f", winnerUsername != null ? winnerUsername : "None", finalPrice);
         sendNotification(auctionId, NotificationType.AUCTION_ENDED, msg);
+        logger.info("Auction ended notification sent auctionId={} finalPrice={}", auctionId, finalPrice);
     }
     public void notifyAuctionCanceled(String auctionId) {
         sendNotification(auctionId, NotificationType.AUCTION_CANCELED, "The auction has been canceled.");
+        logger.info("Auction canceled notification sent auctionId={}", auctionId);
     }
     public void notifyOutbid(String auctionId, String userId, double currentPrice) {
         if (!ClientSessionManager.getInstance().isUserInRoom(auctionId, userId)) {
@@ -29,6 +45,9 @@ public class NotificationService {
             NotificationDTO dto = new NotificationDTO(NotificationType.OUTBID, auctionId, msg);
             Request request = new Request(ActionType.NOTIFICATION, dto);
             ClientSessionManager.getInstance().sendToUser(userId, request);
+            logger.info("Outbid notification sent auctionId={} userId={} currentPrice={}", auctionId, userId, currentPrice);
+        } else {
+            logger.debug("Outbid notification skipped because user is in room auctionId={} userId={}", auctionId, userId);
         }
     }
 }

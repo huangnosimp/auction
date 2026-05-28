@@ -2,9 +2,29 @@ package vn.io.huangnosimp.Manager;
 import vn.io.huangnosimp.controller.*;
 
 public class ControllerManager {
+    private static LoginController loginController;
     private static DashboardController dashboardController;
     private static dashboard_homeController dashboardHomeController;
     private static liveAuctionController liveAuctionController;
+    private static OpenSlotController openSlotController;
+    private static AccountViewController accountViewController;
+    private static InventoryController inventoryController;
+    public static void clearAllController(){
+        loginController = null;
+        dashboardController = null;
+        dashboardHomeController = null;
+        liveAuctionController = null;
+        openSlotController = null;
+        accountViewController = null;
+        inventoryController = null;
+    }
+    //login
+    public static LoginController getLoginController(){
+        return loginController;
+    }
+    public static void setLoginController(LoginController lg){
+        loginController = lg;
+    }
 
     //dashBoard
     public static  DashboardController getDashboardController(){
@@ -13,17 +33,42 @@ public class ControllerManager {
     public static void setDashboardController(DashboardController db){
         dashboardController = db;
     }
+
     //dashboardHome
-    public static dashboard_homeController getDashboardHomeController() {
+    public static dashboard_homeController getDashboardHomeController() {   
         return dashboardHomeController; }
     public static void setDashboardHomeController(dashboard_homeController c) {
         dashboardHomeController = c; }
+
     //liveAuction
-    public void setLiveAuctionController(liveAuctionController c){
+    public static void setLiveAuctionController(liveAuctionController c){
         liveAuctionController = c;
     }
-    public liveAuctionController getLiveAuctionController(){
+    public static liveAuctionController getLiveAuctionController(){
         return liveAuctionController;
     }
 
+    //open slot
+    public static OpenSlotController getOpenSlotController(){
+        return openSlotController;
+    }
+    public static void setOpenSlotController(OpenSlotController o){
+        openSlotController = o;
+    }
+
+    //accountView
+    public static void setAccountViewController(AccountViewController a){
+        accountViewController = a;
+    }
+    public static AccountViewController getAccountViewController(){
+        return accountViewController;
+    }
+
+    //inventory
+    public static InventoryController getInventoryController(){
+        return inventoryController;
+    }
+    public static void setInventoryController(InventoryController inv){
+        inventoryController = inv;
+    }
 }

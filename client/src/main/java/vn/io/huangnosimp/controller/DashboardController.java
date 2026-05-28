@@ -1,8 +1,16 @@
 package vn.io.huangnosimp.controller;
 
+import com.google.gson.reflect.TypeToken;
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -10,75 +18,540 @@ import javafx.scene.layout.StackPane;
 
 import javafx.event.ActionEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import vn.io.huangnosimp.Manager.ControllerManager;
+import vn.io.huangnosimp.Manager.SocketManager;
+import vn.io.huangnosimp.Manager.TimeSyncManager;
+import vn.io.huangnosimp.Manager.UserSession;
+import vn.io.huangnosimp.Manager.ViewManager;
+import vn.io.huangnosimp.dto.request.GetPublicAcutionCardDTO;
+import vn.io.huangnosimp.dto.request.GetPostedAuctionDTO;
+import vn.io.huangnosimp.dto.request.GetEndedPostedAuctionDTO;
+import vn.io.huangnosimp.dto.request.GetWonAuctionDTO;
+import vn.io.huangnosimp.dto.response.GetPostedAuctionCardResponseDTO;
+import vn.io.huangnosimp.dto.response.AuctionCardDTO;
+import vn.io.huangnosimp.dto.response.GetPublicAuctionCardResponseDTO;
+import vn.io.huangnosimp.dto.shared.AuctionExtendedDTO;
+import vn.io.huangnosimp.dto.shared.NotificationDTO;
+import vn.io.huangnosimp.enums.NotificationType;
+import vn.io.huangnosimp.network.IServerMessageListener;
+import vn.io.huangnosimp.protocol.ActionType;
+import vn.io.huangnosimp.protocol.Request;
+import vn.io.huangnosimp.protocol.Response;
+import vn.io.huangnosimp.protocol.ResponseStatus;
+import vn.io.huangnosimp.util.GsonParser;
+import vn.io.huangnosimp.dto.response.AutoBidResponseDTO;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.*;
 
-import static vn.io.huangnosimp.Manager.UserSession.getDashboardInfo;
+import static vn.io.huangnosimp.Manager.FormatUtil.formatNumber;
+import static vn.io.huangnosimp.Manager.UserSession.*;
 import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 
-public class DashboardController extends BaseController {
+public class DashboardController implements Initializable, IServerMessageListener {
     @FXML private BorderPane mainBorderPane;
-    @FXML private StackPane contentArea; // Cái này nằm ở file dashboard.fxml nên giữ lại
-    @FXML private Button createButton;
+    @FXML private StackPane contentArea;
     @FXML private Button btnOpenSlots;
+    @FXML private Button btnInventory;
     @FXML private HBox menuHbox;
     @FXML private VBox sideVbox;
     @FXML private Label lblBalance;
-    @FXML private Label lblActiveBids;
-    @FXML private Label lblWinning;
-    @FXML private Label lblOutbid;
-    @FXML private Label lblWonTotal;
+    @FXML private Label lblBalanceChange;
+    private boolean isInitialized = false;
+
+    @FXML private HBox toastBox;
+    @FXML private Label toastTitle, toastSub, toastIconLabel;
+    @FXML private Circle toastIconCircle;
+    @FXML private ScrollPane outBidScrollPane;
+    @FXML private VBox outbidAlertsList;
+    @FXML private Label outbidBadge;
+    @FXML private VBox autoBidList;
+    @FXML private Label autoBidBadge;
+
+    public static DashboardController instance;
 
     @FXML
-    public void handleMenuAction(ActionEvent event){
+    public void handleMenuAction(ActionEvent event) {
         Button clickedButton = (Button) event.getSource();
-
-        for(Node node : menuHbox.getChildren()){
-            if(node instanceof Button){
-                Button btn = (Button) node;
+        for (Node node : menuHbox.getChildren()) {
+            if (node instanceof Button btn) {
                 btn.getStyleClass().remove("nav-btn-active");
             }
         }
         clickedButton.getStyleClass().add("nav-btn-active");
     }
-    @FXML
-    public void handlebtnAvatar(ActionEvent event){
-        changeView("AccountView.fxml", 1);
+
+    public Button getActiveMenuButton() {
+        for (Node node : menuHbox.getChildren()) {
+            if (node instanceof Button btn) {
+                if (btn.getStyleClass().contains("nav-btn-active")) {
+                    return btn;
+                }
+            }
+        }
+        return null;
     }
 
     @FXML
-    public void handlebtnDashboard(ActionEvent event){
+    public void handlebtnAvatar(ActionEvent event) {
+        changeView("AccountView.fxml", 1);
+        for (Node node : menuHbox.getChildren()) {
+            if (node instanceof Button btn) {
+                btn.getStyleClass().remove("nav-btn-active");
+            }
+        }
+    }
+
+    @FXML
+    public void handlebtnDashboard(ActionEvent event) {
         changeView("dashboard_home.fxml", 1);
         handleMenuAction(event);
     }
+    @FXML
+    public void handlebtnInventory(ActionEvent event){
+        showInventoryView();
+    }
+
+    public void showInventoryView() {
+        Request activeListingsReq = new Request(ActionType.GET_POSTED_AUCTION_CARD, new GetPostedAuctionDTO(30));
+        Request endedListingsReq = new Request(ActionType.GET_ENDED_POSTED_AUCTION, new GetEndedPostedAuctionDTO(30));
+        Request wonReq = new Request(ActionType.GET_WON_AUCTION, new GetWonAuctionDTO(30));
+
+        SocketManager.getClient().sendRequestAsync(activeListingsReq)
+            .thenCombine(SocketManager.getClient().sendRequestAsync(endedListingsReq), (activeRes, endedRes) -> {
+                List<AuctionCardDTO> activeList = new ArrayList<>();
+                List<AuctionCardDTO> endedList = new ArrayList<>();
+                if (activeRes != null && ResponseStatus.SUCCESS.equals(activeRes.getStatus())) {
+                    GetPostedAuctionCardResponseDTO dto = GsonParser.GSON.fromJson(
+                        GsonParser.GSON.toJsonTree(activeRes.getData()),
+                        GetPostedAuctionCardResponseDTO.class
+                    );
+                    if (dto != null && dto.getAuctionCards() != null) {
+                        activeList.addAll(dto.getAuctionCards());
+                    }
+                }
+                if (endedRes != null && ResponseStatus.SUCCESS.equals(endedRes.getStatus())) {
+                    List<AuctionCardDTO> list = GsonParser.GSON.fromJson(
+                        GsonParser.GSON.toJsonTree(endedRes.getData()),
+                        new TypeToken<List<AuctionCardDTO>>(){}.getType()
+                    );
+                    if (list != null) {
+                        endedList.addAll(list);
+                    }
+                }
+                List<AuctionCardDTO> allListings = new ArrayList<>();
+                allListings.addAll(activeList);
+                allListings.addAll(endedList);
+                return allListings;
+            })
+            .thenCombine(SocketManager.getClient().sendRequestAsync(wonReq), (allListings, wonRes) -> {
+                List<AuctionCardDTO> wonList = new ArrayList<>();
+                if (wonRes != null && ResponseStatus.SUCCESS.equals(wonRes.getStatus())) {
+                    List<AuctionCardDTO> list = GsonParser.GSON.fromJson(
+                        GsonParser.GSON.toJsonTree(wonRes.getData()),
+                        new TypeToken<List<AuctionCardDTO>>(){}.getType()
+                    );
+                    if (list != null) {
+                        wonList.addAll(list);
+                    }
+                }
+                
+                Platform.runLater(() -> {
+                    changeView("Inventory.fxml", 1);
+                    InventoryController inventoryController = ControllerManager.getInventoryController();
+                    if (inventoryController != null) {
+                        inventoryController.setData(allListings, wonList);
+                    }
+                    
+                    for (Node node : menuHbox.getChildren()) {
+                        if (node instanceof Button btn) {
+                            btn.getStyleClass().remove("nav-btn-active");
+                        }
+                    }
+                    if (btnInventory != null) {
+                        btnInventory.getStyleClass().add("nav-btn-active");
+                    }
+                });
+                return null;
+            }).exceptionally(ex -> {
+                ex.printStackTrace();
+                return null;
+            });
+    }
 
     @FXML
-    public void handlebtnOpenSlots(ActionEvent event){
-        changeView("open_slots.fxml", 1);
-        handleMenuAction(event);
+    public void handlebtnOpenSlots(ActionEvent event) {
+        List<AuctionCardDTO> combineList = new ArrayList<>(UserSession.getJoiningListCard());
+        combineList.addAll(UserSession.getMyListCard());
+
+        List<AuctionCardDTO> result = new ArrayList<>();
+
+        fetchUntilFull(result, combineList, 30, event, 5);
     }
 
-    @FXML
-    public void handleCreateClick(ActionEvent event){
-        changeView("create_auction.fxml",2);
+    private void applyOpenSlots(List<AuctionCardDTO> result, ActionEvent event) {
+        Platform.runLater(() -> {
+
+            UserSession.addToList(result);
+
+            if (ViewManager.getCache().containsKey("open_slots.fxml")) {
+                ControllerManager.getOpenSlotController().clearContainer();
+                ControllerManager.getOpenSlotController().setupOpenSlot(UserSession.getListCard());
+            }
+
+            ViewManager.changeView("open_slots.fxml", 1);
+            handleMenuAction(event);
+        });
     }
 
-    public Button getCreateButton(){
-        return this.createButton;
+    private void fetchUntilFull(List<AuctionCardDTO> result,
+                                List<AuctionCardDTO> excludeList,
+                                int target,
+                                ActionEvent event,
+                                int maxRetry) {
+
+        if (result.size() >= target || maxRetry <= 0) {
+            applyOpenSlots(result, event);
+            return;
+        }
+
+        int needed = target - result.size();
+        GetPublicAcutionCardDTO requestDTO = new GetPublicAcutionCardDTO(needed * 2);
+        Request request = new Request(ActionType.GET_PUBLIC_AUCTION_CARD, requestDTO);
+
+        SocketManager.getClient().sendRequestAsync(request)
+                .thenAccept(response -> {
+                    if (!ResponseStatus.SUCCESS.equals(response.getStatus())) {
+                        applyOpenSlots(result, event);
+                        return;
+                    }
+
+                    GetPublicAuctionCardResponseDTO dto = GsonParser.GSON.fromJson(
+                            GsonParser.GSON.toJsonTree(response.getData()),
+                            GetPublicAuctionCardResponseDTO.class
+                    );
+
+                    List<AuctionCardDTO> responseList = dto.getPublicAuctionCardList();
+
+                    if (responseList == null || responseList.isEmpty()) {
+                        applyOpenSlots(result, event);
+                        return;
+                    }
+
+                    Set<String> excludeIds = new HashSet<>();
+                    excludeList.forEach(c -> excludeIds.add(c.getAuctionId()));
+                    result.forEach(c -> excludeIds.add(c.getAuctionId()));
+
+                    for (AuctionCardDTO card : responseList) {
+                        long now = TimeSyncManager.nowMillis();
+                        if (!excludeIds.contains(card.getAuctionId()) && now <= card.getEndTime()) {
+                            result.add(card);
+                            excludeIds.add(card.getAuctionId());
+                            if (result.size() >= target) break;
+                        }
+                    }
+
+                    if (result.size() >= target) {
+                        applyOpenSlots(result, event);
+                    } else {
+                        fetchUntilFull(result, excludeList, target, event, maxRetry - 1);
+                    }
+                });
     }
+
+    public void showToast(String title, String sub, boolean success) {
+        String borderColor = success ? "#22c55e" : "#e24b4a";
+        String titleColor  = success ? "#4ade80" : "#f87171";
+        String subColor    = success ? "#86efac" : "#fca5a5";
+        String bgColor     = success ? "#1a2e1a" : "#2e1a1a";
+
+        toastTitle.setText(title);
+        toastSub.setText(sub);
+        toastTitle.setStyle("-fx-text-fill: " + titleColor + "; -fx-font-size: 12px; -fx-font-weight: bold;");
+        toastSub.setStyle("-fx-text-fill: " + subColor + "; -fx-font-size: 10px;");
+        toastIconCircle.setFill(javafx.scene.paint.Color.web(borderColor));
+        toastIconLabel.setText(success ? "✓" : "✕");
+        toastBox.setStyle(
+                "-fx-background-color: " + bgColor + ";" +
+                        "-fx-border-color: " + borderColor + ";" +
+                        "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 10, 0, 0, 4);"
+        );
+
+        toastBox.setVisible(true);
+        toastBox.setManaged(true);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(e -> {
+            FadeTransition fade = new FadeTransition(Duration.millis(400), toastBox);
+            fade.setToValue(0);
+            fade.setOnFinished(f -> {
+                toastBox.setVisible(false);
+                toastBox.setManaged(false);
+                toastBox.setOpacity(1);
+            });
+            fade.play();
+        });
+        pause.play();
+    }
+
+    private void addOutbidCardToUI(){
+        outbidAlertsList.getChildren().clear();
+        for(AuctionCardDTO dto : getJoiningListCard()){
+            if(dto.getYourBid() < dto.getCurrentPrice()){
+                try{
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/outbid_item.fxml"));
+                    Parent node = loader.load();
+                    OutbidItemController controller = loader.getController();
+                    controller.setUp(dto);
+                    node.setUserData(dto.getAuctionId());
+                    outbidAlertsList.getChildren().add(node);
+
+                }
+                catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    public void removeOutbidItem(String Id){
+        outbidAlertsList.getChildren().removeIf(node -> Id.equals(node.getUserData()));
+        updateOutbidBadge();
+    }
+
+    public void addOrUpdateOutbidItem(String auctionId, String productName, double currentPrice) {
+        Platform.runLater(() -> {
+            removeOutbidItem(auctionId);
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/outbid_item.fxml"));
+                Parent node = loader.load();
+                OutbidItemController controller = loader.getController();
+                controller.setUpManual(auctionId, productName, currentPrice);
+                outbidAlertsList.getChildren().add(node);
+                node.setUserData(auctionId);
+                updateOutbidBadge();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+    public void updateOutbidBadge() {
+        int count = outbidAlertsList.getChildren().size();
+        outbidBadge.setText(String.valueOf(count));
+        outbidBadge.setVisible(count > 0);
+        outbidBadge.setManaged(count > 0);
+    }
+
+    private double parsePriceFromMessage(String msg, double defaultValue) {
+        if (msg == null) return defaultValue;
+        try {
+            String prefix = "Current price is ";
+            int idx = msg.indexOf(prefix);
+            if (idx != -1) {
+                int endIdx = msg.indexOf(" in room", idx + prefix.length());
+                if (endIdx != -1) {
+                    String priceStr = msg.substring(idx + prefix.length(), endIdx).trim();
+                    return Double.parseDouble(priceStr);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return defaultValue;
+    }
+
+    private void setupDashboard() {
+        lblBalance.setText(formatNumber(calculateBalance(getDashboardInfo().getBalance()))+" VND");
+        ControllerManager.getDashboardHomeController().setupDashboardHome();
+        addOutbidCardToUI();
+        updateOutbidBadge();
+        addAutoBidCardToUI();
+        updateAutoBidBadge();
+        isInitialized = true;
+    }
+
+    public void updateBalance(double amount, double diffAmount, boolean isRefund){
+        lblBalance.setText(formatNumber(calculateBalance(amount))+" VND");
+        animateBalanceChange(diffAmount, isRefund);
+    }
+
+    public void animateBalanceChange(double amount, boolean isRefund) {
+        lblBalanceChange.getStyleClass().removeAll("balance-deduct", "balance-refund");
+        if (isRefund) {
+            lblBalanceChange.setText("+" + formatNumber(amount) + " VND");
+            lblBalanceChange.getStyleClass().add("balance-refund");
+        } else {
+            lblBalanceChange.setText("-" + formatNumber(amount) + " VND");
+            lblBalanceChange.getStyleClass().add("balance-deduct");
+        }
+
+        lblBalanceChange.setVisible(true);
+        lblBalanceChange.setManaged(true);
+        lblBalanceChange.setOpacity(0.0);
+        lblBalanceChange.setTranslateY(-10.0);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(250), lblBalanceChange);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+
+        TranslateTransition slideDown = new TranslateTransition(Duration.millis(300), lblBalanceChange);
+        slideDown.setFromY(-10.0);
+        slideDown.setToY(10.0);
+
+        ParallelTransition showTransition = new ParallelTransition(fadeIn, slideDown);
+
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(350), lblBalanceChange);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        fadeOut.setDelay(Duration.seconds(1.2));
+        fadeOut.setOnFinished(e -> {
+            lblBalanceChange.setVisible(false);
+            lblBalanceChange.setManaged(false);
+        });
+
+        showTransition.setOnFinished(e -> fadeOut.play());
+        showTransition.play();
+    }
+    private double calculateBalance(double value) {
+        return Double.parseDouble(BigDecimal.valueOf(value).toPlainString());
+    }
+
+    private void addAutoBidCardToUI() {
+        autoBidList.getChildren().clear();
+        for (AutoBidResponseDTO dto : UserSession.getActiveAutoBidList()) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/autobid_item.fxml"));
+                Parent node = loader.load();
+                AutoBidItemController controller = loader.getController();
+                String productName = findProductName(dto.getAuctionId());
+                controller.setUp(dto, productName);
+                node.setUserData(dto.getAuctionId());
+                autoBidList.getChildren().add(node);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void removeAutoBidItem(String auctionId) {
+        autoBidList.getChildren().removeIf(node -> auctionId.equals(node.getUserData()));
+        updateAutoBidBadge();
+    }
+
+    public void addAutoBidItem(String auctionId){
+        for (AutoBidResponseDTO dto : UserSession.getActiveAutoBidList()) {
+            if(dto.getAuctionId().equals(auctionId)){
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/autobid_item.fxml"));
+                    Parent node = loader.load();
+                    AutoBidItemController controller = loader.getController();
+                    String productName = findProductName(dto.getAuctionId());
+                    controller.setUp(dto, productName);
+                    node.setUserData(dto.getAuctionId());
+                    autoBidList.getChildren().add(node);
+                    updateAutoBidBadge();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    public void updateAutoBidBadge() {
+        int count = autoBidList.getChildren().size();
+        autoBidBadge.setText(String.valueOf(count));
+        autoBidBadge.setVisible(count > 0);
+        autoBidBadge.setManaged(count > 0);
+    }
+
+    private String findProductName(String auctionId) {
+        for (AuctionCardDTO dto : getJoiningListCard()) {
+            if (auctionId.equals(dto.getAuctionId())) {
+                return dto.getProductName();
+            }
+        }
+        for (AuctionCardDTO dto : UserSession.getMyListCard()) {
+            if (auctionId.equals(dto.getAuctionId())) {
+                return dto.getProductName();
+            }
+        }
+        return null;
+    }
+
+    public VBox getAutoBidList(){
+        return autoBidList;
+    }
+    @Override
+    public void onResponseReceived(Response response){}
+    public void onResponseReceived(Response response, ActionType actionType){}
+    public void onRequestReceived(Request notification){
+        NotificationDTO notificationDTO = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(notification.getData()), NotificationDTO.class);
+        NotificationType type = notificationDTO.getNotificationType();
+        switch (type){
+
+            case OUTBID -> {
+                Platform.runLater(() -> {
+                    String auctionId = notificationDTO.getAuctionId();
+                    String msg = notificationDTO.getData() != null ? notificationDTO.getData().toString() : "";
+                    double currentPrice = parsePriceFromMessage(msg, 0.0);
+                    
+                    String productName = "Auction #" + auctionId;
+                    for (AuctionCardDTO dto : getJoiningListCard()) {
+                        if (auctionId.equals(dto.getAuctionId())) {
+                            productName = dto.getProductName();
+                            if (currentPrice <= 0.0) {
+                                currentPrice = dto.getCurrentPrice();
+                            }
+                            break;
+                        }
+                    }
+                    addOrUpdateOutbidItem(auctionId, productName, currentPrice);
+
+                    // Hoàn lại tiền bid cũ khi bị outbid (Server đã unfreeze)
+                    double previousBid = UserSession.getLatestBid(auctionId);
+                    if (previousBid > 0) {
+                        UserSession.addBalance(previousBid);
+                        UserSession.setLatestBid(auctionId, 0);
+                        updateBalance(UserSession.getBalance(), previousBid, true);
+                    }
+                });
+            }
+            case AUCTION_ENDED -> {
+                Platform.runLater(() -> {
+                    removeOutbidItem(notificationDTO.getAuctionId());
+                });
+            }
+            case AUCTION_EXTENDED -> {
+                Platform.runLater(() -> {
+                    AuctionExtendedDTO dto = GsonParser.GSON.fromJson(
+                            GsonParser.GSON.toJsonTree(notificationDTO.getData()),
+                            AuctionExtendedDTO.class
+                    );
+                    if (dto != null) {
+                        UserSession.updateAuctionEndTime(notificationDTO.getAuctionId(), dto.getNewEndTime());
+                    }
+                });
+            }
+            case AUCTION_CANCELED -> {
+                Platform.runLater(() -> {
+                    removeOutbidItem(notificationDTO.getAuctionId());
+                });
+            }
+        }
+    }
+    public void onDisconnected(String reason){}
 
     @Override
-    public void onInit(URL location, ResourceBundle resources){
+    public void initialize(URL location, ResourceBundle resources) {
+
         setMainBorderPane(mainBorderPane);
         ControllerManager.setDashboardController(this);
+        SocketManager.getClient().addListener(this);
+        setupDashboard();
         changeView("dashboard_home.fxml", 1);
-        lblBalance.setText(String.valueOf(getDashboardInfo().getBalance()));
-        lblActiveBids.setText(String.valueOf(getDashboardInfo().getJoinedRooms()));
-        lblOutbid.setText(String.valueOf(getDashboardInfo().getOutBids()));
-        lblWinning.setText(String.valueOf(getDashboardInfo().getWinningBids()));
-        lblWonTotal.setText(String.valueOf(getDashboardInfo().getWonTotal()));
     }
 }

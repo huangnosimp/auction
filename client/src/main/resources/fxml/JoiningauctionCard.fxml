@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Card Type 1: Joining Auction Card
+    Displayed when the user has already placed a bid in this session.
+    Badge styleClass options: s-winning (currently leading) | s-outbid (been outbid)
+    Controller: JoiningAuctionCardController
+-->
+
+<VBox fx:id="rootVbox" prefHeight="323.0" prefWidth="205.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
+
+    <children>
+
+        <StackPane prefHeight="100.0" styleClass="image-container">
+            <children>
+                <ImageView fx:id="imgProduct" fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="false" />
+            </children>
+        </StackPane>
+
+        <VBox prefWidth="150.0" spacing="7" style="-fx-padding: 9;">
+            <children>
+
+                <Label styleClass="ac-card-type-label" text="Participating" />
+
+                <Label fx:id="lblProductName" styleClass="ac-product" text="Product Name" wrapText="true" />
+
+                <Label fx:id="lblBidStatus" styleClass="status-badge s-outbid" text="OUTBID" />
+
+                <GridPane vgap="4">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="70.0" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints />
+                    </rowConstraints>
+                    <children>
+                        <Label fx:id="statuslbl" styleClass="ac-key" text="Ends in:" GridPane.rowIndex="0" />
+                        <Label fx:id="lblTimeRemaining" styleClass="ac-val-time" text="01h 43m" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label styleClass="ac-key" text="Current bid:" GridPane.rowIndex="1" />
+                        <Label fx:id="lblCurrentBid" styleClass="ac-val-price" text="285" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    </children>
+                </GridPane>
+
+                <Separator styleClass="ac-separator" />
+
+                <HBox alignment="CENTER_LEFT" spacing="4">
+                    <children>
+                        <VBox>
+                            <children>
+                                <Label styleClass="ac-bid-sub" text="Your bid" />
+                                <Label fx:id="lblYourBid" styleClass="ac-bid-val" text="270" />
+                            </children>
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button fx:id="btnBidNow" maxWidth="68.0" minWidth="55.0" onAction="#handleEnterRoom" prefHeight="28.0" prefWidth="-1" style="-fx-padding: 4 6 4 6;" styleClass="bid-btn-primary" text="Bid Again" />
+                    </children>
+                </HBox>
+
+            </children>
+        </VBox>
+    </children>
+</VBox>

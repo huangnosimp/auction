@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox alignment="CENTER_LEFT" styleClass="inv-row" stylesheets="@../css/Inventory.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.RowItemController">
+
+    <!-- Ảnh sản phẩm -->
+    <ImageView fx:id="imgProduct" fitHeight="48" fitWidth="64" pickOnBounds="true" preserveRatio="true" style="-fx-background-color: #12141f;                       -fx-background-radius: 6;">
+        <HBox.margin><Insets right="12" /></HBox.margin>
+    </ImageView>
+
+    <!-- Tên -->
+    <VBox prefWidth="200" spacing="3">
+        <Label fx:id="lblProductName" styleClass="inv-row-name" text="Product Name" wrapText="true" />
+    </VBox>
+
+    <!-- Giá đã trả -->
+    <VBox alignment="CENTER_LEFT" prefWidth="90" spacing="2">
+        <Label fx:id="lblPaidPrice" styleClass="inv-row-price" text="0" />
+        <Label styleClass="inv-row-muted" text="paid" />
+    </VBox>
+
+    <!-- Thời điểm thắng -->
+    <VBox alignment="CENTER_LEFT" spacing="2" HBox.hgrow="ALWAYS">
+        <Label fx:id="lblWonAt" styleClass="inv-row-muted" text="—" />
+        <Label styleClass="inv-row-muted" text="won at" />
+    </VBox>
+
+</HBox>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="rootVbox" prefWidth="205.0" spacing="0" styleClass="auction-card" stylesheets="@../css/ItemCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.ItemCardController">
+
+    <children>
+
+        <StackPane prefHeight="100.0" styleClass="image-container">
+            <children>
+                <ImageView fx:id="imgProduct" fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="false" />
+
+                <Label fx:id="lblSessionStatus" styleClass="img-owner-badge" text="Mine" StackPane.alignment="TOP_RIGHT" />
+            </children>
+        </StackPane>
+
+        <VBox prefWidth="150.0" spacing="7" style="-fx-padding: 9;">
+            <children>
+
+                <Label styleClass="ac-card-type-label" text="My Auction" />
+
+                <Label fx:id="lblProductName" styleClass="ac-product" text="Product Name" wrapText="true" />
+
+                <Label fx:id="lblAuctionStatus" styleClass="status-badge s-live" text="LIVE" />
+
+                <GridPane vgap="4">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="70.0" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints />
+                    </rowConstraints>
+                    <children>
+                        <Label fx:id="statuslbl" styleClass="ac-key" text="Ends in:" GridPane.rowIndex="0" />
+                        <Label fx:id="lblTimeRemaining" styleClass="ac-val-time" text="05h 20m" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label styleClass="ac-key" text="Highest bid:" GridPane.rowIndex="1" />
+                        <Label fx:id="lblCurrentBid" styleClass="ac-val-price" text="250" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    </children>
+                </GridPane>
+
+                <Separator styleClass="ac-separator" />
+
+                <HBox alignment="CENTER_LEFT" spacing="4">
+                    <children>
+                        <VBox>
+                            <children>
+                                <Label styleClass="ac-bid-sub" text="Total bids" />
+                                <Label fx:id="lblBidCount" styleClass="ac-bid-val" text="12 bids" />
+                            </children>
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button fx:id="btnManage" maxWidth="68.0" minWidth="55.0" onAction="#handleEnterRoom" prefHeight="28.0" prefWidth="-1" style="-fx-padding: 4 6 4 6;" styleClass="bid-btn-secondary" text="Manage" />
+                    </children>
+                </HBox>
+
+            </children>
+        </VBox>
+    </children>
+</VBox>

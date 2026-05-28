@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="0"
+      styleClass="inventory-root"
+      stylesheets="@../css/Inventory.css"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="vn.io.huangnosimp.controller.InventoryController">
+
+    <!-- ═══════════════ HEADER ═══════════════ -->
+    <HBox alignment="CENTER_LEFT" styleClass="inv-header">
+        <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+        <VBox spacing="3" HBox.hgrow="ALWAYS">
+            <Label styleClass="inv-title" text="My Inventory"/>
+            <Label styleClass="inv-sub" text="Track your listings and won items"/>
+        </VBox>
+        <Label fx:id="lblTotalItems" styleClass="inv-count-badge" text="0 items"/>
+    </HBox>
+
+    <!-- ═══════════════ STAT BAR ═══════════════ -->
+    <HBox spacing="12" styleClass="inv-stat-bar">
+        <padding><Insets top="0" right="24" bottom="16" left="24"/></padding>
+
+        <VBox spacing="4" styleClass="inv-stat-card" HBox.hgrow="ALWAYS">
+            <Label styleClass="inv-sc-label" text="MY LISTINGS"/>
+            <Label fx:id="lblListingCount" styleClass="inv-sc-val inv-c-purple" text="0"/>
+            <Label styleClass="inv-sc-sub" text="Total posted"/>
+        </VBox>
+
+        <VBox spacing="4" styleClass="inv-stat-card" HBox.hgrow="ALWAYS">
+            <Label styleClass="inv-sc-label" text="LIVE NOW"/>
+            <Label fx:id="lblLiveCount" styleClass="inv-sc-val inv-c-green" text="0"/>
+            <Label styleClass="inv-sc-sub" text="Currently active"/>
+        </VBox>
+
+        <VBox spacing="4" styleClass="inv-stat-card" HBox.hgrow="ALWAYS">
+            <Label styleClass="inv-sc-label" text="ITEMS WON"/>
+            <Label fx:id="lblWonCount" styleClass="inv-sc-val inv-c-amber" text="0"/>
+            <Label styleClass="inv-sc-sub" text="Total won"/>
+        </VBox>
+
+        <VBox spacing="4" styleClass="inv-stat-card" HBox.hgrow="ALWAYS">
+            <Label styleClass="inv-sc-label" text="TOTAL SPENT"/>
+            <Label fx:id="lblTotalSpent" styleClass="inv-sc-val inv-c-blue" text="0"/>
+            <Label styleClass="inv-sc-sub" text="On won items"/>
+        </VBox>
+
+    </HBox>
+
+    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+    <HBox spacing="16" VBox.vgrow="ALWAYS">
+        <padding><Insets top="0" right="24" bottom="24" left="24"/></padding>
+
+        <!-- ── LEFT: MY LISTINGS ── -->
+        <VBox spacing="0" styleClass="inv-panel" HBox.hgrow="ALWAYS">
+
+            <!-- Panel Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="inv-panel-header">
+                <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+                <Label styleClass="inv-panel-title" text="● My Listings"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <!-- Filter buttons -->
+                <HBox spacing="4" styleClass="inv-filter-bar">
+                    <Button fx:id="filterAllListings"
+                            styleClass="inv-filter-btn inv-filter-active"
+                            text="All"/>
+                    <Button fx:id="filterLive"
+                            styleClass="inv-filter-btn"
+                            text="Live"/>
+                    <Button fx:id="filterEnded"
+                            styleClass="inv-filter-btn"
+                            text="Ended"/>
+                    <Button fx:id="filterCancelled"
+                            styleClass="inv-filter-btn"
+                            text="Cancelled"/>
+                </HBox>
+            </HBox>
+
+            <Separator styleClass="inv-sep"/>
+
+            <!-- Column Headers -->
+            <HBox styleClass="inv-col-header">
+                <padding><Insets top="8" right="16" bottom="8" left="16"/></padding>
+                <Label styleClass="inv-col-lbl" text="Product" prefWidth="200"/>
+                <Label styleClass="inv-col-lbl" text="Bids"    prefWidth="60"/>
+                <Label styleClass="inv-col-lbl" text="Top Bid" prefWidth="90"/>
+                <Label styleClass="inv-col-lbl" text="Ends"    HBox.hgrow="ALWAYS"/>
+                <Label styleClass="inv-col-lbl" text="Action"  prefWidth="80"/>
+            </HBox>
+
+            <Separator styleClass="inv-sep"/>
+
+            <!-- List -->
+            <ScrollPane fitToWidth="true" styleClass="inv-scroll" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="listingsContainer" styleClass="inv-list-container"/>
+                </content>
+            </ScrollPane>
+
+            <!-- Empty state -->
+            <VBox fx:id="listingsEmpty" alignment="CENTER" spacing="8"
+                  styleClass="inv-empty" visible="false" managed="false">
+                <Label styleClass="inv-empty-icon" text="📭"/>
+                <Label styleClass="inv-empty-text" text="No listings yet"/>
+                <Label styleClass="inv-empty-sub"  text="Create your first auction session"/>
+            </VBox>
+
+        </VBox>
+
+        <!-- ── RIGHT: WON ITEMS ── -->
+        <VBox spacing="0" styleClass="inv-panel" HBox.hgrow="ALWAYS">
+
+            <!-- Panel Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="inv-panel-header">
+                <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+                <Label styleClass="inv-panel-title" text="● Won Items"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <!-- Filter buttons -->
+                <HBox spacing="4" styleClass="inv-filter-bar">
+                    <Button fx:id="filterAllWon"
+                            styleClass="inv-filter-btn inv-filter-active"
+                            text="All"/>
+                    <Button fx:id="filterPending"
+                            styleClass="inv-filter-btn"
+                            text="Pending"/>
+                    <Button fx:id="filterReceived"
+                            styleClass="inv-filter-btn"
+                            text="Received"/>
+                </HBox>
+            </HBox>
+
+            <Separator styleClass="inv-sep"/>
+
+            <!-- Column Headers -->
+            <HBox styleClass="inv-col-header">
+                <padding><Insets top="8" right="16" bottom="8" left="16"/></padding>
+                <Label styleClass="inv-col-lbl" text="Product"  prefWidth="200"/>
+                <Label styleClass="inv-col-lbl" text="Paid"     prefWidth="90"/>
+                <Label styleClass="inv-col-lbl" text="Won at"   HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <Separator styleClass="inv-sep"/>
+
+            <!-- List -->
+            <ScrollPane fitToWidth="true" styleClass="inv-scroll" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="wonContainer" styleClass="inv-list-container"/>
+                </content>
+            </ScrollPane>
+
+            <!-- Empty state -->
+            <VBox fx:id="wonEmpty" alignment="CENTER" spacing="8"
+                  styleClass="inv-empty" visible="false" managed="false">
+                <Label styleClass="inv-empty-icon" text="🏆"/>
+                <Label styleClass="inv-empty-text" text="No won items yet"/>
+                <Label styleClass="inv-empty-sub"  text="Join auctions to win items"/>
+            </VBox>
+
+        </VBox>
+
+    </HBox>
+
+</VBox>

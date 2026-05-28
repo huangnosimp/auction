@@ -27,15 +27,10 @@ public class SignUpController {
         String fullName = fullNameField.getText();
         String username = userNameField.getText();
         String email = emailField.getText();
-        String phone = phoneField.getText();
         String pass = passwordField.getText();
         String confirmPass = confirmPasswordField.getText();
 
         // Logic kiểm tra cơ bản
-        if (fullName.isEmpty() || email.isEmpty() || phone.isEmpty() || pass.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Registration Error", "Please fill in all fields!");
-            return;
-        }
 
         if (!pass.equals(confirmPass)) {
             showAlert(Alert.AlertType.ERROR, "Password Mismatch", "Passwords do not match!");
@@ -68,8 +63,8 @@ public class SignUpController {
 
     @FXML
     private void navigateToLogin() {
-        // Code chuyển scene về Login.fxml tại đây
         System.out.println("Navigating back to Login...");
+        ViewManager.changeMainStage("login.fxml");
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
