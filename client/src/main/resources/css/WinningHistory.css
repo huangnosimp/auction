@@ -1,0 +1,309 @@
+/* ═══════════════════════════════════════════════════
+   won_auctions.css  –  dark theme, matches dashboard
+   ═══════════════════════════════════════════════════ */
+
+/* ── Root ── */
+.wa-root {
+    -fx-background-color: #12131a;
+}
+
+/* ── Header ── */
+.wa-header {
+    -fx-background-color: #1a1b25;
+    -fx-border-color: #2a2d3e;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 16 20 16 20;
+}
+
+.wa-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.wa-badge {
+    -fx-background-color: #2a2d3e;
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 8 3 8;
+    -fx-background-radius: 4;
+}
+
+.wa-result-count {
+    -fx-text-fill: #888888;
+    -fx-font-size: 12px;
+}
+
+/* ── Stat Cards ── */
+.wa-stat-card {
+    -fx-background-color: #1e2029;
+    -fx-background-radius: 10;
+    -fx-padding: 12 16 12 16;
+    -fx-border-color: #2a2d3e;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+}
+
+.wa-stat-label {
+    -fx-text-fill: #777788;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.wa-stat-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.wa-val-green  { -fx-text-fill: #4fc97e; }
+.wa-val-amber  { -fx-text-fill: #f0a500; }
+.wa-val-blue   { -fx-text-fill: #5b9cf6; }
+.wa-val-orange { -fx-text-fill: #f07040; }
+
+.wa-stat-sub {
+    -fx-text-fill: #666677;
+    -fx-font-size: 10px;
+}
+
+/* ── Search Box ── */
+.wa-search-box {
+    -fx-background-color: #1e2029;
+    -fx-background-radius: 8;
+    -fx-border-color: #2a2d3e;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 6 12 6 12;
+    -fx-max-width: 320;
+}
+
+.wa-search-icon {
+    -fx-text-fill: #666677;
+    -fx-font-size: 13px;
+}
+
+.wa-search-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ddddee;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: #555566;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+.wa-search-field:focused {
+    -fx-border-width: 0;
+}
+
+/* ── Filter Chips ── */
+.wa-filter-group {
+    -fx-padding: 2 0 2 0;
+}
+
+.wa-filter-chip {
+    -fx-background-color: #1e2029;
+    -fx-text-fill: #aaaacc;
+    -fx-font-size: 12px;
+    -fx-padding: 5 14 5 14;
+    -fx-background-radius: 20;
+    -fx-border-color: #2a2d3e;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.wa-filter-chip:selected,
+.wa-filter-active {
+    -fx-background-color: #4fc97e;
+    -fx-text-fill: #0a1a0f;
+    -fx-font-weight: bold;
+    -fx-border-color: #4fc97e;
+}
+
+.wa-filter-chip:hover {
+    -fx-background-color: #252736;
+}
+
+/* ── Sort Combo ── */
+.wa-sort-combo {
+    -fx-background-color: #1e2029;
+    -fx-text-fill: #ccccdd;
+    -fx-font-size: 12px;
+    -fx-border-color: #2a2d3e;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 4 8 4 8;
+}
+
+/* ── Divider ── */
+.wa-divider {
+    -fx-background-color: #2a2d3e;
+    -fx-opacity: 0.6;
+}
+
+/* ── Scroll ── */
+.wa-scroll {
+    -fx-background-color: transparent;
+    -fx-background: #12131a;
+}
+
+.wa-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.wa-item-list {
+    -fx-background-color: transparent;
+}
+
+/* ── Item Card ── */
+.wa-item-card {
+    -fx-background-color: #1a1b25;
+    -fx-background-radius: 12;
+    -fx-border-color: #2a2d3e;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 14 16 14 16;
+}
+
+.wa-item-card:hover {
+    -fx-border-color: #4fc97e;
+    -fx-background-color: #1e2030;
+}
+
+/* ── Thumbnail ── */
+.wa-thumb {
+    -fx-background-color: #252736;
+    -fx-background-radius: 10;
+    -fx-min-width: 72;
+    -fx-min-height: 72;
+    -fx-max-width: 72;
+    -fx-max-height: 72;
+}
+
+.wa-thumb-icon {
+    -fx-font-size: 28px;
+}
+
+/* ── Item Info ── */
+.wa-item-name {
+    -fx-text-fill: #eeeeff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.wa-meta-key {
+    -fx-text-fill: #777788;
+    -fx-font-size: 11px;
+}
+
+.wa-meta-val {
+    -fx-text-fill: #bbbbcc;
+    -fx-font-size: 11px;
+}
+
+.wa-meta-sep {
+    -fx-text-fill: #444455;
+    -fx-font-size: 11px;
+}
+
+/* ── Status Badges ── */
+.wa-status-badge {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 4;
+}
+
+.wa-status-delivered {
+    -fx-background-color: #1a3a2a;
+    -fx-text-fill: #4fc97e;
+}
+
+.wa-status-pending {
+    -fx-background-color: #3a2a10;
+    -fx-text-fill: #f0a500;
+}
+
+.wa-status-completed {
+    -fx-background-color: #1a2a3a;
+    -fx-text-fill: #5b9cf6;
+}
+
+/* ── Bid Amount ── */
+.wa-amount-label {
+    -fx-text-fill: #666677;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+}
+
+.wa-amount-value {
+    -fx-text-fill: #4fc97e;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.wa-amount-sub {
+    -fx-text-fill: #555566;
+    -fx-font-size: 10px;
+}
+
+/* ── Action Buttons ── */
+.wa-btn-detail {
+    -fx-background-color: #252736;
+    -fx-text-fill: #ccccdd;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 10 6 10;
+    -fx-background-radius: 6;
+    -fx-border-color: #3a3d50;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.wa-btn-detail:hover {
+    -fx-background-color: #2e3145;
+    -fx-text-fill: #ffffff;
+}
+
+.wa-btn-contact {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4fc97e;
+    -fx-font-size: 11px;
+    -fx-padding: 6 10 6 10;
+    -fx-background-radius: 6;
+    -fx-border-color: #4fc97e;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.wa-btn-contact:hover {
+    -fx-background-color: #1a3a2a;
+}
+
+/* ── Footer ── */
+.wa-footer {
+    -fx-background-color: #1a1b25;
+    -fx-border-color: #2a2d3e;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 14 0 14 0;
+}
+
+.wa-show-more-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4fc97e;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 30 8 30;
+    -fx-background-radius: 8;
+    -fx-border-color: #4fc97e;
+    -fx-border-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+}
+
+.wa-show-more-btn:hover {
+    -fx-background-color: #1a3a2a;
+}
