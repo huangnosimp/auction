@@ -31,6 +31,8 @@
 
                 <Label fx:id="lblProductName" styleClass="ac-product" text="Product Name" wrapText="true" />
 
+                <Label fx:id="lblItemType" styleClass="ac-card-type-label" text="ELECTRONICS" />
+
                 <Label fx:id="lblAuctionStatus" styleClass="status-badge s-open" text="OPEN" />
 
                 <GridPane vgap="4">
