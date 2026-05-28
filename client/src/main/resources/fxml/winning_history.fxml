@@ -31,13 +31,13 @@
 
             <VBox styleClass="wa-stat-card" HBox.hgrow="ALWAYS" spacing="4">
                 <Label styleClass="wa-stat-label" text="TOTAL SPENT" />
-                <Label fx:id="lblTotalSpent" styleClass="wa-stat-value wa-val-amber" text="$8450" />
+                <Label fx:id="lblTotalSpent" styleClass="wa-stat-value wa-val-amber" text="8450" />
                 <Label styleClass="wa-stat-sub" text="Lifetime winning bids" />
             </VBox>
 
             <VBox styleClass="wa-stat-card" HBox.hgrow="ALWAYS" spacing="4">
                 <Label styleClass="wa-stat-label" text="AVG BID" />
-                <Label fx:id="lblAvgBid" styleClass="wa-stat-value wa-val-blue" text="$704" />
+                <Label fx:id="lblAvgBid" styleClass="wa-stat-value wa-val-blue" text="704" />
                 <Label styleClass="wa-stat-sub" text="Per won auction" />
             </VBox>
 
@@ -126,7 +126,7 @@
                 <!-- Bid Amount -->
                 <VBox alignment="CENTER_RIGHT" spacing="4" prefWidth="130">
                     <Label styleClass="wa-amount-label" text="WINNING BID" />
-                    <Label styleClass="wa-amount-value" text="$2850" />
+                    <Label styleClass="wa-amount-value" text="2850" />
                     <Label styleClass="wa-amount-sub" text="Starting: $2,000" />
                 </VBox>
 
@@ -171,7 +171,7 @@
 
                 <VBox alignment="CENTER_RIGHT" spacing="4" prefWidth="130">
                     <Label styleClass="wa-amount-label" text="WINNING BID" />
-                    <Label styleClass="wa-amount-value" text="$1200" />
+                    <Label styleClass="wa-amount-value" text="1200" />
                     <Label styleClass="wa-amount-sub" text="Starting: $500" />
                 </VBox>
 

@@ -48,6 +48,7 @@ public class ItemCardController implements Initializable, IServerMessageListener
     @FXML private Label lblBidCount;
     @FXML private Label lblYourBid;
     @FXML private Label lblBidStatus;
+    @FXML private Label lblItemType;
 
     @FXML private Button btnManage;
 
@@ -83,6 +84,7 @@ public class ItemCardController implements Initializable, IServerMessageListener
             imgProduct.setImage(null);
         }
         lblProductName.setText(dto.getProductName());
+        lblItemType.setText("");
         long now = TimeSyncManager.nowMillis();
         if(now < dto.getStartTime()){
             statuslbl.setText("Start in: ");
