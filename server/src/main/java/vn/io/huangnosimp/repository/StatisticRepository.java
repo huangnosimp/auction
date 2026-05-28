@@ -56,7 +56,7 @@ public class StatisticRepository implements IStatisticRepository {
     @Override
     public List<AuctionCardDTO> getMyAuctionCard(String userId) {
         List<AuctionCardDTO> rooms = new java.util.ArrayList<>();
-        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, i.item_type AS item_type, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "(SELECT IFNULL(MAX(bid_amount), 0) FROM bidtransactions bt WHERE bt.auction_id = a.id AND bt.bidder_id = ?) AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -120,8 +120,7 @@ public class StatisticRepository implements IStatisticRepository {
                 int participantCount = rsAuction.getInt("participant_count");
                 int bidCount = rsAuction.getInt("bid_count");
 
-                ItemType category = null;
-                try { category = ItemType.valueOf(itemTypeStr); } catch (Exception ignored) {}
+                ItemType itemType = parseItemType(itemTypeStr);
 
                 ItemCondition condition = null;
                 try { condition = ItemCondition.valueOf(conditionStr); } catch (Exception ignored) {}
@@ -151,7 +150,7 @@ public class StatisticRepository implements IStatisticRepository {
                 }
 
                 result = new AuctionDetailResponseDTO(
-                        productName, category, condition, description,
+                        productName, itemType, condition, description,
                         startPrice, bidIncrement, buyNowPrice, startPrice,
                         startTime, endTime, currentPrice, minNextBid,
                         leadBidder, lastBidTime, participantCount, bidCount,
@@ -168,7 +167,7 @@ public class StatisticRepository implements IStatisticRepository {
 
     @Override
     public AuctionCardDTO getJoiningAuctionCard(String auctionId) {
-        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, i.item_type AS item_type, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "0 AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -194,7 +193,7 @@ public class StatisticRepository implements IStatisticRepository {
     @Override
     public List<AuctionCardDTO> getPublicAuctionCard(int quantity) {
         List<AuctionCardDTO> rooms = new ArrayList<>();
-        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, i.item_type AS item_type, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "0 AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -222,7 +221,7 @@ public class StatisticRepository implements IStatisticRepository {
     @Override
     public List<AuctionCardDTO> getPostedAuctionCard(String userId, int amount) {
         List<AuctionCardDTO> rooms = new ArrayList<>();
-        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, i.item_type AS item_type, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "0 AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -251,7 +250,7 @@ public class StatisticRepository implements IStatisticRepository {
     @Override
     public List<AuctionCardDTO> getWonAuction(String userId, int amount) {
         List<AuctionCardDTO> rooms = new ArrayList<>();
-        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, i.item_type AS item_type, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "(SELECT IFNULL(MAX(bid_amount), 0) FROM bidtransactions bt WHERE bt.auction_id = a.id AND bt.bidder_id = ?) AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -281,7 +280,7 @@ public class StatisticRepository implements IStatisticRepository {
     @Override
     public List<AuctionCardDTO> getEndedPostedAuction(String userId, int amount) {
         List<AuctionCardDTO> rooms = new ArrayList<>();
-        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, " +
+        String sql = "SELECT a.id AS auction_id, i.id AS item_id, i.name AS product_name, i.item_type AS item_type, " +
                      "IFNULL(NULLIF(a.final_price, 0), a.starting_price) AS current_price, " +
                      "0 AS your_bid, " +
                      "a.start_time AS start_time, a.end_time AS end_time, " +
@@ -311,6 +310,7 @@ public class StatisticRepository implements IStatisticRepository {
         String auctionId = rs.getString("auction_id");
         String itemId = rs.getString("item_id");
         String productName = rs.getString("product_name");
+        ItemType itemType = parseItemType(rs.getString("item_type"));
         double currentPrice = rs.getDouble("current_price");
         double yourBid = rs.getDouble("your_bid");
         long startTime = rs.getTimestamp("start_time").getTime();
@@ -322,6 +322,7 @@ public class StatisticRepository implements IStatisticRepository {
         return new AuctionCardDTO(
                 auctionId,
                 productName,
+                itemType,
                 currentPrice,
                 yourBid,
                 startTime,
@@ -330,6 +331,18 @@ public class StatisticRepository implements IStatisticRepository {
                 bidderCount,
                 imageUrl
         );
+    }
+
+    private ItemType parseItemType(String value) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return ItemType.valueOf(value.trim());
+        } catch (IllegalArgumentException e) {
+            logger.warn("Unknown item type from database itemType={}", value);
+            return null;
+        }
     }
 
     private List<String> findImageUrlsByItemId(Connection connection, String itemId) throws SQLException {

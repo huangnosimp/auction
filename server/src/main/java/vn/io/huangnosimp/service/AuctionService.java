@@ -132,7 +132,18 @@ public class AuctionService implements IAuctionService {
         }
         logger.info("Auction created auctionId={} sellerId={} itemId={} startPrice={}",
                 auction.getId(), sellerId, item.getId(), startPrice);
-        return new AuctionCardDTO(auction.getId(), item.getName(), auction.getStartPrice(), 0, auction.getStartTime(), auction.getEndTime(), 0, 0, imageUrl);
+        return new AuctionCardDTO(
+                auction.getId(),
+                item.getName(),
+                itemType,
+                auction.getStartPrice(),
+                0,
+                auction.getStartTime(),
+                auction.getEndTime(),
+                0,
+                0,
+                imageUrl
+        );
     }
 
     private boolean isValidOpenAuctionInput(String sellerId, String name, String description, ItemType type,

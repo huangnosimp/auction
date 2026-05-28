@@ -10,7 +10,8 @@ public class AuctionDetailResponseDTO {
 
     // Thông tin sản phẩm
     private final String productName;      // Tên sản phẩm
-    private final ItemType category;         // Danh mục (Electronics, Art, Vehicle...)
+    private final ItemType category;       // Danh mục (Electronics, Art, Vehicle...)
+    private final ItemType itemType;       // Loại item trả về cho client
     private final ItemCondition condition;        // Tình trạng (New, Like New, Used)
     private final String description;      // Mô tả chi tiết sản phẩm
 
@@ -44,6 +45,7 @@ public class AuctionDetailResponseDTO {
                                     List<BidHistoryDTO> bidHistory, List<PricePointDTO> priceHistory) {
         this.productName = productName;
         this.category = category;
+        this.itemType = category;
         this.condition = condition;
         this.description = description;
         this.startPrice = startPrice;
@@ -64,7 +66,11 @@ public class AuctionDetailResponseDTO {
     public String getProductName() { return productName; }
 
     public ItemType getCategory() {
-        return category;
+        return category != null ? category : itemType;
+    }
+
+    public ItemType getItemType() {
+        return itemType != null ? itemType : category;
     }
 
     public ItemCondition getCondition() {
@@ -80,7 +86,7 @@ public class AuctionDetailResponseDTO {
     public AuctionDetailResponseDTO withEndTime(long newEndTime) {
         return new AuctionDetailResponseDTO(
                 productName,
-                category,
+                getItemType(),
                 condition,
                 description,
                 startPrice,

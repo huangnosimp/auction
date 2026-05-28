@@ -111,6 +111,7 @@ class AuctionServiceTest {
 
         assertNotNull(card);
         assertEquals("Oil Painting", card.getProductName());
+        assertEquals(ItemType.ART, card.getItemType());
         assertEquals(100.0, card.getCurrentPrice());
         verify(auctionRepository).save(any(Auction.class));
         verify(scheduler).scheduleAuction(any(Auction.class));
