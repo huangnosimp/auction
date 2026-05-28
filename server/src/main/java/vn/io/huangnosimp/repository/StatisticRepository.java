@@ -1,6 +1,7 @@
 package vn.io.huangnosimp.repository;
 
 import vn.io.huangnosimp.connection.DatabaseConnection;
+import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 import vn.io.huangnosimp.dto.response.AuctionCardDTO;
 import vn.io.huangnosimp.dto.response.DashboardResponseDTO;
 import vn.io.huangnosimp.dto.response.AuctionDetailResponseDTO;
@@ -87,6 +88,7 @@ public class StatisticRepository implements IStatisticRepository {
 
         String auctionSql = "SELECT a.id, a.starting_price, a.final_price, a.start_time, a.end_time, a.status, a.minimum_increment, a.buy_now_price, " +
                 "i.name AS product_name, i.item_type, i.conditions, i.description, " +
+                "i.artist, i.creation_year, i.brand, i.warranty_period, i.engine_type, i.mileage, " +
                 "w.username AS winner_username, " +
                 "(SELECT COUNT(*) FROM auctionparticipants WHERE auction_id = a.id) AS participant_count, " +
                 "(SELECT COUNT(*) FROM bidtransactions WHERE auction_id = a.id) AS bid_count " +
@@ -121,6 +123,7 @@ public class StatisticRepository implements IStatisticRepository {
                 int bidCount = rsAuction.getInt("bid_count");
 
                 ItemType itemType = parseItemType(itemTypeStr);
+                ItemAttributesDTO attributes = mapItemAttributes(rsAuction, itemType);
 
                 ItemCondition condition = null;
                 try { condition = ItemCondition.valueOf(conditionStr); } catch (Exception ignored) {}
@@ -150,7 +153,7 @@ public class StatisticRepository implements IStatisticRepository {
                 }
 
                 result = new AuctionDetailResponseDTO(
-                        productName, itemType, condition, description,
+                        productName, itemType, condition, description, attributes,
                         startPrice, bidIncrement, buyNowPrice, startPrice,
                         startTime, endTime, currentPrice, minNextBid,
                         leadBidder, lastBidTime, participantCount, bidCount,
@@ -163,6 +166,27 @@ public class StatisticRepository implements IStatisticRepository {
         }
 
         return result;
+    }
+
+    private ItemAttributesDTO mapItemAttributes(ResultSet rs, ItemType itemType) throws SQLException {
+        if (itemType == null) {
+            return null;
+        }
+
+        return switch (itemType) {
+            case ART -> ItemAttributesDTO.createArtAttributes(
+                    rs.getString("artist"),
+                    rs.getInt("creation_year")
+            );
+            case ELECTRONICS -> ItemAttributesDTO.createElectronicsAttributes(
+                    rs.getString("brand"),
+                    rs.getInt("warranty_period")
+            );
+            case VEHICLE -> ItemAttributesDTO.createVehicleAttributes(
+                    rs.getString("engine_type"),
+                    rs.getInt("mileage")
+            );
+        };
     }
 
     @Override
