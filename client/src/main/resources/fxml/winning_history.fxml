@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="0" styleClass="wa-root"
+      stylesheets="@../css/WinningHistory.css"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="vn.io.huangnosimp.controller.WinningHistoryController">
+
+    <!-- ═══════════════ PAGE HEADER ═══════════════ -->
+    <VBox styleClass="wa-header" spacing="12">
+
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label styleClass="wa-title" text="🏆 Won Auctions" />
+            <Label styleClass="wa-badge" text="HISTORY" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblResultCount" styleClass="wa-result-count" text="Showing 6 of 12 items" />
+        </HBox>
+
+        <!-- Stat Summary Row -->
+        <HBox spacing="12">
+
+            <VBox styleClass="wa-stat-card" HBox.hgrow="ALWAYS" spacing="4">
+                <Label styleClass="wa-stat-label" text="TOTAL WON" />
+                <Label fx:id="lblTotalWon" styleClass="wa-stat-value wa-val-green" text="12" />
+                <Label styleClass="wa-stat-sub" text="Auctions won" />
+            </VBox>
+
+            <VBox styleClass="wa-stat-card" HBox.hgrow="ALWAYS" spacing="4">
+                <Label styleClass="wa-stat-label" text="TOTAL SPENT" />
+                <Label fx:id="lblTotalSpent" styleClass="wa-stat-value wa-val-amber" text="$8450" />
+                <Label styleClass="wa-stat-sub" text="Lifetime winning bids" />
+            </VBox>
+
+            <VBox styleClass="wa-stat-card" HBox.hgrow="ALWAYS" spacing="4">
+                <Label styleClass="wa-stat-label" text="AVG BID" />
+                <Label fx:id="lblAvgBid" styleClass="wa-stat-value wa-val-blue" text="$704" />
+                <Label styleClass="wa-stat-sub" text="Per won auction" />
+            </VBox>
+
+            <VBox styleClass="wa-stat-card" HBox.hgrow="ALWAYS" spacing="4">
+                <Label styleClass="wa-stat-label" text="PENDING DELIVERY" />
+                <Label fx:id="lblPendingDelivery" styleClass="wa-stat-value wa-val-orange" text="3" />
+                <Label styleClass="wa-stat-sub" text="Items awaiting shipment" />
+            </VBox>
+
+        </HBox>
+
+        <!-- Search + Filter Row -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+
+            <HBox styleClass="wa-search-box" alignment="CENTER_LEFT" spacing="6" HBox.hgrow="ALWAYS">
+                <Label styleClass="wa-search-icon" text="🔍" />
+                <TextField fx:id="txtSearch"
+                           styleClass="wa-search-field"
+                           promptText="Search won items, sellers..."
+                           HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <HBox styleClass="wa-filter-group" alignment="CENTER_LEFT" spacing="6">
+                <ToggleButton fx:id="filterAll"       styleClass="wa-filter-chip, wa-filter-active" text="All"         selected="true" />
+                <ToggleButton fx:id="filterPending"   styleClass="wa-filter-chip" text="⏳ Pending"   />
+                <ToggleButton fx:id="filterDelivered" styleClass="wa-filter-chip" text="✅ Delivered"  />
+                <ToggleButton fx:id="filterCompleted" styleClass="wa-filter-chip" text="🎁 Completed"  />
+            </HBox>
+
+            <ComboBox fx:id="cbSort"
+                      styleClass="wa-sort-combo"
+                      promptText="Sort by..."
+                      prefWidth="150" />
+
+        </HBox>
+
+    </VBox>
+
+    <Separator styleClass="wa-divider" />
+
+    <!-- ═══════════════ CONTENT ═══════════════ -->
+    <ScrollPane fx:id="scrollPane"
+                styleClass="wa-scroll"
+                fitToWidth="true"
+                VBox.vgrow="ALWAYS">
+
+        <VBox fx:id="itemList" styleClass="wa-item-list" spacing="10">
+            <padding><Insets top="14" right="14" bottom="14" left="14" /></padding>
+
+            <!-- ── Mỗi item row được tạo động bởi controller ── -->
+            <!-- Cấu trúc mẫu của 1 won-item-card: -->
+
+            <!-- SAMPLE CARD 1 -->
+            <HBox styleClass="wa-item-card" alignment="CENTER_LEFT" spacing="14">
+
+                <!-- Thumbnail -->
+                <VBox styleClass="wa-thumb" alignment="CENTER" prefWidth="72" prefHeight="72">
+                    <Label styleClass="wa-thumb-icon" text="📦" />
+                </VBox>
+
+                <!-- Main Info -->
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label styleClass="wa-item-name" text="iPhone 15 Pro Max 256GB – Space Black" />
+                        <Label styleClass="wa-status-badge wa-status-delivered" text="Delivered" />
+                    </HBox>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label styleClass="wa-meta-key" text="Seller:" />
+                        <Label styleClass="wa-meta-val" text="TechStore Official" />
+                        <Label styleClass="wa-meta-sep" text="·" />
+                        <Label styleClass="wa-meta-key" text="Lot:" />
+                        <Label styleClass="wa-meta-val" text="#A-2024-081" />
+                        <Label styleClass="wa-meta-sep" text="·" />
+                        <Label styleClass="wa-meta-key" text="Category:" />
+                        <Label styleClass="wa-meta-val" text="Electronics" />
+                    </HBox>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label styleClass="wa-meta-key" text="Won on:" />
+                        <Label styleClass="wa-meta-val" text="17 Apr 2026  ·  18:55" />
+                        <Label styleClass="wa-meta-sep" text="·" />
+                        <Label styleClass="wa-meta-key" text="Participants:" />
+                        <Label styleClass="wa-meta-val" text="14 bidders" />
+                    </HBox>
+                </VBox>
+
+                <!-- Bid Amount -->
+                <VBox alignment="CENTER_RIGHT" spacing="4" prefWidth="130">
+                    <Label styleClass="wa-amount-label" text="WINNING BID" />
+                    <Label styleClass="wa-amount-value" text="$2850" />
+                    <Label styleClass="wa-amount-sub" text="Starting: $2,000" />
+                </VBox>
+
+                <!-- Action Button -->
+                <VBox alignment="CENTER" spacing="6" prefWidth="110">
+                    <Button styleClass="wa-btn-detail" text="View Details" maxWidth="Infinity" />
+                    <Button styleClass="wa-btn-contact" text="Contact Seller" maxWidth="Infinity" />
+                </VBox>
+
+            </HBox>
+
+            <!-- SAMPLE CARD 2 -->
+            <HBox styleClass="wa-item-card" alignment="CENTER_LEFT" spacing="14">
+
+                <VBox styleClass="wa-thumb" alignment="CENTER" prefWidth="72" prefHeight="72">
+                    <Label styleClass="wa-thumb-icon" text="🎨" />
+                </VBox>
+
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label styleClass="wa-item-name" text="Original Watercolor – Sunset Series No.3" />
+                        <Label styleClass="wa-status-badge wa-status-pending" text="Pending" />
+                    </HBox>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label styleClass="wa-meta-key" text="Seller:" />
+                        <Label styleClass="wa-meta-val" text="ArtGallery Saigon" />
+                        <Label styleClass="wa-meta-sep" text="·" />
+                        <Label styleClass="wa-meta-key" text="Lot:" />
+                        <Label styleClass="wa-meta-val" text="#B-2024-033" />
+                        <Label styleClass="wa-meta-sep" text="·" />
+                        <Label styleClass="wa-meta-key" text="Category:" />
+                        <Label styleClass="wa-meta-val" text="Art" />
+                    </HBox>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label styleClass="wa-meta-key" text="Won on:" />
+                        <Label styleClass="wa-meta-val" text="15 Apr 2026  ·  11:00" />
+                        <Label styleClass="wa-meta-sep" text="·" />
+                        <Label styleClass="wa-meta-key" text="Participants:" />
+                        <Label styleClass="wa-meta-val" text="8 bidders" />
+                    </HBox>
+                </VBox>
+
+                <VBox alignment="CENTER_RIGHT" spacing="4" prefWidth="130">
+                    <Label styleClass="wa-amount-label" text="WINNING BID" />
+                    <Label styleClass="wa-amount-value" text="$1200" />
+                    <Label styleClass="wa-amount-sub" text="Starting: $500" />
+                </VBox>
+
+                <VBox alignment="CENTER" spacing="6" prefWidth="110">
+                    <Button styleClass="wa-btn-detail" text="View Details" maxWidth="Infinity" />
+                    <Button styleClass="wa-btn-contact" text="Contact Seller" maxWidth="Infinity" />
+                </VBox>
+
+            </HBox>
+
+        </VBox>
+
+    </ScrollPane>
+
+    <!-- ═══════════════ FOOTER ═══════════════ -->
+    <HBox styleClass="wa-footer" alignment="CENTER">
+        <Button fx:id="btnShowMore"
+                styleClass="wa-show-more-btn"
+                text="Show More  ↓" />
+    </HBox>
+
+</VBox>
