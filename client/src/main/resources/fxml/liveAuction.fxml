@@ -6,7 +6,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.liveAuctionController">
+<StackPane prefHeight="1179.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.io.huangnosimp.controller.liveAuctionController">
    <children>
       <HBox fx:id="mainHbox" prefHeight="934.0" prefWidth="800.0" stylesheets="@../css/liveAuction.css">
           <children>
@@ -34,7 +34,7 @@
                       <!-- ScrollPane: Thông tin sản phẩm đấu giá -->
                       <ScrollPane fx:id="productInfoScroll" fitToWidth="true" prefHeight="117.0" prefWidth="561.0" styleClass="product-scroll" VBox.vgrow="ALWAYS">
                           <content>
-                              <VBox spacing="10" styleClass="product-info-container">
+                              <VBox prefHeight="787.0" prefWidth="515.0" spacing="10" styleClass="product-info-container">
                                   <padding>
                               <Insets bottom="14" left="14" right="14" top="14" />
                            </padding>
@@ -50,21 +50,87 @@
                                       <Label fx:id="productTitleLabel" styleClass="info-card-value-white" text="iPhone 15 Pro Max 256GB – Space Black" wrapText="true" />
                                   </VBox>
       
-                                  <HBox spacing="8">
-                                      <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
-                                          <padding>
-                                    <Insets bottom="10" left="12" right="12" top="10" />
-                                 </padding>
-                                          <Label styleClass="info-card-label" text="Danh mục" />
-                                          <Label fx:id="categoryLabel" styleClass="info-card-value-white" text="Điện tử" wrapText="true" />
-                                      </VBox>
-                                      <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
-                                          <padding>
-                                    <Insets bottom="10" left="12" right="12" top="10" />
-                                 </padding>
-                                          <Label styleClass="info-card-label" text="Tình trạng" />
-                                          <Label fx:id="conditionLabel" styleClass="info-card-badge-new" text="Mới" />
-                                      </VBox>
+                                   <HBox spacing="8">
+                                       <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                           <padding>
+                                     <Insets bottom="10" left="12" right="12" top="10" />
+                                  </padding>
+                                           <Label styleClass="info-card-label" text="Danh mục" />
+                                           <Label fx:id="categoryLabel" styleClass="info-card-value-white" text="Điện tử" wrapText="true" />
+                                       </VBox>
+                                       <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                           <padding>
+                                     <Insets bottom="10" left="12" right="12" top="10" />
+                                  </padding>
+                                           <Label styleClass="info-card-label" text="Tình trạng" />
+                                           <Label fx:id="conditionLabel" styleClass="info-card-badge-new" text="Mới" />
+                                       </VBox>
+                                   </HBox>
+                                  <HBox fx:id="artAttributes" managed="false" visible="false" spacing="8">
+                                     <children>
+                                        <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                           <padding>
+                                              <Insets bottom="10" left="12" right="12" top="10" />
+                                           </padding>
+                                           <children>
+                                              <Label styleClass="info-card-label" text="Artist" />
+                                              <Label fx:id="artistLabel" styleClass="info-card-value-white" wrapText="true" />
+                                           </children>
+                                        </VBox>
+                                        <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                           <padding>
+                                              <Insets bottom="10" left="12" right="12" top="10" />
+                                           </padding>
+                                           <children>
+                                              <Label styleClass="info-card-label" text="Creation year" />
+                                       <Label fx:id="creationYearLabel" styleClass="info-card-value-white" text="Label" />
+                                           </children>
+                                        </VBox>
+                                     </children>
+                                  </HBox>
+                                  <HBox fx:id="electronicsAttributes" managed="false" visible="false" layoutX="24.0" layoutY="280.0" spacing="8">
+                                     <children>
+                                        <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                           <padding>
+                                              <Insets bottom="10" left="12" right="12" top="10" />
+                                           </padding>
+                                           <children>
+                                              <Label styleClass="info-card-label" text="Brand" />
+                                              <Label fx:id="brandLabel" styleClass="info-card-value-white" wrapText="true" />
+                                           </children>
+                                        </VBox>
+                                        <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                           <padding>
+                                              <Insets bottom="10" left="12" right="12" top="10" />
+                                           </padding>
+                                           <children>
+                                              <Label styleClass="info-card-label" text="Warranty" />
+                                              <Label fx:id="warrantyLabel" styleClass="info-card-value-white" />
+                                           </children>
+                                        </VBox>
+                                     </children>
+                                  </HBox>
+                                  <HBox fx:id="vehicleAttributes" managed="false" visible="false" layoutX="24.0" layoutY="216.0" spacing="8">
+                                     <children>
+                                        <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                           <padding>
+                                              <Insets bottom="10" left="12" right="12" top="10" />
+                                           </padding>
+                                           <children>
+                                              <Label styleClass="info-card-label" text="Engine type" />
+                                              <Label fx:id="EngineLabel" styleClass="info-card-value-white" wrapText="true" />
+                                           </children>
+                                        </VBox>
+                                        <VBox spacing="4" styleClass="info-card" HBox.hgrow="ALWAYS">
+                                           <padding>
+                                              <Insets bottom="10" left="12" right="12" top="10" />
+                                           </padding>
+                                           <children>
+                                              <Label styleClass="info-card-label" text="Mileage" />
+                                              <Label fx:id="mileageLabel" styleClass="info-card-value-white" />
+                                           </children>
+                                        </VBox>
+                                     </children>
                                   </HBox>
       
                                   <VBox spacing="4" styleClass="info-card">

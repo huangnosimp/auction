@@ -28,6 +28,7 @@ import vn.io.huangnosimp.Manager.*;
 import vn.io.huangnosimp.dto.request.*;
 import vn.io.huangnosimp.dto.response.*;
 import vn.io.huangnosimp.dto.shared.AuctionExtendedDTO;
+import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 import vn.io.huangnosimp.dto.shared.NotificationDTO;
 import vn.io.huangnosimp.enums.NotificationType;
 import vn.io.huangnosimp.network.IServerMessageListener;
@@ -76,6 +77,12 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML private Label autoBidStatusLabel;
     @FXML private Label lastBidTimeLabel;
     @FXML private Label statusLabel;
+    @FXML private Label artistLabel;
+    @FXML private Label creationYearLabel;
+    @FXML private Label brandLabel;
+    @FXML private Label warrantyLabel;
+    @FXML private Label EngineLabel;
+    @FXML private Label mileageLabel;
 
     @FXML private Button btnIncrease;
     @FXML private Button btnDecrease;
@@ -91,8 +98,9 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML private Separator spr1;
     @FXML private ListView bidHistoryList;
     @FXML private TextField maxBidInput;
-    @FXML private HBox AutobidHbox;
-    @FXML private VBox AutobidVbox;
+    @FXML private HBox artAttributes;
+    @FXML private HBox electronicsAttributes;
+    @FXML private HBox vehicleAttributes;
 
     @FXML private FlowPane imgDisplayPlowPane;
     @FXML private StackPane imageOverlay;
@@ -107,6 +115,29 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     private volatile double pendingBidAmount = 0;
     private AuctionCountdownUtil clock;
 
+    private void setUpCategory(AuctionDetailResponseDTO dto){
+        ItemAttributesDTO attributes = dto.getAttributes();
+        switch (dto.getItemType()){
+            case ART -> {
+                artAttributes.setVisible(true);
+                artAttributes.setManaged(true);
+                artistLabel.setText(attributes.getArtist());
+                creationYearLabel.setText(String.valueOf(attributes.getCreationYear()));
+            }
+            case ELECTRONICS -> {
+                electronicsAttributes.setVisible(true);
+                electronicsAttributes.setManaged(true);
+                brandLabel.setText(attributes.getBrand());
+                warrantyLabel.setText(String.valueOf(attributes.getWarrantyMonths()));
+            }
+            case VEHICLE -> {
+                vehicleAttributes.setManaged(true);
+                vehicleAttributes.setVisible(true);
+                EngineLabel.setText(attributes.getEngineType());
+                mileageLabel.setText(String.valueOf(attributes.getMileage()));
+            }
+        }
+    }
     public void setUpPreviewImg(List<String> Img) {
         if (Img == null || Img.isEmpty()) return;
 
@@ -177,6 +208,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         productTitleLabel.setText(DTO.getProductName());//tên sản phẩm
         categoryLabel.setText(String.valueOf(DTO.getCategory()));//phân loại
         conditionLabel.setText(String.valueOf(DTO.getCondition()));//tình trạng
+        setUpCategory(DTO);
         descriptionLabel.setText(DTO.getDescription());//mô tả
         sidebarBuyNowPriceLabel.setText(formatNumber(DTO.getBuyNowPrice()));//giá mua ngay
         startDateLabel.setText(formatEpochSecond(DTO.getStartTime()));//thời điểm bắt đầu

@@ -84,7 +84,7 @@ public class ItemCardController implements Initializable, IServerMessageListener
             imgProduct.setImage(null);
         }
         lblProductName.setText(dto.getProductName());
-        lblItemType.setText("");
+        lblItemType.setText(String.valueOf(dto.getItemType()));
         long now = TimeSyncManager.nowMillis();
         if(now < dto.getStartTime()){
             statuslbl.setText("Start in: ");
