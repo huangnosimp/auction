@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class StatisticRepositoryTest extends H2RepositoryTestSupport {
     private StatisticRepository repository;
@@ -51,5 +52,8 @@ class StatisticRepositoryTest extends H2RepositoryTestSupport {
         assertEquals(ItemType.ART, cards.get(0).getItemType());
         assertEquals(ItemType.ART, detail.getItemType());
         assertEquals(ItemType.ART, detail.getCategory());
+        assertNotNull(detail.getAttributes());
+        assertEquals("Test Artist", detail.getAttributes().getArtist());
+        assertEquals(2024, detail.getAttributes().getCreationYear());
     }
 }

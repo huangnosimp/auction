@@ -1,5 +1,6 @@
 package vn.io.huangnosimp.dto.response;
 
+import vn.io.huangnosimp.dto.shared.ItemAttributesDTO;
 import vn.io.huangnosimp.enums.ItemCondition;
 import vn.io.huangnosimp.enums.ItemType;
 
@@ -14,6 +15,7 @@ public class AuctionDetailResponseDTO {
     private final ItemType itemType;       // Loại item trả về cho client
     private final ItemCondition condition;        // Tình trạng (New, Like New, Used)
     private final String description;      // Mô tả chi tiết sản phẩm
+    private final ItemAttributesDTO attributes; // Thuộc tính riêng theo từng loại item
 
     // Định giá
     private final double startPrice;       // Giá khởi điểm
@@ -43,11 +45,27 @@ public class AuctionDetailResponseDTO {
                                     String leadBidder, long lastBidTime,
                                     int participantCount, int bidCount,
                                     List<BidHistoryDTO> bidHistory, List<PricePointDTO> priceHistory) {
+        this(productName, category, condition, description, null,
+                startPrice, bidIncrement, buyNowPrice, reservePrice,
+                startTime, endTime, currentPrice, minNextBid,
+                leadBidder, lastBidTime, participantCount, bidCount,
+                bidHistory, priceHistory);
+    }
+
+    public AuctionDetailResponseDTO(String productName, ItemType category, ItemCondition condition, String description,
+                                    ItemAttributesDTO attributes,
+                                    double startPrice, double bidIncrement, double buyNowPrice, double reservePrice,
+                                    long startTime, long endTime,
+                                    double currentPrice, double minNextBid,
+                                    String leadBidder, long lastBidTime,
+                                    int participantCount, int bidCount,
+                                    List<BidHistoryDTO> bidHistory, List<PricePointDTO> priceHistory) {
         this.productName = productName;
         this.category = category;
         this.itemType = category;
         this.condition = condition;
         this.description = description;
+        this.attributes = attributes;
         this.startPrice = startPrice;
         this.bidIncrement = bidIncrement;
         this.buyNowPrice = buyNowPrice;
@@ -78,6 +96,7 @@ public class AuctionDetailResponseDTO {
     }
 
     public String getDescription() { return description; }
+    public ItemAttributesDTO getAttributes() { return attributes; }
     public double getStartPrice() { return startPrice; }
     public double getBidIncrement() { return bidIncrement; }
     public double getBuyNowPrice() { return buyNowPrice; }
@@ -89,6 +108,7 @@ public class AuctionDetailResponseDTO {
                 getItemType(),
                 condition,
                 description,
+                attributes,
                 startPrice,
                 bidIncrement,
                 buyNowPrice,
