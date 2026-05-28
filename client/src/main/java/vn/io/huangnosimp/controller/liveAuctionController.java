@@ -622,6 +622,21 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                     minNextBidLabel.setText(formatNumber(dto.getAmount() + minCount));
                     myBidLabel.setText(formatNumber(dto.getAmount() + minCount));
                     lastBidTimeLabel.setText(formatEpochSecond(dto.getPlaceAt()));
+                    if(dto.getAmount() >= Double.parseDouble(maxBidInput.getText())){
+                        AutoBidRequestDTO cancelAutoBidRequest = new AutoBidRequestDTO(auctionId, Double.parseDouble(maxBidInput.getText()), minCount);
+                        Request stopAutobid = new Request(ActionType.UNREGISTER_AUTO_BID, cancelAutoBidRequest);
+                        SocketManager.getClient().sendRequestAsync(stopAutobid)
+                                .thenAccept(response -> {
+                                    if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+                                        updateAutoBidStatus(false);
+                                        ControllerManager.getDashboardController().removeAutoBidItem(auctionId);
+                                        UserSession.removeAutoBid(auctionId);
+                                    }
+                                    else{
+                                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                                    }
+                                });
+                    }
 
                     if (UserSession.getAuctionDetail() != null && UserSession.getAuctionDetail().getBuyNowPrice() > 0) {
                         if (dto.getAmount() >= UserSession.getAuctionDetail().getBuyNowPrice()) {
