@@ -52,7 +52,7 @@
                 <VBox alignment="CENTER" prefHeight="199.0" prefWidth="329.0" spacing="6" styleClass="avatar-section">
                     <padding><Insets bottom="10" /></padding>
                     <Label styleClass="avatar-circle" text="👤" />
-                    <Label fx:id="usernameLabel" styleClass="uname" text="HoangChim88" />
+                    <Label fx:id="usernameLabel" styleClass="uname" text="AUCTION88" />
                     <Label styleClass="verified-badge" text="VERIFIED" />
                <Button mnemonicParsing="false" onAction="#handleLogOut" prefHeight="25.0" prefWidth="76.0" styleClass="btn-dep" text="Log Out" />
                 </VBox>

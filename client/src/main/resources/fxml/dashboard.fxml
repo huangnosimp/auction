@@ -13,7 +13,7 @@
             <top>
                 <HBox alignment="CENTER_LEFT" spacing="0" styleClass="navbar">
                     <HBox alignment="CENTER_LEFT" spacing="4" styleClass="logo-container">
-                        <Label styleClass="logo-ofc" text="HOANGCHIM88." />
+                        <Label styleClass="logo-ofc" text="AUCTION88." />
                         <Label styleClass="logo-digital" text="Digital" />
                     </HBox>
 

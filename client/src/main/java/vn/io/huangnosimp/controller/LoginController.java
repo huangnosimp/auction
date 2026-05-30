@@ -129,7 +129,7 @@ public class LoginController {
                     .thenAccept(response -> {
                         if (ResponseStatus.SUCCESS.equals(response.getStatus())) {
                             TimeSyncManager.syncAsync(SocketManager.getClient()).exceptionally(ex -> null);
-                            Platform.runLater(()-> changeMainStage("AdminDashboarđ.fxml"));
+                            Platform.runLater(()-> changeMainStage("AdminDashboard.fxml"));
                         }
                         else if (ResponseStatus.UNAUTHORIZED.equals(response.getStatus())){
                             Platform.runLater(()-> showAlert("UNAUTHORIZED", response.getMessage()));
