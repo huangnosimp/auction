@@ -32,6 +32,8 @@ public class LoginController {
 
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
+    @FXML private TextField passwordTextField;
+    @FXML private CheckBox showPasswordCheck;
     @FXML private ToggleButton userToggle;
     @FXML private ToggleButton adminToggle;
     @FXML private ToggleGroup roleGroup;
@@ -40,13 +42,38 @@ public class LoginController {
 
     @FXML
     public void handleEmailEnter(ActionEvent event) {
-        passwordField.requestFocus();
+        if (showPasswordCheck != null && showPasswordCheck.isSelected()) {
+            passwordTextField.requestFocus();
+        } else {
+            passwordField.requestFocus();
+        }
+    }
+
+    @FXML
+    private void togglePasswordVisibility() {
+        if (showPasswordCheck.isSelected()) {
+            passwordTextField.setText(passwordField.getText());
+            passwordTextField.setVisible(true);
+            passwordTextField.setManaged(true);
+            passwordField.setVisible(false);
+            passwordField.setManaged(false);
+            passwordTextField.requestFocus();
+            passwordTextField.positionCaret(passwordTextField.getText().length());
+        } else {
+            passwordField.setText(passwordTextField.getText());
+            passwordField.setVisible(true);
+            passwordField.setManaged(true);
+            passwordTextField.setVisible(false);
+            passwordTextField.setManaged(false);
+            passwordField.requestFocus();
+            passwordField.positionCaret(passwordField.getText().length());
+        }
     }
 
     @FXML
     private void handleLogin() {
         String email = emailField.getText();
-        String password = passwordField.getText();
+        String password = (showPasswordCheck != null && showPasswordCheck.isSelected()) ? passwordTextField.getText() : passwordField.getText();
 
         boolean isAdmin = adminToggle.isSelected();
         if(isAdmin){

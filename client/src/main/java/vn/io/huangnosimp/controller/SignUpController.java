@@ -17,18 +17,93 @@ public class SignUpController {
     @FXML private TextField fullNameField;
     @FXML private TextField userNameField;
     @FXML private TextField emailField;
-    @FXML private TextField phoneField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
+    @FXML private TextField passwordTextField;
+    @FXML private TextField confirmPasswordTextField;
+    @FXML private CheckBox showPasswordCheck;
     @FXML private CheckBox termsCheckBox;
 
     @FXML
+    public void handleFullNameEnter(ActionEvent event) {
+        userNameField.requestFocus();
+    }
+
+    @FXML
+    public void handleUserNameEnter(ActionEvent event) {
+        emailField.requestFocus();
+    }
+
+    @FXML
+    public void handleEmailEnter(ActionEvent event) {
+        if (showPasswordCheck != null && showPasswordCheck.isSelected()) {
+            passwordTextField.requestFocus();
+        } else {
+            passwordField.requestFocus();
+        }
+    }
+
+    @FXML
+    public void handlePasswordEnter(ActionEvent event) {
+        if (showPasswordCheck != null && showPasswordCheck.isSelected()) {
+            confirmPasswordTextField.requestFocus();
+        } else {
+            confirmPasswordField.requestFocus();
+        }
+    }
+
+    @FXML
+    public void handleConfirmPasswordEnter(ActionEvent event) {
+        termsCheckBox.requestFocus();
+    }
+
+    @FXML
+    private void togglePasswordVisibility() {
+        if (showPasswordCheck.isSelected()) {
+            passwordTextField.setText(passwordField.getText());
+            passwordTextField.setVisible(true);
+            passwordTextField.setManaged(true);
+            passwordField.setVisible(false);
+            passwordField.setManaged(false);
+
+            confirmPasswordTextField.setText(confirmPasswordField.getText());
+            confirmPasswordTextField.setVisible(true);
+            confirmPasswordTextField.setManaged(true);
+            confirmPasswordField.setVisible(false);
+            confirmPasswordField.setManaged(false);
+            
+            passwordTextField.requestFocus();
+            passwordTextField.positionCaret(passwordTextField.getText().length());
+        } else {
+            passwordField.setText(passwordTextField.getText());
+            passwordField.setVisible(true);
+            passwordField.setManaged(true);
+            passwordTextField.setVisible(false);
+            passwordTextField.setManaged(false);
+
+            confirmPasswordField.setText(confirmPasswordTextField.getText());
+            confirmPasswordField.setVisible(true);
+            confirmPasswordField.setManaged(true);
+            confirmPasswordTextField.setVisible(false);
+            confirmPasswordTextField.setManaged(false);
+            
+            passwordField.requestFocus();
+            passwordField.positionCaret(passwordField.getText().length());
+        }
+    }
+
+    @FXML
     private void handleSignUp(ActionEvent event) {
-        String fullName = fullNameField.getText();
-        String username = userNameField.getText();
-        String email = emailField.getText();
-        String pass = passwordField.getText();
-        String confirmPass = confirmPasswordField.getText();
+        String fullName = fullNameField.getText().trim();
+        String username = userNameField.getText().trim();
+        String email = emailField.getText().trim();
+        String pass = (showPasswordCheck != null && showPasswordCheck.isSelected()) ? passwordTextField.getText() : passwordField.getText();
+        String confirmPass = (showPasswordCheck != null && showPasswordCheck.isSelected()) ? confirmPasswordTextField.getText() : confirmPasswordField.getText();
+
+        if (fullName.isEmpty() || username.isEmpty() || email.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Registration Error", "Please fill in all fields!");
+            return;
+        }
 
         // Logic kiểm tra cơ bản
 

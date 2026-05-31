@@ -35,7 +35,13 @@
                 <VBox spacing="15.0">
                     <children>
                         <TextField fx:id="emailField" promptText="Email or Username" styleClass="input-field" />
-                        <PasswordField fx:id="passwordField" promptText="Password" styleClass="input-field" />
+                        <StackPane>
+                            <children>
+                                <PasswordField fx:id="passwordField" promptText="Password" styleClass="input-field" />
+                                <TextField fx:id="passwordTextField" promptText="Password" styleClass="input-field" visible="false" managed="false" />
+                            </children>
+                        </StackPane>
+                        <CheckBox fx:id="showPasswordCheck" onAction="#togglePasswordVisibility" text="Show Password" />
                     </children>
                 </VBox>
 

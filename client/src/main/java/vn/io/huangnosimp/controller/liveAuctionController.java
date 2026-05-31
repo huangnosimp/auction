@@ -111,8 +111,6 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     private Timeline holdTimer;
     private Runnable currentAction;
     private String auctionId;
-    private boolean isBuyNowDp;
-    private volatile double pendingBidAmount = 0;
     private AuctionCountdownUtil clock;
 
     private void setUpCategory(AuctionDetailResponseDTO dto){
@@ -325,7 +323,6 @@ public class liveAuctionController implements Initializable, IServerMessageListe
         int maxIndex = Math.max(10, bidIndex);
         xAxis.setUpperBound(maxIndex);
         
-        // Chia trục X ra tối đa 10 khoảng hợp lý tùy thuộc số lượng bid
         double unit = Math.max(1.0, Math.ceil(maxIndex / 10.0));
         xAxis.setTickUnit(unit);
     }
@@ -360,10 +357,20 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             }
         }
     }
-    @FXML
-    public void handleReturnToDashboard(){
+    public void cleanup() {
         SocketManager.getClient().removeListener(this);
         ControllerManager.setLiveAuctionController(null);
+        if (clock != null) {
+            clock.stop();
+        }
+        if (holdTimer != null) {
+            holdTimer.stop();
+        }
+    }
+
+    @FXML
+    public void handleReturnToDashboard(){
+        cleanup();
         Button ActBtn = ControllerManager.getDashboardController().getActiveMenuButton();
         if(ActBtn.getText().equals("Dashboard")){
             changeView("dashboard_home.fxml", 1);
@@ -384,8 +391,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         Platform.runLater(()->{
                             ControllerManager.getDashboardHomeController().removeFromDashBoard(auctionId, ControllerManager.getDashboardHomeController().getFlowJoined());
                             UserSession.removeCard(UserSession.getJoiningListCard(), auctionId);
-                            SocketManager.getClient().removeListener(this);
-                            ControllerManager.setLiveAuctionController(null);
+                            cleanup();
                             Button activeBtn = ControllerManager.getDashboardController().getActiveMenuButton();
                             if(activeBtn.getText().equals("Dashboard")){
                                 changeView("dashboard_home.fxml", 1);
@@ -415,8 +421,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         Platform.runLater(()->{
                             ControllerManager.getDashboardHomeController().removeFromDashBoard(auctionId, ControllerManager.getDashboardHomeController().getFlowJoined());
                             UserSession.removeCard(UserSession.getJoiningListCard(), auctionId);
-                            SocketManager.getClient().removeListener(this);
-                            ControllerManager.setLiveAuctionController(null);
+                            cleanup();
                             changeView("dashboard_home.fxml", 1);
                             ControllerManager.getDashboardController().showToast("SUCCESS", response.getMessage(), true);
                             btnBuyNow.setDisable(false);
@@ -435,7 +440,6 @@ public class liveAuctionController implements Initializable, IServerMessageListe
     @FXML
     public void handlePlaceBid(){
         double amount = parseNumber(myBidLabel.getText());
-        pendingBidAmount = amount;
         PlaceBidRequestDTO placeBidRequest = new PlaceBidRequestDTO(auctionId, amount);
         Request request = new Request(ActionType.PLACE_BID, placeBidRequest);
         SocketManager.getClient().sendRequest(request);
@@ -488,6 +492,7 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                                 ControllerManager.getDashboardController().showToast("SUCCESS", cancelResponse.getMessage(), true);
                                 ControllerManager.getDashboardHomeController().removeFromDashBoard(this.auctionId, ControllerManager.getDashboardHomeController().getAuctionFlowPane());
                                 UserSession.removeCard(UserSession.getMyListCard(), auctionId);
+                                cleanup();
                                 ViewManager.changeView("dashboard_home.fxml", 1);
                             });
                         }
@@ -587,7 +592,6 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                             ControllerManager.getDashboardController().removeOutbidItem(notificationDTO.getAuctionId());
                         }
 
-                        // Trừ chênh lệch (newBid - oldBid) khỏi balance hiển thị khi đặt bid của chính mình thành công
                         double newBid = dto.getAmount();
                         double oldBid = UserSession.getLatestBid(notificationDTO.getAuctionId());
                         double diff = newBid - oldBid;
@@ -602,7 +606,6 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         btnPlaceBid.setDisable(false);
                         statusLabel.setText("OUTBID");
 
-                        // Hoàn lại tiền bid cũ khi bị outbid (Server đã unfreeze)
                         double previousBid = UserSession.getLatestBid(notificationDTO.getAuctionId());
                         if (previousBid > 0) {
                             UserSession.addBalance(previousBid);

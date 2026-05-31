@@ -2,6 +2,7 @@ package vn.io.huangnosimp.Manager;
 
 import javafx.scene.Scene;
 import vn.io.huangnosimp.controller.DashboardController;
+import vn.io.huangnosimp.controller.liveAuctionController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
@@ -24,6 +25,9 @@ public class ViewManager {
 
     public static void changeView(String fxmlFile, int mode){
         try {
+            if (ControllerManager.getLiveAuctionController() != null) {
+                ControllerManager.getLiveAuctionController().cleanup();
+            }
 
             Parent root;
             if (mode == 1 && cache.containsKey(fxmlFile)) {
@@ -46,6 +50,10 @@ public class ViewManager {
 
     public static <T> T changeViewWithController(String fxmlFile){
         try{
+            if (ControllerManager.getLiveAuctionController() != null) {
+                ControllerManager.getLiveAuctionController().cleanup();
+            }
+
             FXMLLoader loader = new FXMLLoader(ViewManager.class.getResource("/fxml/" + fxmlFile));
             Parent root = loader.load();
             mainBorderPane.setCenter(root);
@@ -57,6 +65,10 @@ public class ViewManager {
     }
     public static void changeMainStage(String fxmlFile){
         try{
+            if (ControllerManager.getLiveAuctionController() != null) {
+                ControllerManager.getLiveAuctionController().cleanup();
+            }
+
             javafx.stage.Stage stage = SceneManager.getStage();
             double width = stage.getWidth();
             double height = stage.getHeight();

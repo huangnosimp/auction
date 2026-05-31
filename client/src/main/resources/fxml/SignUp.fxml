@@ -23,11 +23,25 @@
 
                 <VBox spacing="12.0">
                     <children>
-                        <TextField fx:id="fullNameField" promptText="Full Name" styleClass="input-field" />
-                  <TextField fx:id="userNameField" promptText="User Name" styleClass="input-field" />
-                        <TextField fx:id="emailField" promptText="Email Address" styleClass="input-field" />
-                        <PasswordField fx:id="passwordField" promptText="Password" styleClass="input-field" />
-                        <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" styleClass="input-field" />
+                        <TextField fx:id="fullNameField" onAction="#handleFullNameEnter" promptText="Full Name" styleClass="input-field" />
+                        <TextField fx:id="userNameField" onAction="#handleUserNameEnter" promptText="User Name" styleClass="input-field" />
+                        <TextField fx:id="emailField" onAction="#handleEmailEnter" promptText="Email Address" styleClass="input-field" />
+                        
+                        <StackPane>
+                            <children>
+                                <PasswordField fx:id="passwordField" onAction="#handlePasswordEnter" promptText="Password" styleClass="input-field" />
+                                <TextField fx:id="passwordTextField" onAction="#handlePasswordEnter" promptText="Password" styleClass="input-field" visible="false" managed="false" />
+                            </children>
+                        </StackPane>
+
+                        <StackPane>
+                            <children>
+                                <PasswordField fx:id="confirmPasswordField" onAction="#handleConfirmPasswordEnter" promptText="Confirm Password" styleClass="input-field" />
+                                <TextField fx:id="confirmPasswordTextField" onAction="#handleConfirmPasswordEnter" promptText="Confirm Password" styleClass="input-field" visible="false" managed="false" />
+                            </children>
+                        </StackPane>
+                        
+                        <CheckBox fx:id="showPasswordCheck" onAction="#togglePasswordVisibility" text="Show Password" />
                     </children>
                 </VBox>
 

@@ -55,7 +55,6 @@ public class ItemCardController implements Initializable, IServerMessageListener
     @FXML private ImageView imgProduct;
 
     private int bidCount;
-    private int bidderCount;
 
     private String auctionId;
     private List<String> displayImg;
@@ -64,7 +63,6 @@ public class ItemCardController implements Initializable, IServerMessageListener
     public void addInfo(AuctionCardDTO dto, String type){
         displayImg = dto.getImageUrl();
         bidCount = dto.getBidCount();
-        bidderCount = dto.getBidderCount();
         this.auctionId = dto.getAuctionId();
         if (lblBidStatus != null) {
             if(dto.getCurrentPrice() == dto.getYourBid()){
@@ -151,14 +149,18 @@ public class ItemCardController implements Initializable, IServerMessageListener
                                     if (ResponseStatus.SUCCESS.equals(response1.getStatus())) {
                                         Type listType = new TypeToken<List<AuctionCardDTO>>(){}.getType();
                                         List<AuctionCardDTO> list = GsonParser.GSON.fromJson(GsonParser.GSON.toJsonTree(response1.getData()), listType);
-                                        for(AuctionCardDTO dto:list){
-                                            ControllerManager.getOpenSlotController().addCard(dto, "Public");
-                                        }
+                                        Platform.runLater(() -> {
+                                            for(AuctionCardDTO dto:list){
+                                                ControllerManager.getOpenSlotController().addCard(dto, "Public");
+                                            }
+                                        });
                                     }
                                 });
                     }
                     if(ResponseStatus.FAILED.equals(response.getStatus())){
-                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                        Platform.runLater(() -> {
+                            ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                        });
                     }
                 });
     }
@@ -187,12 +189,16 @@ public class ItemCardController implements Initializable, IServerMessageListener
                                         });
                                     }
                                     if(ResponseStatus.FAILED.equals(response.getStatus())){
-                                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                                        Platform.runLater(() -> {
+                                            ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                                        });
                                     }
                                 });
                     }
                     if(ResponseStatus.FAILED.equals(joinRoomResponse.getStatus())){
-                        ControllerManager.getDashboardController().showToast("FAILED", joinRoomResponse.getMessage(), false);
+                        Platform.runLater(() -> {
+                            ControllerManager.getDashboardController().showToast("FAILED", joinRoomResponse.getMessage(), false);
+                        });
                     }
                 });
 
@@ -280,6 +286,15 @@ public class ItemCardController implements Initializable, IServerMessageListener
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         SocketManager.getClient().addListener(this);
+
+        lblProductName.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene == null) {
+                SocketManager.getClient().removeListener(this);
+                if (countdownUtil != null) {
+                    countdownUtil.stop();
+                }
+            }
+        });
     }
     private double extractPrice(String message) {
         Pattern pattern = Pattern.compile("Current price is ([\\d.]+) in room");

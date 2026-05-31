@@ -15,7 +15,6 @@ public class FormatUtil {
         NUMBER_FORMAT = new DecimalFormat("#,###.##", symbols);
     }
 
-    // Gọi ở bất kỳ đâu trong dự án
     public static String formatNumber(double number) {
         return NUMBER_FORMAT.format(number);
     }

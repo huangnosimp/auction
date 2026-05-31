@@ -63,13 +63,13 @@ public class AuctionCountdownUtil {
         timeLabel.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
     }
 
-    public static String formatEpochSecond(long epochSecond) {//chỉnh hiển thị theo form
+    public static String formatEpochSecond(long epochSecond) {
         return LocalDateTime
                 .ofInstant(Instant.ofEpochMilli(epochSecond), VN_ZONE)
                 .format(DEFAULT_FORMAT);
     }
 
-    public static String formatEpochSecond(long epochSecond, String pattern) {//chỉnh theo form tùy chỉnh
+    public static String formatEpochSecond(long epochSecond, String pattern) {
         return LocalDateTime
                 .ofInstant(Instant.ofEpochMilli(epochSecond), VN_ZONE)
                 .format(DateTimeFormatter.ofPattern(pattern));
