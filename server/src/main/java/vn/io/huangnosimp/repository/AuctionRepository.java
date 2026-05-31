@@ -28,7 +28,7 @@ public class AuctionRepository implements IAuctionRepository {
     public boolean save(Auction auction) {
         if (auction == null || auction.getId() == null) return false;
         //add save bidders
-        String sql = "INSERT INTO Auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status, minimum_increment, buy_now_price) " +
+        String sql = "INSERT INTO auctions (id, item_id, seller_id, winner_id, start_time, end_time, starting_price, final_price, status, minimum_increment, buy_now_price) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE winner_id = VALUES(winner_id), end_time = VALUES(end_time), final_price = VALUES(final_price), " +
                 "status = VALUES(status), minimum_increment = VALUES(minimum_increment), buy_now_price = VALUES(buy_now_price)";
@@ -57,7 +57,7 @@ public class AuctionRepository implements IAuctionRepository {
 
     @Override
     public Auction findById(String auctionId) {
-        String sql = "SELECT * FROM Auctions WHERE id = ?";
+        String sql = "SELECT * FROM auctions WHERE id = ?";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, auctionId);
@@ -74,7 +74,7 @@ public class AuctionRepository implements IAuctionRepository {
 
     @Override
     public boolean delete(String auctionId) {
-        String sql = "DELETE FROM Auctions WHERE id = ?";
+        String sql = "DELETE FROM auctions WHERE id = ?";
         try (Connection connection = databaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, auctionId);
@@ -118,7 +118,7 @@ public class AuctionRepository implements IAuctionRepository {
     @Override
     public List<Auction> findAll() {
         List<Auction> auctions = new ArrayList<>();
-        String sql = "SELECT * FROM Auctions";
+        String sql = "SELECT * FROM auctions";
 
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql);

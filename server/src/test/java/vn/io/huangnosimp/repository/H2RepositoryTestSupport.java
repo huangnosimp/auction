@@ -73,7 +73,7 @@ abstract class H2RepositoryTestSupport {
 
     private void createSchema() throws SQLException {
         execute("""
-                CREATE TABLE Users (
+                CREATE TABLE users (
                     id VARCHAR(36) PRIMARY KEY,
                     username VARCHAR(100) NOT NULL UNIQUE,
                     password VARCHAR(255) NOT NULL,
@@ -87,7 +87,7 @@ abstract class H2RepositoryTestSupport {
                 )
                 """);
         execute("""
-                CREATE TABLE Items (
+                CREATE TABLE items (
                     id VARCHAR(36) PRIMARY KEY,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     owner_id VARCHAR(36) NOT NULL,
@@ -104,13 +104,13 @@ abstract class H2RepositoryTestSupport {
                 )
                 """);
         execute("""
-                CREATE TABLE ItemImages (
+                CREATE TABLE itemimages (
                     item_id VARCHAR(36) NOT NULL,
                     image_url TEXT NOT NULL
                 )
                 """);
         execute("""
-                CREATE TABLE Auctions (
+                CREATE TABLE auctions (
                     id VARCHAR(36) PRIMARY KEY,
                     item_id VARCHAR(36) NOT NULL,
                     seller_id VARCHAR(36) NOT NULL,
@@ -126,14 +126,14 @@ abstract class H2RepositoryTestSupport {
                 )
                 """);
         execute("""
-                CREATE TABLE AuctionParticipants (
+                CREATE TABLE auctionparticipants (
                     auction_id VARCHAR(36) NOT NULL,
                     user_id VARCHAR(36) NOT NULL,
                     PRIMARY KEY (auction_id, user_id)
                 )
                 """);
         execute("""
-                CREATE TABLE BidTransactions (
+                CREATE TABLE bidtransactions (
                     id VARCHAR(36) PRIMARY KEY,
                     bidder_id VARCHAR(36) NOT NULL,
                     auction_id VARCHAR(36) NOT NULL,
@@ -142,7 +142,7 @@ abstract class H2RepositoryTestSupport {
                 )
                 """);
         execute("""
-                CREATE TABLE Transactions (
+                CREATE TABLE transactions (
                     id VARCHAR(36) PRIMARY KEY,
                     user_id VARCHAR(36) NOT NULL,
                     amount DOUBLE NOT NULL,

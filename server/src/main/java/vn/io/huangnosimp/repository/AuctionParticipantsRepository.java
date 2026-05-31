@@ -19,7 +19,7 @@ public class AuctionParticipantsRepository implements IAuctionParticipantsReposi
 
     @Override
     public void addParticipant(String auctionId, String userId) {
-        String sql = "INSERT IGNORE INTO AuctionParticipants (auction_id, user_id) VALUES (?, ?)";
+        String sql = "INSERT IGNORE INTO auctionparticipants (auction_id, user_id) VALUES (?, ?)";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, auctionId);
@@ -32,7 +32,7 @@ public class AuctionParticipantsRepository implements IAuctionParticipantsReposi
 
     @Override
     public void removeParticipant(String auctionId, String userId) {
-        String sql = "DELETE FROM AuctionParticipants WHERE auction_id = ? AND user_id = ?";
+        String sql = "DELETE FROM auctionparticipants WHERE auction_id = ? AND user_id = ?";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, auctionId);
@@ -45,7 +45,7 @@ public class AuctionParticipantsRepository implements IAuctionParticipantsReposi
 
     @Override
     public boolean isParticipant(String auctionId, String userId) {
-        String sql = "SELECT 1 FROM AuctionParticipants WHERE auction_id = ? AND user_id = ? LIMIT 1";
+        String sql = "SELECT 1 FROM auctionparticipants WHERE auction_id = ? AND user_id = ? LIMIT 1";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, auctionId);

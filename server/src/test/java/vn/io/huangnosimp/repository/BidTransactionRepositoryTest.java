@@ -22,9 +22,9 @@ class BidTransactionRepositoryTest extends H2RepositoryTestSupport {
 
         repository.saveBidTransaction(bidTransaction);
 
-        assertEquals(1, countRows("BidTransactions"));
-        assertEquals("bidder-1", queryString("SELECT bidder_id FROM BidTransactions WHERE id = 'bid-1'"));
-        assertEquals("auction-1", queryString("SELECT auction_id FROM BidTransactions WHERE id = 'bid-1'"));
-        assertEquals(250.0, queryDouble("SELECT bid_amount FROM BidTransactions WHERE id = 'bid-1'"));
+        assertEquals(1, countRows("bidtransactions"));
+        assertEquals("bidder-1", queryString("SELECT bidder_id FROM bidtransactions WHERE id = 'bid-1'"));
+        assertEquals("auction-1", queryString("SELECT auction_id FROM bidtransactions WHERE id = 'bid-1'"));
+        assertEquals(250.0, queryDouble("SELECT bid_amount FROM bidtransactions WHERE id = 'bid-1'"));
     }
 }

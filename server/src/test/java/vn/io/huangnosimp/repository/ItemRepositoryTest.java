@@ -45,7 +45,7 @@ class ItemRepositoryTest extends H2RepositoryTestSupport {
         assertEquals("Test Artist", art.getArtist());
         assertEquals(2024, art.getCreationYear());
         assertEquals(List.of("https://example.com/one.png", "https://example.com/two.png"), art.getImageUrl());
-        assertEquals(2, countRows("ItemImages"));
+        assertEquals(2, countRows("itemimages"));
     }
 
     @Test
