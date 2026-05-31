@@ -12,7 +12,7 @@
                 <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
             </padding>
             <children>
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-text" text="HOANGCHIM88" />
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-text" text="E-Auctio Realtime" />
 
                 <VBox spacing="10.0">
                     <children>

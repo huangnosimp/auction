@@ -413,6 +413,8 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                 .thenAccept(response -> {
                     if(ResponseStatus.SUCCESS.equals(response.getStatus())){
                         Platform.runLater(()->{
+                            ControllerManager.getDashboardHomeController().removeFromDashBoard(auctionId, ControllerManager.getDashboardHomeController().getFlowJoined());
+                            UserSession.removeCard(UserSession.getJoiningListCard(), auctionId);
                             SocketManager.getClient().removeListener(this);
                             ControllerManager.setLiveAuctionController(null);
                             changeView("dashboard_home.fxml", 1);
@@ -463,14 +465,16 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             Request stopAutobid = new Request(ActionType.UNREGISTER_AUTO_BID, cancelAutoBidRequest);
             SocketManager.getClient().sendRequestAsync(stopAutobid)
                     .thenAccept(response -> {
-                        if(ResponseStatus.SUCCESS.equals(response.getStatus())){
-                            updateAutoBidStatus(false);
-                            ControllerManager.getDashboardController().removeAutoBidItem(auctionId);
-                            UserSession.removeAutoBid(auctionId);
-                        }
-                        else{
-                            ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
-                        }
+                        Platform.runLater(() -> {
+                            if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+                                updateAutoBidStatus(false);
+                                ControllerManager.getDashboardController().removeAutoBidItem(auctionId);
+                                UserSession.removeAutoBid(auctionId);
+                            }
+                            else{
+                                ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                            }
+                        });
                     });
         }
         else{
@@ -627,14 +631,16 @@ public class liveAuctionController implements Initializable, IServerMessageListe
                         Request stopAutobid = new Request(ActionType.UNREGISTER_AUTO_BID, cancelAutoBidRequest);
                         SocketManager.getClient().sendRequestAsync(stopAutobid)
                                 .thenAccept(response -> {
-                                    if(ResponseStatus.SUCCESS.equals(response.getStatus())){
-                                        updateAutoBidStatus(false);
-                                        ControllerManager.getDashboardController().removeAutoBidItem(auctionId);
-                                        UserSession.removeAutoBid(auctionId);
-                                    }
-                                    else{
-                                        ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
-                                    }
+                                    Platform.runLater(() -> {
+                                        if(ResponseStatus.SUCCESS.equals(response.getStatus())){
+                                            updateAutoBidStatus(false);
+                                            ControllerManager.getDashboardController().removeAutoBidItem(auctionId);
+                                            UserSession.removeAutoBid(auctionId);
+                                        }
+                                        else{
+                                            ControllerManager.getDashboardController().showToast("FAILED", response.getMessage(), false);
+                                        }
+                                    });
                                 });
                     }
 
@@ -676,12 +682,16 @@ public class liveAuctionController implements Initializable, IServerMessageListe
             }
             case AUCTION_CANCELED -> {
                 Platform.runLater(()->{
+                    ControllerManager.getDashboardHomeController().removeFromDashBoard(auctionId, ControllerManager.getDashboardHomeController().getFlowJoined());
+                    UserSession.removeCard(UserSession.getJoiningListCard(), auctionId);
                     handleReturnToDashboard();
                     ControllerManager.getDashboardController().showToast("Auction has been canceled buy the seller", null, true);
                 });
             }
             case AUCTION_ENDED -> {
                 Platform.runLater(()->{
+                    ControllerManager.getDashboardHomeController().removeFromDashBoard(auctionId, ControllerManager.getDashboardHomeController().getFlowJoined());
+                    UserSession.removeCard(UserSession.getJoiningListCard(), auctionId);
                     handleReturnToDashboard();
                     ControllerManager.getDashboardController().showToast("Auction Ended", null, true);
                 });

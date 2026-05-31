@@ -57,10 +57,22 @@ public class ViewManager {
     }
     public static void changeMainStage(String fxmlFile){
         try{
+            javafx.stage.Stage stage = SceneManager.getStage();
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMaximized = stage.isMaximized();
+
             FXMLLoader loader = new FXMLLoader(ViewManager.class.getResource("/fxml/" + fxmlFile));
             Parent root = loader.load();
             Scene scene = new Scene(root);
-            SceneManager.getStage().setScene(scene);
+            stage.setScene(scene);
+
+            if (!isMaximized) {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            } else {
+                stage.setMaximized(true);
+            }
         }
         catch (IOException e){
             e.printStackTrace();
