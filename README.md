@@ -360,3 +360,7 @@ Chạy test theo module:
 - Thông báo real-time: server gửi notification khi có bid mới, người dùng bị outbid, phiên bị hủy hoặc kết thúc.
 - Upload ảnh qua Cloudinary: server cấp upload signature, client dùng cho ảnh sản phẩm khi tạo đấu giá.
 - Docker deployment: có `Dockerfile`, `docker-compose.yml`, image server và log volume.
+
+## Link:
+- [báo cáo PDF](https://drive.google.com/file/d/1xMGIka6cLzp3QTtVjiP1cA1iKZAetjtx/view?usp=sharing)
+- [video demo](https://drive.google.com/file/d/1XKuV_qLI-csJX_Emoe8ZaJjx3qerHeoF/view)
