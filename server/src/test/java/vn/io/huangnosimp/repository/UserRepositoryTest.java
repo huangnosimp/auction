@@ -66,6 +66,6 @@ class UserRepositoryTest extends H2RepositoryTestSupport {
         assertNull(userRepository.findById("missing"));
         assertFalse(userRepository.checkUsername("missing"));
         assertFalse(userRepository.checkEmail("missing@example.com"));
-        assertEquals(0, countRows("Users"));
+        assertEquals(0, countRows("users"));
     }
 }

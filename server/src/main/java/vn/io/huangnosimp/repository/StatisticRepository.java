@@ -371,7 +371,7 @@ public class StatisticRepository implements IStatisticRepository {
 
     private List<String> findImageUrlsByItemId(Connection connection, String itemId) throws SQLException {
         List<String> imageUrls = new ArrayList<>();
-        String sql = "SELECT image_url FROM ItemImages WHERE item_id = ?";
+        String sql = "SELECT image_url FROM itemimages WHERE item_id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, itemId);

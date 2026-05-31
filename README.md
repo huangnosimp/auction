@@ -26,7 +26,7 @@ Phạm vi hiện tại tập trung vào:
 
 ## Môi trường chạy và yêu cầu cài đặt
 - JDK 25 hoặc tương thích với cấu hình JavaFX/Dockerfile hiện tại.
-- MySQL server đã tạo database/schema phù hợp với các bảng `users`, `items`, `itemimages`, `auctions`, `auctionparticipants`, `bidtransactions`, `transactions`, `auto_bids`. Lưu ý code hiện có query trộn tên bảng chữ hoa/thường, nên môi trường MySQL nên dùng cấu hình không phân biệt hoa/thường tên bảng hoặc đồng bộ lại casing giữa code và schema trước khi chạy.
+- MySQL server đã tạo database/schema phù hợp với các bảng `users`, `items`, `itemimages`, `auctions`, `auctionparticipants`, `bidtransactions`, `transactions`, `auto_bids`.
 - Cloudinary account nếu dùng chức năng upload ảnh sản phẩm.
 - Docker/Docker Compose nếu chạy server bằng container.
 

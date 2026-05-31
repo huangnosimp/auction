@@ -20,7 +20,7 @@ public class TransactionRepository implements ITransactionRepository {
 
     @Override
     public boolean saveTransaction(Transaction transaction) {
-        String sql = "INSERT INTO Transactions (id, user_id, amount, transaction_time, transaction_type) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO transactions (id, user_id, amount, transaction_time, transaction_type) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 

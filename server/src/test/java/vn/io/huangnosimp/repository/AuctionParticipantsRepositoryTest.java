@@ -23,11 +23,11 @@ class AuctionParticipantsRepositoryTest extends H2RepositoryTestSupport {
         repository.addParticipant("auction-1", "user-1");
 
         assertTrue(repository.isParticipant("auction-1", "user-1"));
-        assertEquals(1, countRows("AuctionParticipants"));
+        assertEquals(1, countRows("auctionparticipants"));
 
         repository.removeParticipant("auction-1", "user-1");
 
         assertFalse(repository.isParticipant("auction-1", "user-1"));
-        assertEquals(0, countRows("AuctionParticipants"));
+        assertEquals(0, countRows("auctionparticipants"));
     }
 }

@@ -24,7 +24,7 @@ public class ItemRepository implements IItemRepository {
     public void save(Item item) {
         if (item == null || item.getId() == null)
             return;
-        String sql = "INSERT INTO Items (id, created_at, owner_id, name, description, item_type, " +
+        String sql = "INSERT INTO items (id, created_at, owner_id, name, description, item_type, " +
                 "artist, creation_year, brand, warranty_period, engine_type, mileage, conditions) "
                 +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -85,7 +85,7 @@ public class ItemRepository implements IItemRepository {
     }
     @Override
     public Item findById(String itemId) {
-        String sql = "SELECT * FROM Items WHERE id = ?";
+        String sql = "SELECT * FROM items WHERE id = ?";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, itemId);
@@ -102,7 +102,7 @@ public class ItemRepository implements IItemRepository {
 
     @Override
     public boolean updateOwner(String itemId, String ownerId) {
-        String sql = "UPDATE Items SET owner_id = ? WHERE id = ?";
+        String sql = "UPDATE items SET owner_id = ? WHERE id = ?";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, ownerId);
@@ -116,7 +116,7 @@ public class ItemRepository implements IItemRepository {
 
     @Override
     public boolean delete(String itemId) {
-        String sql = "DELETE FROM Items WHERE id = ?";
+        String sql = "DELETE FROM items WHERE id = ?";
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, itemId);
@@ -133,7 +133,7 @@ public class ItemRepository implements IItemRepository {
             return;
         }
 
-        String sql = "INSERT INTO ItemImages (item_id, image_url) VALUES (?, ?)";
+        String sql = "INSERT INTO itemimages (item_id, image_url) VALUES (?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (String imageUrl : imageUrls) {
                 if (imageUrl == null || imageUrl.isBlank()) {
@@ -149,7 +149,7 @@ public class ItemRepository implements IItemRepository {
 
     private List<String> findImageUrlsByItemId(Connection conn, String itemId) throws SQLException {
         List<String> imageUrls = new ArrayList<>();
-        String sql = "SELECT image_url FROM ItemImages WHERE item_id = ?";
+        String sql = "SELECT image_url FROM itemimages WHERE item_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, itemId);
             try (ResultSet rs = stmt.executeQuery()) {

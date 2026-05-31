@@ -23,19 +23,19 @@ class StatisticRepositoryTest extends H2RepositoryTestSupport {
     @Test
     void auctionCardsAndDetailsIncludeItemType() throws SQLException {
         execute("""
-                INSERT INTO Users (id, username, password, email, role)
+                INSERT INTO users (id, username, password, email, role)
                 VALUES ('seller-1', 'seller', 'hash', 'seller@example.com', 'MEMBER')
                 """);
         execute("""
-                INSERT INTO Items (id, owner_id, name, description, item_type, artist, creation_year, conditions)
+                INSERT INTO items (id, owner_id, name, description, item_type, artist, creation_year, conditions)
                 VALUES ('item-1', 'seller-1', 'Oil Painting', 'Landscape', 'ART', 'Test Artist', 2024, 'NEW')
                 """);
         execute("""
-                INSERT INTO ItemImages (item_id, image_url)
+                INSERT INTO itemimages (item_id, image_url)
                 VALUES ('item-1', 'https://example.com/item.png')
                 """);
         execute("""
-                INSERT INTO Auctions (
+                INSERT INTO auctions (
                     id, item_id, seller_id, start_time, end_time, starting_price, final_price,
                     status, minimum_increment, buy_now_price
                 )
