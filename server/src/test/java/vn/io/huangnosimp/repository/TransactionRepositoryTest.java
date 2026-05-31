@@ -23,9 +23,9 @@ class TransactionRepositoryTest extends H2RepositoryTestSupport {
 
         repository.saveTransaction(transaction);
 
-        assertEquals(1, countRows("Transactions"));
-        assertEquals("user-1", queryString("SELECT user_id FROM Transactions WHERE id = 'tx-1'"));
-        assertEquals(300.0, queryDouble("SELECT amount FROM Transactions WHERE id = 'tx-1'"));
-        assertEquals("DEPOSIT", queryString("SELECT transaction_type FROM Transactions WHERE id = 'tx-1'"));
+        assertEquals(1, countRows("transactions"));
+        assertEquals("user-1", queryString("SELECT user_id FROM transactions WHERE id = 'tx-1'"));
+        assertEquals(300.0, queryDouble("SELECT amount FROM transactions WHERE id = 'tx-1'"));
+        assertEquals("DEPOSIT", queryString("SELECT transaction_type FROM transactions WHERE id = 'tx-1'"));
     }
 }

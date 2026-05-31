@@ -22,7 +22,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public boolean checkUsername(String Username) {
-        String sql = "SELECT 1 FROM Users WHERE username = ? LIMIT 1";
+        String sql = "SELECT 1 FROM users WHERE username = ? LIMIT 1";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, Username);
@@ -52,7 +52,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public boolean saveUser(String userId, String username, String password, String email, String role) {
-        String sql = "INSERT INTO Users (id, username, password, email, role) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (id, username, password, email, role) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = databaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, userId);
@@ -70,7 +70,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public User findByUsername(String username) {
-        String sql = "SELECT * FROM Users WHERE username = ?";
+        String sql = "SELECT * FROM users WHERE username = ?";
         try (Connection connection = databaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, username);
@@ -87,7 +87,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public User findById(String userId) {
-        String sql = "SELECT * FROM Users WHERE id = ?";
+        String sql = "SELECT * FROM users WHERE id = ?";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, userId);
@@ -104,7 +104,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public boolean updateBalance(String userId, double newBalance) {
-        String sql = "UPDATE Users SET account_balance = ? WHERE id = ?";
+        String sql = "UPDATE users SET account_balance = ? WHERE id = ?";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setDouble(1, newBalance);
@@ -118,7 +118,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public boolean updateFrozenBalance(String userId, double newFrozenBalance) {
-        String sql = "UPDATE Users SET frozen_balance = ? WHERE id = ?";
+        String sql = "UPDATE users SET frozen_balance = ? WHERE id = ?";
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setDouble(1, newFrozenBalance);
@@ -153,7 +153,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public boolean updateBanStatus(String userId, boolean isBanned, LocalDateTime banUntil) {
-        String sql = "UPDATE Users SET is_banned = ?, ban_until = ? WHERE id = ?";
+        String sql = "UPDATE users SET is_banned = ?, ban_until = ? WHERE id = ?";
 
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -177,7 +177,7 @@ public class UserRepository implements IUserRepository {
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM Users";
+        String sql = "SELECT * FROM users";
 
         try (Connection connection = databaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql);
