@@ -55,6 +55,7 @@ import static vn.io.huangnosimp.Manager.ViewManager.*;
 
 public class DashboardController implements Initializable, IServerMessageListener {
     @FXML private BorderPane mainBorderPane;
+    @FXML private javafx.scene.layout.AnchorPane side;
     @FXML private StackPane contentArea;
     @FXML private Button btnOpenSlots;
     @FXML private Button btnInventory;
@@ -551,6 +552,14 @@ public class DashboardController implements Initializable, IServerMessageListene
         setMainBorderPane(mainBorderPane);
         ControllerManager.setDashboardController(this);
         SocketManager.getClient().addListener(this);
+
+        // Bind sidebar (left part) dynamically to 25% of the total screen/window width
+        if (side != null) {
+            side.prefWidthProperty().bind(mainBorderPane.widthProperty().multiply(0.25));
+            side.setMinWidth(250); // Prevent getting too small to read
+            side.setMaxWidth(360); // Prevent getting too large on big screens
+        }
+
         setupDashboard();
         changeView("dashboard_home.fxml", 1);
     }

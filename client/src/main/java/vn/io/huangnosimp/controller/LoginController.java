@@ -109,7 +109,7 @@ public class LoginController {
                                             UserSession.addJoiningCard(joinedRooms);
 
                                             changeMainStage("dashboard.fxml");
-                                            SceneManager.getStage().setMaximized(true);
+
                                         });
                                         return null;
                                     });
