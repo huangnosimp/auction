@@ -56,14 +56,11 @@ import static vn.io.huangnosimp.Manager.ViewManager.*;
 public class DashboardController implements Initializable, IServerMessageListener {
     @FXML private BorderPane mainBorderPane;
     @FXML private javafx.scene.layout.AnchorPane side;
-    @FXML private StackPane contentArea;
     @FXML private Button btnOpenSlots;
     @FXML private Button btnInventory;
     @FXML private HBox menuHbox;
-    @FXML private VBox sideVbox;
     @FXML private Label lblBalance;
     @FXML private Label lblBalanceChange;
-    private boolean isInitialized = false;
 
     @FXML private HBox toastBox;
     @FXML private Label toastTitle, toastSub, toastIconLabel;
@@ -73,8 +70,6 @@ public class DashboardController implements Initializable, IServerMessageListene
     @FXML private Label outbidBadge;
     @FXML private VBox autoBidList;
     @FXML private Label autoBidBadge;
-
-    public static DashboardController instance;
 
     @FXML
     public void handleMenuAction(ActionEvent event) {
@@ -373,7 +368,6 @@ public class DashboardController implements Initializable, IServerMessageListene
         updateOutbidBadge();
         addAutoBidCardToUI();
         updateAutoBidBadge();
-        isInitialized = true;
     }
 
     public void updateBalance(double amount, double diffAmount, boolean isRefund){
@@ -512,7 +506,6 @@ public class DashboardController implements Initializable, IServerMessageListene
                     }
                     addOrUpdateOutbidItem(auctionId, productName, currentPrice);
 
-                    // Hoàn lại tiền bid cũ khi bị outbid (Server đã unfreeze)
                     double previousBid = UserSession.getLatestBid(auctionId);
                     if (previousBid > 0) {
                         UserSession.addBalance(previousBid);
@@ -553,11 +546,10 @@ public class DashboardController implements Initializable, IServerMessageListene
         ControllerManager.setDashboardController(this);
         SocketManager.getClient().addListener(this);
 
-        // Bind sidebar (left part) dynamically to 25% of the total screen/window width
         if (side != null) {
             side.prefWidthProperty().bind(mainBorderPane.widthProperty().multiply(0.25));
-            side.setMinWidth(250); // Prevent getting too small to read
-            side.setMaxWidth(360); // Prevent getting too large on big screens
+            side.setMinWidth(250);
+            side.setMaxWidth(360);
         }
 
         setupDashboard();

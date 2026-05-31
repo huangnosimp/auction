@@ -37,8 +37,16 @@
                         <!-- Khi nhấn Enter ở đây, hàm handleEmailEnter sẽ được gọi để nhảy sang ô tiếp theo -->
                         <TextField fx:id="emailField" onAction="#handleEmailEnter" promptText="Email or Username" styleClass="input-field" />
 
-                        <!-- Khi nhấn Enter ở đây, hàm handleLogin sẽ thực hiện đăng nhập -->
-                        <PasswordField fx:id="passwordField" onAction="#handleLogin" promptText="Password" styleClass="input-field" />
+                        <!-- Vùng mật khẩu lồng nhau -->
+                        <StackPane>
+                            <children>
+                                <!-- Khi nhấn Enter ở đây, hàm handleLogin sẽ thực hiện đăng nhập -->
+                                <PasswordField fx:id="passwordField" onAction="#handleLogin" promptText="Password" styleClass="input-field" />
+                                <TextField fx:id="passwordTextField" onAction="#handleLogin" promptText="Password" styleClass="input-field" visible="false" managed="false" />
+                            </children>
+                        </StackPane>
+                        
+                        <CheckBox fx:id="showPasswordCheck" onAction="#togglePasswordVisibility" text="Show Password" />
                     </children>
                 </VBox>
 

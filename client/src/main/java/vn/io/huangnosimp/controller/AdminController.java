@@ -52,8 +52,6 @@ public class AdminController implements Initializable {
     @FXML private TableColumn<AuctionAdminDTO, String> colStatus;
     @FXML private TableColumn<AuctionAdminDTO, String> colWinnerName;
 
-    @FXML private TableColumn<AuctionAdminDTO, Void> colAuctionAction;
-
     private AdminNetworkService networkService;
 
     private Timeline autoRefreshTimeline;
@@ -69,6 +67,12 @@ public class AdminController implements Initializable {
         }));
         autoRefreshTimeline.setCycleCount(Timeline.INDEFINITE); // Chạy lặp đi lặp lại mãi mãi
         autoRefreshTimeline.play();
+
+        lblSystemRevenue.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene == null) {
+                stopAutoRefresh();
+            }
+        });
     }
 
     public void stopAutoRefresh() {
